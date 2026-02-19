@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-t-4 border-green-500">
+    <h2 class="text-3xl font-bold text-center text-blue-800 mb-6">Palpitoo</h2>
+    
+    <form class="flex flex-col gap-4">
+      <input 
+        type="email" 
+        placeholder="E-mail" 
+        required
+        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+      <input 
+        type="password" 
+        placeholder="Senha" 
+        required
+        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+      <button type="button" class="bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition">
+        Entrar
+      </button>
+    </form>
+
+    <p class="text-center mt-4 text-sm text-gray-600">
+      Ainda não tem conta? 
+      <a href="#" class="text-blue-600 font-bold hover:underline">Cadastre-se</a>
+    </p>
+  </div>
+
+</body>
+</html>
