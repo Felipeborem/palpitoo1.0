@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Perfil e Sobre</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <header class="cabecalho-palpitoo">
+    <div class="logo-container">
+      <div class="logo-circle"></div>
+      <h1 class="logo-text font-russo">PalpitoO</h1>
+    </div>
+    
+    <nav>
+      <ul class="nav-links">
+        <li><a href="_index.html">Ligas</a></li> 
+        <li><a href="palpites.html">Palpites</a></li>
+        <li><a href="#">Novidades</a></li>
+        <li><a href="#">Social</a></li>
+        <li><a href="#">Carreira</a></li>
+        <li><a href="#">Ranking</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container-principal" style="max-width: 600px; margin-top: 60px;">
+    
+    <section class="cartao bg-escuro animacao-suave text-center">
+      
+      <div class="mb-20">
+        <img src="https://via.placeholder.com/120" alt="Foto do usuário" class="foto-perfil" style="width: 120px; height: 120px; margin: 0 auto;">
+        <h2 class="font-russo titulo-branco mt-15" style="font-size: 28px;">Roda</h2>
+        <p style="color: var(--text-gray); font-size: 14px; margin-top: 5px;">Membro da Arena desde: Temporada 1</p>
+      </div>
+
+      <div class="divisor-tracejado mb-20"></div>
+
+      <form class="text-left" style="max-width: 400px; margin: 0 auto;">
+        
+        <div class="form-group">
+          <label>E-MAIL</label>
+          <input type="email" value="roda@palpitoo.com" readonly style="opacity: 0.6; cursor: not-allowed;">
+        </div>
+        
+        <div class="form-group">
+          <label>TIME DO CORAÇÃO</label>
+          <input type="text" placeholder="Ex: Flamengo, Vasco, São Paulo...">
+        </div>
+        
+        <div class="form-group">
+          <label>SOBRE MIM (Frase de Efeito)</label>
+          <input type="text" placeholder="Deixe seu recado para os rivais...">
+        </div>
+
+        <button type="button" class="btn-primary" style="margin-top: 30px;">Salvar Alterações</button>
+        
+        <a href="login.html" class="btn btn-cancelar font-russo mt-15" style="display: block; text-align: center; text-decoration: none;">Sair da Conta</a>
+        
+      </form>
+    </section>
+
+  </main>
+
+</body>
+</html>

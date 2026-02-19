@@ -1,0 +1,627 @@
+/* =========================================
+   IMPORTAÇÃO DE FONTES
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Teko:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap');
+
+/* =========================================
+   VARIÁVEIS DE CORES (NOVA PALETA VINHO/PRETO)
+   ========================================= */
+:root {
+  /* Cores Principais baseadas na sua escolha VIP */
+  --bg-dark: #0F0F0F;          /* Base: Preto fosco */
+  --bg-header: #181818;        /* Cabeçalho: Cinza carvão */
+  --card-light: #181818;       /* Cards: Cinza carvão */
+  --card-dark: #181818;        /* Cards: Cinza carvão */
+  
+  --accent-cyan: #7A1E3A;      /* Destaque principal: Vinho fechado */
+  --accent-green: #2E7D32;     /* Sucesso: Verde discreto */
+  
+  --text-white: #F1F1F1;       /* Texto: Branco gelo */
+  --text-gray: #9A9A9A;        /* Secundário: Cinza */
+  --text-dark: #F1F1F1;        /* Adaptado para o tema dark */
+  
+  --borda-divisoria: #262626;  /* Bordas: Cinza um tom acima do cartão para separar sutilmente */
+
+  /* Mapeamento das variáveis do Dashboard antigo */
+  --ink-black: #0F0F0F;        /* Fundo do dashboard */
+  --bg-cartao-escuro: #181818; /* Fundo dos cartões */
+  --mint-cream: #181818;       /* Fundo dos cartões "claros" */
+  --emerald: #2E7D32;          /* Verde discreto nos acertos e ícones */
+  --vermelho: #8B1E1E;         /* Erro: Vermelho escuro */
+  --dourado: #7A1E3A;          /* Destaques (status, relógio, inputs) usam o Vinho fechado */
+  --azul-texto: #9A9A9A;       /* Subtítulos usam o cinza secundário */
+
+  /* Fontes Globais */
+  --font-main: 'Montserrat', sans-serif;
+  --font-display: 'Teko', sans-serif;
+}
+
+/* =========================================
+   RESET E CONFIGURAÇÕES GERAIS
+   ========================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-russo { 
+  font-family: 'Russo One', sans-serif; 
+}
+
+/* =========================================
+   CLASSES UTILITÁRIAS (Helpers)
+   ========================================= */
+.mt-10 { margin-top: 10px; }
+.mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-15 { margin-bottom: 15px; }
+.mb-20 { margin-bottom: 20px; }
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.lh-grande { line-height: 1.6; }
+
+/* =========================================
+   NAVBAR (CABEÇALHO)
+   ========================================= */
+.navbar, .cabecalho-palpitoo {
+  background-color: var(--bg-header);
+  color: var(--text-white);
+  padding: 12px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--borda-divisoria); 
+  position: relative;
+  z-index: 50;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--accent-cyan); /* Círculo em vinho */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.5rem;
+}
+
+.logo-text {
+  font-weight: 900;
+  font-size: 1.8rem;
+  letter-spacing: -1px;
+}
+
+.nav-menu, .nav-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+.nav-link, .nav-links a {
+  text-decoration: none;
+  color: var(--text-gray); 
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+}
+
+.nav-link:hover, .nav-links a:hover {
+  color: var(--accent-cyan);
+}
+
+.nav-link.active, .nav-links a.ativo {
+  background-color: var(--bg-dark); /* Botão ativo no menu fica Preto Fosco */
+  color: var(--text-white);
+}
+
+/* =========================================
+   MAIN HERO SECTION (Página Inicial de Login)
+   ========================================= */
+.hero-section {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 48px 24px;
+}
+
+.glow-blue {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 250px;
+  height: 250px;
+  background-color: var(--borda-divisoria);
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.3;
+}
+
+.glow-green {
+  position: absolute;
+  bottom: 10%;
+  right: 10%;
+  width: 300px;
+  height: 300px;
+  background-color: var(--accent-cyan); /* Brilho em Vinho */
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15; 
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (min-width: 992px) {
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.subtitle {
+  font-family: var(--font-display);
+  color: var(--accent-cyan);
+  font-size: 2rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.main-title {
+  font-weight: 900;
+  font-size: 3.5rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.text-gradient {
+  background: linear-gradient(to right, var(--text-white), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  color: var(--text-gray);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 450px;
+}
+
+.feature-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 400px;
+}
+
+.feature-card {
+  background-color: var(--card-dark);
+  border: 1px solid var(--borda-divisoria); 
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.feature-icon {
+  font-family: var(--font-display);
+  font-size: 2rem;
+}
+
+.feature-icon.green { color: var(--accent-cyan); }
+.feature-icon.blue { color: var(--text-gray); }
+
+.feature-title {
+  font-size: 0.75rem;
+  color: var(--text-gray);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* =========================================
+   CARD DE LOGIN
+   ========================================= */
+.login-area {
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 992px) {
+  .login-area {
+    justify-content: flex-end;
+  }
+}
+
+.login-card {
+  background-color: var(--card-light);
+  color: var(--text-white);
+  padding: 40px;
+  border-radius: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--borda-divisoria);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-header h3 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  text-transform: uppercase;
+}
+
+.login-header p {
+  color: var(--text-gray);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.form-group { margin-bottom: 20px; }
+.form-group.hidden { display: none; }
+
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-gray);
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--bg-dark); 
+  border: 2px solid var(--borda-divisoria);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-white);
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  border-color: var(--accent-cyan); /* Borda fica Vinho ao digitar */
+}
+
+/* O botão de entrar mantemos no verde discreto de Sucesso para criar um contraponto legal com o Vinho */
+.btn-primary {
+  width: 100%;
+  background-color: var(--accent-green);
+  color: var(--text-white);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #1B5E20; /* Tom mais escuro do verde discreto no hover */
+  transform: translateY(-2px);
+}
+
+.login-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--borda-divisoria);
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-gray);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--text-white);
+  font-weight: 900;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.875rem;
+  margin-left: 4px;
+}
+
+.btn-link:hover {
+  color: var(--accent-cyan);
+}
+
+/* =========================================
+   ESTRUTURA GRID (DASHBOARD)
+   ========================================= */
+.container-principal {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 280px; 
+  gap: 30px;
+  align-items: start;
+}
+
+.cartao {
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6); 
+  border: 1px solid var(--borda-divisoria); 
+}
+
+.animacao-suave {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.animacao-suave:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+  border-color: var(--accent-cyan); /* Borda brilha em Vinho ao passar o mouse */
+}
+
+.bg-claro, .bg-escuro {
+  background-color: var(--bg-cartao-escuro);
+  color: var(--text-white);
+}
+
+.bg-claro {
+  border-top-left-radius: 60px;
+}
+
+.perfil-topo { display: flex; align-items: center; gap: 15px; }
+.foto-perfil {
+  width: 65px; height: 65px; border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--borda-divisoria);
+}
+.titulo-azul { font-size: 20px; color: var(--text-gray); }
+
+.linha-divisoria { border: none; border-top: 2px solid var(--borda-divisoria); }
+
+.lista-desempenho { list-style: none; }
+.lista-desempenho li {
+  display: flex; align-items: center; gap: 15px; margin-bottom: 12px;
+  font-size: 18px; padding: 5px; border-radius: 8px; transition: background 0.2s ease;
+}
+.lista-desempenho li:hover { background: var(--borda-divisoria); }
+
+.icone { font-size: 20px; }
+.icone-grande { font-size: 32px; filter: grayscale(100%); opacity: 0.6; }
+
+.aproveitamento-box {
+  display: flex; align-items: center; gap: 15px;
+  background: var(--bg-dark); 
+  padding: 15px; border-radius: 12px;
+  border: 1px solid var(--borda-divisoria);
+}
+
+.final-linha { margin-top: 40px; margin-bottom: 20px;}
+.perfil-rodape { display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; color: var(--text-gray); }
+.texto-hover { transition: color 0.2s ease; }
+.perfil-rodape:hover .texto-hover { color: var(--text-white); }
+
+.texto-centralizado { text-align: center; }
+
+.divisor-tracejado {
+  width: 100%; height: 2px;
+  background-image: linear-gradient(to right, var(--borda-divisoria) 50%, transparent 50%);
+  background-size: 15px 2px; background-repeat: repeat-x;
+}
+
+.destaque-dourado { color: var(--accent-cyan); font-size: 18px; margin: 5px 0; }
+.brilha-suave { text-shadow: 0 0 12px rgba(122, 30, 58, 0.5); } /* Aura Vinho */
+
+.destaque-status { 
+  background: var(--bg-dark); 
+  border: 1px solid var(--borda-divisoria);
+  display: inline-block; padding: 8px 20px; border-radius: 20px; 
+}
+
+.tabelona-container { display: inline-block; width: 100%; padding: 0 20px;}
+.tabelona-lista { list-style: none; }
+.item-interativo { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 15px; padding: 8px 15px; border-radius: 8px; transition: all 0.2s ease; cursor: default; }
+.item-interativo:hover { background: var(--bg-dark); transform: translateX(5px); }
+
+.quadrado { width: 14px; height: 14px; display: inline-block; border-radius: 4px; }
+.verde { background-color: var(--accent-green); }
+.amarelo { background-color: #eab308; } 
+.laranja { background-color: #f97316; }
+.vermelho { background-color: var(--vermelho); }
+
+.coluna-destaques { display: flex; flex-direction: column; }
+.titulo-branco { font-size: 18px; }
+.cor-emerald { color: var(--accent-cyan); margin-top: 5px; } 
+.cor-vermelha { color: var(--vermelho); margin-top: 5px; } 
+.efeito-texto { font-size: 16px; transition: transform 0.2s ease; }
+.bloco-destaque:hover .efeito-texto { transform: scale(1.05) translateX(5px); }
+.caixa-chat { flex-grow: 1; display: flex; align-items: center; justify-content: center; text-align: center; opacity: 0.5; }
+
+/* =========================================
+   PÁGINA DE PALPITES - ESTILOS ESPECÍFICOS
+   ========================================= */
+.container-palpites { 
+  display: flex; 
+  gap: 30px; 
+}
+
+.cartao-palpite {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.subtitulo-tempo { 
+  font-family: 'Russo One', sans-serif; 
+  font-size: 13px; 
+  color: var(--accent-cyan); 
+  opacity: 0.8;
+  margin-top: 5px;
+}
+
+.linha-jogo {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; 
+  align-items: center;
+  gap: 15px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--borda-divisoria); 
+}
+
+.linha-jogo:last-child {
+  border-bottom: none;
+}
+
+.nome-time {
+  font-size: 16px;
+  color: var(--text-white);
+}
+
+.time-casa { text-align: right; } 
+.time-fora { text-align: left; }  
+
+.area-placar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-dark); 
+  padding: 5px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--borda-divisoria);
+}
+
+.versus {
+  font-size: 14px;
+  color: var(--text-gray);
+  font-family: 'Russo One', sans-serif;
+}
+
+/* =========================================
+   INPUTS (Campos de Placar Minimalistas)
+   ========================================= */
+.input-placar {
+  width: 45px;
+  height: 45px;
+  background-color: var(--bg-cartao-escuro); 
+  border: 1px solid var(--borda-divisoria); 
+  border-radius: 8px;
+  color: var(--accent-cyan); /* Números em Vinho Fechado */
+  font-size: 20px;
+  text-align: center; 
+  outline: none; 
+  transition: all 0.3s ease;
+}
+
+.input-placar:focus {
+  border-color: var(--accent-cyan);
+  background-color: var(--bg-dark);
+  box-shadow: 0 0 10px rgba(122, 30, 58, 0.3); /* Sombra de foco em Vinho */
+  transform: scale(1.05); 
+}
+
+.input-placar::-webkit-outer-spin-button,
+.input-placar::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.input-placar[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* =========================================
+   BOTÕES DE AÇÃO (Página de Palpites)
+   ========================================= */
+.botoes-acao {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: auto; 
+  padding-top: 20px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 700;
+}
+
+/* Botão Vermelho (Cancelar/Limpar) */
+.btn-cancelar {
+  background-color: transparent; 
+  color: var(--vermelho);
+  border: 1px solid var(--vermelho);
+}
+.btn-cancelar:hover {
+  background-color: var(--vermelho);
+  color: var(--text-white);
+}
+
+/* Botão Verde (Salvar Palpites) - Usando o Verde Discreto de sucesso */
+.btn-salvar {
+  background-color: var(--accent-green);
+  color: var(--text-white); 
+  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
+}
+.btn-salvar:hover {
+  background-color: #1B5E20; /* Escurece o verde ao focar */
+  transform: translateY(-2px); 
+}
+
+.area-vazia {
+  flex-grow: 1; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  opacity: 0.5; 
+}

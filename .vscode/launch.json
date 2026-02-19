@@ -1,11 +1,12 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         {
-            "type": "chrome",
+            "type": "msedge",
             "request": "launch",
             "name": "Rodar Palpito no Chrome",
-            "file": "${workspaceFolder}/frontend/src/pages/index.html"
+            "file": "C:\\Users\\Pichau\\Desktop\\projeto\\palpitoo1.0\\palpitoo1.0\\frontend\\src\\pages\\_index.html"
         }
     ]
 }

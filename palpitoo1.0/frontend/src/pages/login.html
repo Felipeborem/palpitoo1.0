@@ -3,37 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palpitoo - Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Palpitoo - Entrar</title>
+  <link rel="stylesheet" href="./css/style.css">
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="hero-section"> 
+  <div class="glow-green"></div>
 
-  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-t-4 border-green-500">
-    <h2 class="text-3xl font-bold text-center text-blue-800 mb-6">Palpitoo</h2>
-    
-    <form class="flex flex-col gap-4">
-      <input 
-        type="email" 
-        placeholder="E-mail" 
-        required
-        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-      <input 
-        type="password" 
-        placeholder="Senha" 
-        required
-        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-      <button type="button" class="bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition">
-        Entrar
-      </button>
-    </form>
+  <div class="container login-area" style="justify-content: center;">
+    <div class="login-card animacao-suave">
+      
+      <div class="login-header">
+        <h3 class="font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h3>
+        <p>A Arena te espera, Craque.</p>
+      </div>
 
-    <p class="text-center mt-4 text-sm text-gray-600">
-      Ainda não tem conta? 
-      <a href="#" class="text-blue-600 font-bold hover:underline">Cadastre-se</a>
-    </p>
+      <form id="form-login">
+        <div class="form-group">
+          <label>E-MAIL</label>
+          <input type="email" placeholder="exemplo@email.com" required> </div>
+        <div class="form-group">
+          <label>SENHA</label>
+          <input type="password" placeholder="••••••••" required>
+        </div>
+        
+        <button type="submit" class="btn-primary">Acessar Arena</button>
+      </form>
+
+      <div class="login-footer">
+        Ainda não é membro? <button class="btn-link">Cadastre-se</button>
+      </div>
+    </div>
   </div>
 
+  <script>
+    // Passo 1: O JavaScript procura no documento HTML pelo formulário que tem o ID 'form-login'
+    const formulario = document.getElementById('form-login');
+
+    // Passo 2: Adicionamos um "ouvinte" que fica esperando o formulário ser enviado (submit)
+    formulario.addEventListener('submit', function(evento) {
+      
+      // Passo 3: O comportamento padrão de um formulário é recarregar a página. Nós cancelamos isso com o preventDefault!
+      evento.preventDefault(); 
+      
+      // Passo 4: Redirecionamos o usuário para a página inicial (dashboard). 
+      // NOTA: Coloquei "_index.html" porque é o nome exato do arquivo que você enviou.
+      window.location.href = '_index.html'; 
+    });
+  </script>
 </body>
 </html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Palpites</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <header class="cabecalho-palpitoo">
+    <div class="logo-container">
+      <div class="logo-circle"></div>
+      <h1 class="logo-text font-russo">PalpitoO</h1>
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Ligas</a></li>
+        <li><a href="palpites.html" class="ativo">Palpites</a></li> <li><a href="#">Novidades</a></li>
+        <li><a href="#">Social</a></li>
+        <li><a href="#">Carreira</a></li>
+        <li><a href="#">Ranking</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container-principal container-palpites">
+    
+    <section class="cartao bg-escuro cartao-palpite animacao-suave">
+      
+      <div class="cabecalho-palpite mb-20">
+        <h2 class="font-russo titulo-branco text-center">Palpites Brah.bet</h2>
+        <p class="subtitulo-tempo text-center">⏳ 3h até fim dos palpites</p>
+      </div>
+      
+      <div class="lista-jogos">
+        
+        <div class="linha-jogo">
+          <span class="nome-time time-casa">Flamengo</span>
+          
+          <div class="area-placar">
+            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
+            <span class="versus">x</span>
+            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
+          </div>
+          
+          <span class="nome-time time-fora text-left">Internacional</span>
+        </div>
+
+        <div class="linha-jogo">
+          <span class="nome-time time-casa">Bragantino</span>
+          <div class="area-placar">
+            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
+            <span class="versus">x</span>
+            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
+          </div>
+          <span class="nome-time time-fora text-left">Atlético MG</span>
+        </div>
+
+        <div class="linha-jogo">
+          <span class="nome-time time-casa">Remo</span>
+          <div class="area-placar">
+            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
+            <span class="versus">x</span>
+            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
+          </div>
+          <span class="nome-time time-fora text-left">Mirassol</span>
+        </div>
+
+      </div>
+
+      <div class="botoes-acao mt-20">
+        <button class="btn btn-cancelar font-russo">Limpar</button>
+        <button class="btn btn-salvar font-russo">Salvar Palpites</button>
+      </div>
+    </section>
+
+    <section class="cartao bg-escuro cartao-palpite animacao-suave">
+      <div class="cabecalho-palpite mb-20">
+        <h2 class="font-russo titulo-branco text-center">Palpites liga 2</h2>
+        <p class="subtitulo-tempo text-center">⏳ 12h até fim dos palpites</p>
+      </div>
+      
+      <div class="area-vazia">
+        <p>Jogos ainda não liberados.</p>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

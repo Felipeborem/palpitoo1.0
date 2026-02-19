@@ -1,0 +1,39 @@
+Fundo Principal (Azul Escuro):
+
+Classe Tailwind: bg-blue-900
+
+Cor Hexadecimal aproximada: #1e3a8a
+
+Destaques em Verde (Textos como "entende de futebol!" e o "too" do logo):
+
+Classe Tailwind: text-green-400
+
+Cor Hexadecimal aproximada: #4ade80
+
+Botão Principal ("Começar a Palpitar" e o botão verde no topo):
+
+Classe Tailwind: bg-green-500
+
+Cor Hexadecimal aproximada: #22c55e
+
+Botão Secundário ("Saiba Mais"):
+
+Classe Tailwind: bg-blue-800
+
+Cor Hexadecimal aproximada: #1e40af
+
+Texto de Apoio (O parágrafo abaixo do título):
+
+Classe Tailwind: text-blue-100
+
+Cor Hexadecimal aproximada: #dbeafe
+
+Fundo da Seção Inferior ("Como o Palpitoo funciona?"):
+
+Classe Tailwind: bg-white (Branco puro #ffffff)
+
+Título da Seção Inferior:
+
+Classe Tailwind: text-blue-900
+
+Cor Hexadecimal aproximada: #1e3a8a
