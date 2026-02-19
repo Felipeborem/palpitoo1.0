@@ -37,3 +37,11 @@ Título da Seção Inferior:
 Classe Tailwind: text-blue-900
 
 Cor Hexadecimal aproximada: #1e3a8a
+
+
+
+
+
+FAZER DEPOIS DO DIA 19/02
+
+CRIAR A TELA DE LOGIN PARA ENTRAR, CADASTRO JA FOI FEITO

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Cadastro de Craque</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-t-4 border-green-500">
+    <h2 class="text-3xl font-bold text-center text-blue-800 mb-6">Palpitoo</h2>
+    
+    <form id="meuFormulario" class="flex flex-col gap-4">
+      <input 
+        id="campoNome"
+        type="text" 
+        placeholder="Seu Nome de Craque" 
+        required
+        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+
+      <input 
+        id="campoEmail"
+        type="email" 
+        placeholder="E-mail" 
+        required
+        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+      
+      <input 
+        id="campoSenha"
+        type="password" 
+        placeholder="Senha" 
+        required
+        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+      <input 
+        id="campoTime"
+        type="text" 
+        placeholder="Time do Coração"
+        required
+        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+
+      <button
+        type="button" 
+        onclick="enviarDados()"
+        class="bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition"
+      >
+        Criar Minha Conta
+      </button>
+    </form>
+
+    <p class="text-center mt-4 text-sm text-gray-600">
+      Já tem conta? 
+      <a href="login.html" class="text-blue-600 font-bold hover:underline">Entrar</a>
+    </p>
+  </div>
+
+  <script>
+    async function enviarDados() {
+      // 1. Capturamos os 4 campos agora! [cite: 6, 14]
+      const nome = document.getElementById('campoNome').value;
+      const email = document.getElementById('campoEmail').value;
+      const senha = document.getElementById('campoSenha').value;
+      const time_favorito = document.getElementById('campoTime').value;
+      // Verificação de segurança
+      if (!nome || !email || !senha) {
+        alert("Preencha todos os campos para entrar em campo!");
+        return;
+      }
+
+      try {
+        // 2. O fetch envia os dados para a rota /cadastro do seu servidor [cite: 39]
+        const resposta = await fetch('http://localhost:3000/cadastro', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            nome: nome, 
+            email: email, 
+            senha: senha,
+            time: time_favorito, 
+          })
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+          alert("✅ " + resultado.mensagem);
+          // Limpa o formulário após o sucesso
+          document.getElementById('meuFormulario').reset();
+          console.log("Sucesso no banco:", resultado.usuario);
+        } else {
+          alert("❌ Ops: " + resultado.erro);
+        }
+
+      } catch (error) {
+        console.error("Erro na conexão:", error);
+        alert("Servidor desligado! Verifique se deu 'node server.js' no terminal.");
+      }
+    }
+  </script>
+
+</body>
+</html>

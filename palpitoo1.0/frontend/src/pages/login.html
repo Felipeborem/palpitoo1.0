@@ -3,52 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palpitoo - Entrar</title>
-  <link rel="stylesheet" href="./css/style.css">
+  <title>Palpitoo - Entrar no Jogo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="hero-section"> 
-  <div class="glow-green"></div>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-  <div class="container login-area" style="justify-content: center;">
-    <div class="login-card animacao-suave">
+  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-t-4 border-blue-600">
+    <h2 class="text-3xl font-bold text-center text-blue-800 mb-2">Palpitoo</h2>
+    <p class="text-center text-gray-500 mb-6">Entre com sua conta de craque</p>
+
+    <form id="meuFormulario" class="flex flex-col gap-4">
       
-      <div class="login-header">
-        <h3 class="font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h3>
-        <p>A Arena te espera, Craque.</p>
-      </div>
+      <input 
+        id="campoEmail"
+        type="email" 
+        placeholder="Seu E-mail" 
+        required
+        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+      
+      <input 
+        id="campoSenha"
+        type="password" 
+        placeholder="Sua Senha" 
+        required
+        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
 
-      <form id="form-login">
-        <div class="form-group">
-          <label>E-MAIL</label>
-          <input type="email" placeholder="exemplo@email.com" required> </div>
-        <div class="form-group">
-          <label>SENHA</label>
-          <input type="password" placeholder="••••••••" required>
-        </div>
-        
-        <button type="submit" class="btn-primary">Acessar Arena</button>
-      </form>
+      <button
+        type="button" 
+        onclick="fazerLogin()"
+        class="bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition mt-2"
+      >
+        Entrar
+      </button>
+    </form>
 
-      <div class="login-footer">
-        Ainda não é membro? <button class="btn-link">Cadastre-se</button>
-      </div>
-    </div>
+    <p class="text-center mt-6 text-sm text-gray-600">
+      Ainda não tem conta? <a href="cadastro.html" class="text-blue-600 font-bold hover:underline">Cadastre-se</a>
+    </p>
   </div>
 
   <script>
-    // Passo 1: O JavaScript procura no documento HTML pelo formulário que tem o ID 'form-login'
-    const formulario = document.getElementById('form-login');
+    async function fazerLogin() {
+      // 1. Capturamos os dados (apenas email e senha agora)
+      const email = document.getElementById('campoEmail').value;
+      const senha = document.getElementById('campoSenha').value;
 
-    // Passo 2: Adicionamos um "ouvinte" que fica esperando o formulário ser enviado (submit)
-    formulario.addEventListener('submit', function(evento) {
-      
-      // Passo 3: O comportamento padrão de um formulário é recarregar a página. Nós cancelamos isso com o preventDefault!
-      evento.preventDefault(); 
-      
-      // Passo 4: Redirecionamos o usuário para a página inicial (dashboard). 
-      // NOTA: Coloquei "_index.html" porque é o nome exato do arquivo que você enviou.
-      window.location.href = '_index.html'; 
-    });
+      // Verificação simples
+      if (!email || !senha) {
+        alert("Ei! Preencha e-mail e senha para entrar.");
+        return;
+      }
+
+      try {
+        // 2. IMPORTANTE: Mudamos o link para /login
+        const resposta = await fetch('http://localhost:3000/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            email: email, 
+            senha: senha 
+          })
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+            alert("✅ " + resultado.mensagem);
+              
+              // 1. Guardamos o nome do craque para usar na index
+              localStorage.setItem('usuarioNome', resultado.usuario.nome);
+              
+              // 2. O comando que faz a mágica:
+              window.location.href = '_index.html';
+        } else {
+          // Exibe o erro de "E-mail ou senha incorretos" vindo do servidor
+          alert("❌ " + resultado.erro);
+        }
+
+      } catch (error) {
+        console.error("Erro na conexão:", error);
+        alert("Ih! O servidor está desligado. Ligue o node server.js!");
+      }
+    }
   </script>
+
 </body>
 </html>
