@@ -73,13 +73,17 @@
 
         if (resposta.ok) {
             alert("✅ " + resultado.mensagem);
-              
-              // 1. Guardamos o nome do craque para usar na index
-              localStorage.setItem('usuarioNome', resultado.usuario.nome);
-              
-              // 2. O comando que faz a mágica:
-              window.location.href = '_index.html';
-        } else {
+            
+            // O servidor devolveu: resultado.usuario.nome e resultado.usuario.time
+            // Nós guardamos na memória com as chaves: 'nome_craque' e 'time_craque'
+            localStorage.setItem('nome_craque', resultado.usuario.nome);
+            localStorage.setItem('time_craque', resultado.usuario.time);
+            localStorage.setItem('email_craque', resultado.usuario.email); // Essencial para a foto!
+        
+            localStorage.setItem('foto_craque', resultado.usuario.foto);
+            // E então manda para a index
+            window.location.href = '_index.html'; 
+          } else {
           // Exibe o erro de "E-mail ou senha incorretos" vindo do servidor
           alert("❌ " + resultado.erro);
         }

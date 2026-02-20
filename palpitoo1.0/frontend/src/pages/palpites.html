@@ -35,47 +35,18 @@
         <h2 class="font-russo titulo-branco text-center">Palpites Brah.bet</h2>
         <p class="subtitulo-tempo text-center">⏳ 3h até fim dos palpites</p>
       </div>
-      
-      <div class="lista-jogos">
-        
-        <div class="linha-jogo">
-          <span class="nome-time time-casa">Flamengo</span>
-          
-          <div class="area-placar">
-            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
-            <span class="versus">x</span>
-            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
-          </div>
-          
-          <span class="nome-time time-fora text-left">Internacional</span>
-        </div>
 
-        <div class="linha-jogo">
-          <span class="nome-time time-casa">Bragantino</span>
-          <div class="area-placar">
-            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
-            <span class="versus">x</span>
-            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
-          </div>
-          <span class="nome-time time-fora text-left">Atlético MG</span>
-        </div>
 
-        <div class="linha-jogo">
-          <span class="nome-time time-casa">Remo</span>
-          <div class="area-placar">
-            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
-            <span class="versus">x</span>
-            <input type="number" class="input-placar font-russo" placeholder="0" min="0">
-          </div>
-          <span class="nome-time time-fora text-left">Mirassol</span>
-        </div>
-
+<!-- DIV PRINCIPAL DE LISTAS DE JOGOS-->
+      <div class="lista-jogos" id="container-jogos">
+        <p class="text-center text-white font-russo mt-10">Carregando jogos do banco de dados...</p>
       </div>
 
       <div class="botoes-acao mt-20">
-        <button class="btn btn-cancelar font-russo">Limpar</button>
-        <button class="btn btn-salvar font-russo">Salvar Palpites</button>
+        <button class="btn btn-cancelar font-russo" onclick="limparPalpites()">Limpar</button>
+        <button class="btn btn-salvar font-russo" onclick="enviarTodosPalpites()">Salvar Palpites</button>
       </div>
+
     </section>
 
     <section class="cartao bg-escuro cartao-palpite animacao-suave">
@@ -90,5 +61,92 @@
     </section>
 
   </main>
+<script>
+  // Variável global para lembrarmos quais jogos estão na tela
+  let jogosCarregados = [];
+
+  // 1. FUNÇÃO QUE BUSCA E DESENHA OS JOGOS
+  async function carregarJogos() {
+    try {
+      const resposta = await fetch('http://localhost:3000/jogos');
+      jogosCarregados = await resposta.json();
+      
+      const container = document.getElementById('container-jogos');
+      container.innerHTML = ''; // Limpa a mensagem de carregando
+
+      if (jogosCarregados.length === 0) {
+        container.innerHTML = '<p class="text-center text-white font-russo mt-10">Nenhum jogo liberado ainda.</p>';
+        return;
+      }
+
+      // Desenha o HTML usando as SUAS classes CSS para cada jogo do banco
+      jogosCarregados.forEach(jogo => {
+        container.innerHTML += `
+          <div class="linha-jogo">
+            <span class="nome-time time-casa">${jogo.time_casa}</span>
+            
+            <div class="area-placar">
+              <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0">
+              <span class="versus">x</span>
+              <input type="number" id="fora_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0">
+            </div>
+            
+            <span class="nome-time time-fora text-left">${jogo.time_fora}</span>
+          </div>
+        `;
+      });
+    } catch (erro) {
+      console.error("Erro ao buscar jogos:", erro);
+      document.getElementById('container-jogos').innerHTML = '<p class="text-center text-red-500 font-russo mt-10">Erro ao conectar com o servidor.</p>';
+    }
+  }
+
+  // 2. FUNÇÃO QUE RECOLHE OS DADOS DIGITADOS
+  async function enviarTodosPalpites() {
+    // Puxa o ID do usuário que guardamos no Login!
+    const idUsuario = localStorage.getItem('craqueId'); 
+    
+    if (!idUsuario) {
+      alert("Você precisa estar logado para salvar seus palpites!");
+      return;
+    }
+
+    const palpitesParaSalvar = [];
+
+    // Passa por todos os jogos que estão na tela
+    jogosCarregados.forEach(jogo => {
+      const inputCasa = document.getElementById(`casa_${jogo.id_jogo}`).value;
+      const inputFora = document.getElementById(`fora_${jogo.id_jogo}`).value;
+
+      // Só cria o palpite se o cara digitou números nos dois campos
+      if (inputCasa !== "" && inputFora !== "") {
+        palpitesParaSalvar.push({
+          id_jogo: jogo.id_jogo,
+          id_usuario: idUsuario,
+          gols_casa: parseInt(inputCasa),
+          gols_fora: parseInt(inputFora)
+        });
+      }
+    });
+
+    if (palpitesParaSalvar.length === 0) {
+      alert("Preencha pelo menos um placar para salvar!");
+      return;
+    }
+
+    // Aqui é onde enviaremos pro servidor (faremos isso no próximo passo)
+    console.log("📦 Pacote de palpites pronto para envio:", palpitesParaSalvar);
+    alert("Abra o F12 (Console) para ver os dados sendo capturados perfeitamente!");
+  }
+
+  // 3. FUNÇÃO DO BOTÃO LIMPAR
+  function limparPalpites() {
+    const inputs = document.querySelectorAll('.input-placar');
+    inputs.forEach(input => input.value = '');
+  }
+
+  // Aciona a busca de jogos assim que a página carrega
+  carregarJogos();
+</script>
 </body>
 </html>

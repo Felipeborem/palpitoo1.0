@@ -34,12 +34,22 @@
   <main class="container-principal dashboard-layout">
     
     <aside class="cartao bg-claro cartao-perfil animacao-suave">
+              
+    <div class="perfil-topo" style="display: flex; flex-direction: column; align-items: center;">
       
-      <div class="perfil-topo">
-        <img src="https://via.placeholder.com/60" alt="Foto do usuário" class="foto-perfil">
-        <h2 class="font-russo titulo-azul">Roda</h2>
-      </div>
-      
+      <img src="https://via.placeholder.com/60" alt="Foto do usuário" id="fotoPerfil" class="foto-perfil" style="border-radius: 50%; width: 80px; height: 80px; object-fit: cover;">
+<!--  
+      <label for="inputFoto" class="cursor-pointer text-sm text-blue-600 font-bold mb-5 hover:underline">
+        Trocar Foto
+      </label>
+      <input type="file" id="inputFoto" accept="image/*" class="hidden" onchange="salvarFoto()">
+-->   
+      <h2 class="font-russo titulo-azul" id="textoNome">Carregando...</h2>
+      <p class="font-russo text-gray-600 mt-5" style="font-size: 0.9em;">
+        Time: <span id="textoTime" class="text-blue-800">Nenhum</span>
+      </p>
+    </div>
+  
       <hr class="linha-divisoria mt-15 mb-15">
       
       <h3 class="font-russo titulo-azul">Desempenho na temporada</h3>
@@ -59,7 +69,7 @@
       
       <a href="perfil.html" class="perfil-rodape font-russo" style="text-decoration: none; display: flex;">
         <span class="icone">⚙️</span>
-        <span class="texto-hover">Perfil e sobre</span>
+        <span class="texto-hover">Alterar Perfil</span>
       </a>
       
     </aside>
@@ -117,6 +127,99 @@
     </aside>
 
   </main>
-
 </body>
+<script>
+  // 1. Puxamos os dados exatamente como vamos salvar no login
+  const nomeLogado = localStorage.getItem('nome_craque');
+  const timeLogado = localStorage.getItem('time_craque');
+  const fotoLogada = localStorage.getItem('foto_craque'); // <-- Puxa a foto!
+
+  if (nomeLogado) {
+    document.getElementById('textoNome').innerText = nomeLogado;
+    
+    if (timeLogado && timeLogado !== "undefined") {
+      document.getElementById('textoTime').innerText = timeLogado;
+    }
+
+    // SE TIVER FOTO, SUBSTITUI A IMAGEM PADRÃO!
+    if (fotoLogada && fotoLogada !== "undefined" && fotoLogada !== "null") {
+      document.getElementById('fotoPerfil').src = fotoLogada;
+    }
+
+  } else {
+    // window.location.href = 'login.html'; 
+  }
+  console.log("Nome encontrado no navegador:", nomeLogado);
+  console.log("Time encontrado no navegador:", timeLogado);
+
+  // 2. Se o nome existir, injeta na tela
+  if (nomeLogado) {
+    document.getElementById('textoNome').innerText = nomeLogado;
+    
+    // Se ele tiver um time, injeta também
+    if (timeLogado && timeLogado !== "undefined") {
+      document.getElementById('textoTime').innerText = timeLogado;
+    }
+  } else {
+    // Se não achar ninguém, redireciona pro login para proteger a página!
+    console.log("Ninguém logado! Bloqueando acesso...");
+    // Remova as barras "//" da linha abaixo quando o login estiver 100% pronto
+    // window.location.href = 'login.html'; 
+  }
+
+  //foto do user
+  // Função que roda quando o usuário escolhe uma foto do computador/celular
+async function salvarFoto() {
+  const arquivo = document.getElementById('inputFoto').files[0];
+  if (!arquivo) return;
+
+  // Precisamos do e-mail do usuário para saber quem está trocando a foto
+  const emailLogado = localStorage.getItem('email_craque'); 
+  if (!emailLogado) {
+    alert("Erro: E-mail não encontrado. Faça login novamente.");
+    return;
+  }
+
+  // Isso aqui transforma a imagem em um texto Base64
+  const reader = new FileReader();
+  reader.onloadend = async function() {
+    const fotoBase64 = reader.result;
+
+    // Mostra a foto na tela na mesma hora
+    document.getElementById('fotoPerfil').src = fotoBase64;
+
+    try {
+      // Manda a foto pro servidor
+      const resposta = await fetch('http://localhost:3000/atualizar-foto', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: emailLogado, 
+          foto_base64: fotoBase64 
+        })
+      });
+
+      const resultado = await resposta.json();
+      
+      if (resposta.ok) {
+        // Salva a foto na memória do navegador para não sumir quando atualizar a página
+        localStorage.setItem('foto_craque', fotoBase64);
+        console.log("Foto salva no banco de dados!");
+      }
+    } catch (erro) {
+      console.error("Erro ao enviar foto:", erro);
+    }
+  };
+  
+  // Inicia a transformação da imagem
+  reader.readAsDataURL(arquivo);
+}
+
+// Quando a página carregar, puxa a foto da memória (adicione isso no seu script principal)
+const fotoSalva = localStorage.getItem('foto_craque');
+if (fotoSalva && fotoSalva !== "undefined" && fotoSalva !== "null") {
+  document.getElementById('fotoPerfil').src = fotoSalva;
+}
+</script>
+
 </html>
