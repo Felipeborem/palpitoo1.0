@@ -57,6 +57,52 @@ app.get('/jogos', async (req, res) => {
   }
 });
 
+
+// ROTA PARA SALVAR OU ATUALIZAR OS PALPITES
+app.post('/palpites', async (req, res) => {
+  try {
+    const { palpites } = req.body; // Pega a "caixa" cheia de palpites que o HTML enviou
+
+    // Passa por cada palpite da caixa e salva no banco
+    for (const p of palpites) {
+      await pool.query(
+        `INSERT INTO palpites (usuario_id, jogo_id, gols_casa_palpite, gols_fora_palpite) 
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (usuario_id, jogo_id) 
+         DO UPDATE SET 
+            gols_casa_palpite = EXCLUDED.gols_casa_palpite, 
+            gols_fora_palpite = EXCLUDED.gols_fora_palpite`,
+        [p.id_usuario, p.id_jogo, p.gols_casa, p.gols_fora]
+      );
+    }
+
+    res.json({ mensagem: 'Palpites cravados com sucesso!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao salvar os palpites no banco de dados.' });
+  }
+});
+
+
+// ROTA PARA BUSCAR OS PALPITES SALVOS DE UM USUÁRIO
+app.get('/meus-palpites/:id_usuario', async (req, res) => {
+  try {
+    const { id_usuario } = req.params; // Pega o ID que vem na URL
+
+    const resultado = await pool.query(
+      'SELECT * FROM palpites WHERE usuario_id = $1',
+      [id_usuario]
+    );
+
+    res.json(resultado.rows); // Devolve a lista de palpites desse cara
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar os palpites do usuário.' });
+  }
+});
+
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando bem demais na porta ${PORT}`);
@@ -121,3 +167,4 @@ app.put('/atualizar-foto', async (req, res) => {
     res.status(500).json({ erro: 'Erro ao salvar a foto no banco.' });
   }
 });
+

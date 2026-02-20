@@ -11,11 +11,13 @@
 </head>
 <body>
 
-  <header class="cabecalho-palpitoo">
-    <div class="logo-container">
-      <div class="logo-circle"></div>
-      <h1 class="logo-text font-russo">PalpitoO</h1>
-    </div>
+  <header class="navbar">
+    <a href="http://localhost:5501/palpitoo1.0/frontend/src/pages/inicio.html" style="text-decoration: none; color: inherit;">
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
+        </div>
+    </a>
     <nav>
       <ul class="nav-links">
         <li><a href="index.html">Ligas</a></li>
@@ -49,14 +51,16 @@
 
     </section>
 
-    <section class="cartao bg-escuro cartao-palpite animacao-suave">
+
+<!-- 2° CABEÇALHO - PALPITES E ANDAMENTO DOS JOGOS DO USER-->
+    <section class="cartao bg-escuro cartao-palpite animacao-suave mt-20">
       <div class="cabecalho-palpite mb-20">
-        <h2 class="font-russo titulo-branco text-center">Palpites liga 2</h2>
-        <p class="subtitulo-tempo text-center">⏳ 12h até fim dos palpites</p>
+        <h2 class="font-russo titulo-branco text-center">Meus Palpites Registrados</h2>
+        <p class="subtitulo-tempo text-center">Acompanhe o andamento das partidas</p>
       </div>
       
-      <div class="area-vazia">
-        <p>Jogos ainda não liberados.</p>
+      <div class="lista-jogos" id="resumo-palpites">
+        <p class="text-center text-white font-russo mt-10">Buscando seus comprovantes...</p>
       </div>
     </section>
 
@@ -94,6 +98,7 @@
             <span class="nome-time time-fora text-left">${jogo.time_fora}</span>
           </div>
         `;
+      puxarPalpitesSalvos()
       });
     } catch (erro) {
       console.error("Erro ao buscar jogos:", erro);
@@ -135,9 +140,29 @@
     }
 
     // Aqui é onde enviaremos pro servidor (faremos isso no próximo passo)
-    console.log("📦 Pacote de palpites pronto para envio:", palpitesParaSalvar);
-    alert("Abra o F12 (Console) para ver os dados sendo capturados perfeitamente!");
-  }
+    // 🚀 ENVIANDO O PACOTE PARA O SERVIDOR!
+        try {
+          const resposta = await fetch('http://localhost:3000/palpites', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ palpites: palpitesParaSalvar }) // Envia a caixa de palpites
+          });
+
+          const resultado = await resposta.json();
+
+          if (resposta.ok) {
+            alert("✅ " + resultado.mensagem);
+          } else {
+            alert("❌ Ops: " + resultado.erro);
+          }
+        } catch (erro) {
+          console.error("Erro na conexão:", erro);
+          alert("Servidor desligado! Verifique o terminal.");
+        }
+      }
+
 
   // 3. FUNÇÃO DO BOTÃO LIMPAR
   function limparPalpites() {
@@ -147,6 +172,79 @@
 
   // Aciona a busca de jogos assim que a página carrega
   carregarJogos();
+// 4. FUNÇÃO QUE PREENCHE OS INPUTS E GERA O RESUMO
+  async function puxarPalpitesSalvos() {
+    const idUsuario = localStorage.getItem('craqueId');
+    if (!idUsuario) return;
+
+    try {
+      const resposta = await fetch(`http://localhost:3000/meus-palpites/${idUsuario}`);
+      const meusPalpites = await resposta.json();
+
+      // Pega a caixa do segundo cartão
+      const containerResumo = document.getElementById('resumo-palpites');
+      containerResumo.innerHTML = ''; // Limpa o texto de "buscando"
+
+      if (meusPalpites.length === 0) {
+        containerResumo.innerHTML = '<p class="text-center text-gray-400 font-russo mt-10">Você ainda não deu nenhum palpite.</p>';
+        return;
+      }
+
+      // Passa por cada palpite que veio do banco
+      meusPalpites.forEach(palpite => {
+        
+        // 1. PREENCHE AS CAIXINHAS LÁ EM CIMA (Para ele poder editar se quiser)
+        const inputCasa = document.getElementById(`casa_${palpite.jogo_id}`);
+        const inputFora = document.getElementById(`fora_${palpite.jogo_id}`);
+        if (inputCasa && inputFora) {
+          inputCasa.value = palpite.gols_casa_palpite;
+          inputFora.value = palpite.gols_fora_palpite;
+        }
+
+        // 2. ACHA DE QUAL JOGO É ESSE PALPITE PARA PEGAR OS NOMES E O STATUS
+        const jogo = jogosCarregados.find(j => j.id_jogo === palpite.jogo_id);
+
+        if (jogo) {
+          // Define a cor da bolinha de status em código Hexadecimal
+          let corStatus = "color: #4ade80;"; // Verde para aberto
+          if (jogo.status.toLowerCase() === "em andamento") corStatus = "color: #facc15;"; // Amarelo
+          if (jogo.status.toLowerCase() === "finalizado") corStatus = "color: #f87171;"; // Vermelho
+
+          // 3. DESENHA O COMPROVANTE FIXO RESPEITANDO O SEU CSS
+          containerResumo.innerHTML += `
+            <div class="linha-jogo" style="margin-bottom: 5px;">
+              <span class="nome-time time-casa">${jogo.time_casa}</span>
+              
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <span class="font-russo" style="${corStatus} font-size: 10px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+                  ● ${jogo.status}
+                </span>
+                
+                <div class="area-placar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  <div class="input-placar font-russo" style="display: flex; align-items: center; justify-content: center; background-color: #1f2937; color: white; border: 1px solid #374151;">
+                    ${palpite.gols_casa_palpite}
+                  </div>
+                  
+                  <span class="versus">x</span>
+                  
+                  <div class="input-placar font-russo" style="display: flex; align-items: center; justify-content: center; background-color: #1f2937; color: white; border: 1px solid #374151;">
+                    ${palpite.gols_fora_palpite}
+                  </div>
+                </div>
+              </div>
+              
+              <span class="nome-time time-fora text-left">${jogo.time_fora}</span>
+            </div>
+            
+            <div style="border-bottom: 1px dashed #333; margin: 15px 10% 25px 10%;"></div>
+          `;
+        }
+      });
+      
+    } catch (erro) {
+      console.error("Erro ao puxar os palpites:", erro);
+    }
+  }
 </script>
 </body>
 </html>
