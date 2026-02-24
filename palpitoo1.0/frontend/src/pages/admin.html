@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Painel do ADM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+  <style>
+    .font-russo { font-family: 'Russo One', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4">
+
+  <h1 class="text-4xl font-russo text-red-500 mb-2">Painel Secreto do ADM 🕵️‍♂️</h1>
+  <p class="text-gray-400 mb-10">Área restrita para gerenciar o campeonato.</p>
+
+  <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
+    
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl border-t-4 border-red-500 w-full md:w-1/3 h-fit">
+      <h2 class="text-xl font-russo text-white text-center mb-6">Encerrar Partida</h2>
+
+      <div class="flex flex-col gap-4">
+        <div>
+          <label class="text-sm text-gray-400 font-bold">ID do Jogo:</label>
+          <input type="number" id="inputIdJogo" placeholder="Ex: 1" class="w-full mt-1 p-2 rounded bg-gray-700 text-white font-bold text-center border-2 border-transparent focus:border-red-500 outline-none">
+        </div>
+
+        <div class="flex justify-center items-center gap-4 mt-4">
+          <div class="flex flex-col items-center">
+            <label class="text-xs text-gray-400 mb-1">Gols Casa</label>
+            <input type="number" id="inputGolsCasa" placeholder="0" class="w-16 h-16 text-center text-2xl font-bold rounded bg-gray-700 text-white">
+          </div>
+          
+          <span class="font-russo text-xl text-gray-500 mt-4">X</span>
+
+          <div class="flex flex-col items-center">
+            <label class="text-xs text-gray-400 mb-1">Gols Fora</label>
+            <input type="number" id="inputGolsFora" placeholder="0" class="w-16 h-16 text-center text-2xl font-bold rounded bg-gray-700 text-white">
+          </div>
+        </div>
+
+        <button onclick="dispararEncerramento()" class="mt-8 bg-red-600 hover:bg-red-700 text-white font-russo py-3 px-4 rounded transition w-full">
+          🚨 ENCERRAR JOGO 🚨
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl border-t-4 border-blue-500 w-full md:w-2/3">
+      <h2 class="text-xl font-russo text-white text-center mb-2">Lista de Jogos</h2>
+      <p class="text-xs text-gray-400 text-center mb-6">Clique em um jogo para selecionar o ID automaticamente.</p>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-300">
+          <thead class="text-xs text-gray-400 uppercase bg-gray-700 font-russo">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-center">ID</th>
+              <th scope="col" class="px-4 py-3 text-right">Casa</th>
+              <th scope="col" class="px-4 py-3 text-center">X</th>
+              <th scope="col" class="px-4 py-3 text-left">Fora</th>
+              <th scope="col" class="px-4 py-3 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaJogosBody">
+            <tr>
+              <td colspan="5" class="text-center py-6">Carregando jogos da base de dados...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 1. FUNÇÃO PARA BUSCAR E LISTAR OS JOGOS NA TABELA
+    async function carregarListaDeJogos() {
+      try {
+        const resposta = await fetch('http://localhost:3000/jogos');
+        const jogos = await resposta.json();
+        
+        const tbody = document.getElementById('tabelaJogosBody');
+        tbody.innerHTML = ''; // Limpa a mensagem de carregando
+
+        if (jogos.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center py-6">Nenhum jogo cadastrado.</td></tr>';
+          return;
+        }
+
+        jogos.forEach(jogo => {
+          // Define a cor do status
+          let corStatus = "text-green-400";
+          if (jogo.status.toLowerCase() === "em andamento") corStatus = "text-yellow-400";
+          if (jogo.status.toLowerCase() === "finalizado") corStatus = "text-red-400";
+
+          // Cria a linha da tabela (com evento de clique para jogar o ID no input!)
+          tbody.innerHTML += `
+            <tr class="border-b border-gray-700 hover:bg-gray-600 cursor-pointer transition" onclick="selecionarJogo(${jogo.id_jogo})">
+              <td class="px-4 py-3 text-center font-bold text-white">${jogo.id_jogo}</td>
+              <td class="px-4 py-3 text-right font-russo">${jogo.time_casa}</td>
+              <td class="px-4 py-3 text-center font-bold">
+                ${jogo.status === 'finalizado' ? `<span class="text-gray-400">${jogo.gols_casa_real} x ${jogo.gols_fora_real}</span>` : 'x'}
+              </td>
+              <td class="px-4 py-3 text-left font-russo">${jogo.time_fora}</td>
+              <td class="px-4 py-3 text-center font-bold ${corStatus} uppercase text-xs">${jogo.status}</td>
+            </tr>
+          `;
+        });
+      } catch (erro) {
+        console.error(erro);
+        document.getElementById('tabelaJogosBody').innerHTML = '<tr><td colspan="5" class="text-center py-6 text-red-500">Erro ao carregar jogos.</td></tr>';
+      }
+    }
+
+    // 2. FUNÇÃO QUE PREENCHE O INPUT QUANDO CLICA NA TABELA
+    function selecionarJogo(id) {
+      document.getElementById('inputIdJogo').value = id;
+      // Dá um efeitinho visual pra mostrar que selecionou
+      const input = document.getElementById('inputIdJogo');
+      input.classList.add('ring-2', 'ring-red-500');
+      setTimeout(() => input.classList.remove('ring-2', 'ring-red-500'), 500);
+    }
+
+    // 3. FUNÇÃO QUE ENVIA OS DADOS PARA O SERVIDOR ENCERRAR
+    async function dispararEncerramento() {
+      const idJogo = document.getElementById('inputIdJogo').value;
+      const golsCasa = document.getElementById('inputGolsCasa').value;
+      const golsFora = document.getElementById('inputGolsFora').value;
+
+      if (!idJogo || golsCasa === "" || golsFora === "") {
+        alert("Preencha o ID do jogo e o placar real completo!");
+        return;
+      }
+
+      const certeza = confirm(`Confirmar fim de jogo: ID ${idJogo} terminou em ${golsCasa} x ${golsFora}?`);
+      if (!certeza) return;
+
+      try {
+        const resposta = await fetch('http://localhost:3000/encerrar-jogo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            id_jogo: parseInt(idJogo), 
+            gols_casa_real: parseInt(golsCasa), 
+            gols_fora_real: parseInt(golsFora) 
+          })
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+          alert("✅ " + resultado.mensagem);
+          document.getElementById('inputGolsCasa').value = '';
+          document.getElementById('inputGolsFora').value = '';
+          // Recarrega a tabela para mostrar o jogo atualizado como "finalizado"
+          carregarListaDeJogos();
+        } else {
+          alert("❌ Erro: " + resultado.erro);
+        }
+      } catch (erro) {
+        console.error(erro);
+        alert("Erro ao conectar com o servidor.");
+      }
+    }
+
+    // Carrega a tabela assim que a página abrir
+    carregarListaDeJogos();
+  </script>
+</body>
+</html>

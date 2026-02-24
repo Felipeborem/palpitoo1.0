@@ -4,60 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palpitoo - Entrar no Jogo</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./css/style.css">
 </head>
-<body class="bg-black flex items-center justify-center min-h-screen">
+<body>
 
-  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-t-4 border-blue-600">
-    <h2 class="text-3xl font-bold text-center text-blue-800 mb-2">Palpitoo</h2>
-    <p class="text-center text-gray-500 mb-6">Entre com sua conta de craque</p>
-
-    <form id="meuFormulario" class="flex flex-col gap-4">
+  <main class="hero-section" style="justify-content: center; width: 100%;">
+    <div class="login-area" style="justify-content: center; width: 100%;">
       
-      <input 
-        id="campoEmail"
-        type="email" 
-        placeholder="Seu E-mail" 
-        required
-        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-      
-      <input 
-        id="campoSenha"
-        type="password" 
-        placeholder="Sua Senha" 
-        required
-        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
+      <div class="login-card animacao-suave">
+        <div class="login-header">
+          <h3 class="font-russo" style="color: var(--accent-cyan);">Palpitoo</h3>
+          <p>Entre com sua conta de craque</p>
+        </div>
 
-      <button
-        type="button" 
-        onclick="fazerLogin()"
-        class="bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition mt-2"
-      >
-        Entrar
-      </button>
-    </form>
+        <form id="meuFormulario">
+          
+          <div class="form-group">
+            <label for="campoEmail">E-mail</label>
+            <input id="campoEmail" type="email" placeholder="Seu E-mail" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="campoSenha">Senha</label>
+            <input id="campoSenha" type="password" placeholder="Sua Senha" required>
+          </div>
 
-    <p class="text-center mt-6 text-sm text-gray-600">
-      Ainda não tem conta? <a href="cadastro.html" class="text-blue-600 font-bold hover:underline">Cadastre-se</a>
-    </p>
-  </div>
+          <button type="button" onclick="fazerLogin()" class="btn-primary">
+            Entrar
+          </button>
+        </form>
+
+        <div class="login-footer">
+          Ainda não tem conta? <a href="cadastro.html" class="btn-link">Cadastre-se</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
 
   <script>
     async function fazerLogin() {
-      // 1. Capturamos os dados (apenas email e senha agora)
       const email = document.getElementById('campoEmail').value;
       const senha = document.getElementById('campoSenha').value;
 
-      // Verificação simples
       if (!email || !senha) {
         alert("Ei! Preencha e-mail e senha para entrar.");
         return;
       }
 
       try {
-        // 2. IMPORTANTE: Mudamos o link para /login
         const resposta = await fetch('http://localhost:3000/login', {
           method: 'POST',
           headers: {
@@ -74,18 +74,14 @@
         if (resposta.ok) {
             alert("✅ " + resultado.mensagem);
             
-            // O servidor devolveu: resultado.usuario.nome e resultado.usuario.time
-            // Nós guardamos na memória com as chaves: 'nome_craque' e 'time_craque'
             localStorage.setItem('craqueId', resultado.usuario.id);
             localStorage.setItem('nome_craque', resultado.usuario.nome);
             localStorage.setItem('time_craque', resultado.usuario.time);
-            localStorage.setItem('email_craque', resultado.usuario.email); // Essencial para a foto!
-        
+            localStorage.setItem('email_craque', resultado.usuario.email); 
             localStorage.setItem('foto_craque', resultado.usuario.foto);
-            // E então manda para a index
+            
             window.location.href = '_index.html'; 
           } else {
-          // Exibe o erro de "E-mail ou senha incorretos" vindo do servidor
           alert("❌ " + resultado.erro);
         }
 

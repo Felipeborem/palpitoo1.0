@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Carreira e Troféus</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="_index.html" style="text-decoration: none; color: inherit;">
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
+        </div>
+    </a>
+    
+    <nav>
+      <ul class="nav-links">
+        <li><a href="_index.html">Início</a></li> 
+        <li><a href="ligas.html">Ligas</a></li> 
+        <li><a href="palpites.html">Palpites</a></li>
+        <li><a href="novidades.html">Novidades</a></li>
+        <li><a href="social.html">Social</a></li>
+        <li><a href="carreira.html" class="ativo">Carreira</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container-principal" style="margin-top: 40px;">
+    
+    <section class="cartao bg-escuro animacao-suave text-center mb-20" style="position: relative; overflow: hidden; border: 1px solid var(--accent-cyan);">
+      <div style="position: absolute; top: -50px; right: -50px; font-size: 150px; opacity: 0.03; pointer-events: none;">👑</div>
+      
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <img id="fotoPerfil" src="https://via.placeholder.com/100" alt="Sua Foto" class="foto-perfil" style="width: 100px; height: 100px; border-color: var(--accent-cyan); border-width: 3px;">
+        <h2 id="nomeUsuario" class="font-russo titulo-branco" style="font-size: 28px; margin: 0;">Carregando...</h2>
+        <p id="timeUsuario" style="color: var(--text-gray); font-size: 14px; margin: 0; text-transform: uppercase;">Membro Oficial Brah.Bet</p>
+        
+        <div style="background: var(--bg-dark); padding: 8px 20px; border-radius: 20px; border: 1px solid var(--borda-divisoria); margin-top: 10px;">
+          <span class="font-russo" style="color: var(--accent-green); font-size: 14px;">Total na Carreira: 142 Pontos</span>
+        </div>
+      </div>
+      
+      <a href="perfil.html" class="btn-link" style="display: inline-block; margin-top: 15px; font-size: 12px; color: var(--text-gray);">⚙️ Configurações da Conta</a>
+    </section>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+      
+      <section class="cartao bg-escuro animacao-suave">
+        <h3 class="font-russo titulo-branco mb-15" style="font-size: 20px;">🏆 Sala de Troféus</h3>
+        <div class="divisor-tracejado mb-20"></div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          
+          <div style="background: var(--bg-dark); border: 1px solid #eab308; border-radius: 12px; padding: 20px 10px; text-align: center; box-shadow: 0 0 15px rgba(234, 179, 8, 0.1);">
+            <div style="font-size: 40px; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(234, 179, 8, 0.5));">🏆</div>
+            <h4 class="font-russo" style="color: #eab308; font-size: 14px; margin-bottom: 5px;">Série A</h4>
+            <p style="color: var(--text-gray); font-size: 10px; font-weight: bold;">CAMPEÃO TEMP. 4</p>
+          </div>
+
+          <div style="background: var(--bg-dark); border: 1px solid var(--text-white); border-radius: 12px; padding: 20px 10px; text-align: center;">
+            <div style="font-size: 40px; margin-bottom: 10px;">🥈</div>
+            <h4 class="font-russo" style="color: var(--text-white); font-size: 14px; margin-bottom: 5px;">Copa Brah.Bet</h4>
+            <p style="color: var(--text-gray); font-size: 10px; font-weight: bold;">VICE TEMP. 5</p>
+          </div>
+
+          <div style="background: var(--bg-dark); border: 1px solid var(--accent-cyan); border-radius: 12px; padding: 20px 10px; text-align: center; grid-column: span 2;">
+            <div style="font-size: 30px; margin-bottom: 10px;">🎯</div>
+            <h4 class="font-russo" style="color: var(--accent-cyan); font-size: 14px; margin-bottom: 5px;">Rei da Rodada</h4>
+            <p style="color: var(--text-gray); font-size: 10px; font-weight: bold;">MAIOR PONTUADOR EM UMA ÚNICA RODADA (18 PTS)</p>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="cartao bg-escuro animacao-suave">
+        <h3 class="font-russo titulo-branco mb-15" style="font-size: 20px;">📜 Histórico de Ligas</h3>
+        <div class="divisor-tracejado mb-20"></div>
+
+        <ul style="list-style: none; padding: 0;">
+          
+          <li style="display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed var(--borda-divisoria);">
+            <div>
+              <h4 class="font-russo text-white" style="font-size: 14px; margin: 0;">Temporada 5</h4>
+              <p style="color: var(--text-gray); font-size: 12px; margin: 0;">Brah.League - Série A</p>
+            </div>
+            <div style="text-align: right;">
+              <span class="font-russo" style="color: var(--text-white); font-size: 16px;">3º Lugar</span>
+              <p style="color: var(--accent-cyan); font-size: 12px; margin: 0;">32 Pontos</p>
+            </div>
+          </li>
+
+          <li style="display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed var(--borda-divisoria);">
+            <div>
+              <h4 class="font-russo text-white" style="font-size: 14px; margin: 0;">Temporada 4</h4>
+              <p style="color: var(--text-gray); font-size: 12px; margin: 0;">Brah.League - Série A</p>
+            </div>
+            <div style="text-align: right;">
+              <span class="font-russo" style="color: #eab308; font-size: 16px;">🏆 Campeão</span>
+              <p style="color: var(--accent-cyan); font-size: 12px; margin: 0;">45 Pontos</p>
+            </div>
+          </li>
+
+          <li style="display: flex; align-items: center; justify-content: space-between; padding: 15px 0;">
+            <div>
+              <h4 class="font-russo text-white" style="font-size: 14px; margin: 0;">Temporada 3</h4>
+              <p style="color: var(--text-gray); font-size: 12px; margin: 0;">Brah.League - Série B</p>
+            </div>
+            <div style="text-align: right;">
+              <span class="font-russo" style="color: var(--accent-green); font-size: 16px;">⬆️ Acesso (2º)</span>
+              <p style="color: var(--accent-cyan); font-size: 12px; margin: 0;">38 Pontos</p>
+            </div>
+          </li>
+
+        </ul>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const nome = localStorage.getItem('nome_craque');
+      const time = localStorage.getItem('time_craque');
+      const foto = localStorage.getItem('foto_craque');
+
+      if (!nome) {
+        // window.location.href = 'login.html';
+        return;
+      }
+
+      // Preenche Nome
+      document.getElementById('nomeUsuario').innerText = nome;
+      
+      // Preenche Time
+      if (time && time !== "undefined" && time !== "null") {
+        document.getElementById('timeUsuario').innerText = time;
+      }
+
+      // Preenche Foto
+      if (foto && foto !== "undefined" && foto !== "null") {
+        document.getElementById('fotoPerfil').src = foto;
+      }
+    });
+  </script>
+
+</body>
+</html>

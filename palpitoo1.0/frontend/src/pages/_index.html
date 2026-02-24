@@ -24,12 +24,12 @@
     <nav>
       <ul class="nav-links">
         <li><a href="_index.html" class="ativo">início</a></li> 
-        <li><a href="_index.html">Ligas</a></li> 
+        <li><a href="ligas.html">Ligas</a></li> 
         <li><a href="palpites.html">Palpites</a></li>
-        <li><a href="#">Novidades</a></li>
-        <li><a href="#">Social</a></li>
-        <li><a href="#">Carreira</a></li>
-        <li><a href="#">Ranking</a></li>
+        <li><a href="novidades.html">Novidades</a></li>
+        <li><a href="social.html">Social</a></li>
+        <li><a href="carreira.html">Carreira</a></li>
+        
       </ul>
     </nav>
   </header>
@@ -55,17 +55,29 @@
   
       <hr class="linha-divisoria mt-15 mb-15">
       
-      <h3 class="font-russo titulo-azul">Desempenho na temporada</h3>
+<h3 class="font-russo titulo-azul">Desempenho na temporada</h3>
       <ul class="lista-desempenho mt-10">
-        <li><span class="icone">⚽</span> <strong>1/5</strong></li>
-        <li><span class="icone">✔️</span> <strong>0/5</strong></li>
-        <li><span class="icone">✖️</span> <strong>4/5</strong></li>
+        <li>
+          <span class="icone">🎯</span> 
+          <strong id="stat-cravadas">0</strong> 
+          <span style="font-size: 0.7em; color: gray; margin-left: 5px;">Cravações (3pts)</span>
+        </li>
+        <li>
+          <span class="icone">✔️</span> 
+          <strong id="stat-acertos">0</strong> 
+          <span style="font-size: 0.7em; color: gray; margin-left: 5px;">Acertos (1pt)</span>
+        </li>
+        <li>
+          <span class="icone">✖️</span> 
+          <strong id="stat-erros">0</strong> 
+          <span style="font-size: 0.7em; color: gray; margin-left: 5px;">Erros (0pt)</span>
+        </li>
       </ul>
       
       <h3 class="font-russo titulo-azul mt-20">Aproveitamento</h3>
       <div class="aproveitamento-box mt-10">
-        <span class="icone-grande">👎</span>
-        <p><strong>Do mal ao pior,<br>20% de acerto</strong></p>
+        <span class="icone-grande" id="icone-aproveitamento">⏳</span>
+        <p><strong id="texto-aproveitamento">Calculando...<br>--% de acerto</strong></p>
       </div>
       
       <hr class="linha-divisoria final-linha">
@@ -123,9 +135,26 @@
         </div>
       </div>
 
-      <div class="cartao bg-escuro animacao-suave caixa-chat">
-        <h3 class="font-russo titulo-branco lh-grande">Alguma<br>informação rápida,<br>como pontuação<br>na rodada<br>colocação na copa,<br>um chat...</h3>
-      </div>
+      <div class="cartao bg-escuro animacao-suave" style="position: relative; overflow: hidden; border: 1px solid var(--accent-cyan);">
+    
+    <div style="position: absolute; bottom: -20px; right: -20px; font-size: 100px; opacity: 0.05; pointer-events: none;">🦆</div>
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+        <div style="width: 45px; height: 45px; background: var(--bg-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid var(--accent-cyan); box-shadow: 0 0 10px rgba(122, 30, 58, 0.4);">
+            🦆
+        </div>
+        <div class="text-left">
+            <h3 class="font-russo titulo-branco" style="font-size: 16px; margin: 0;">Pato Mestre</h3>
+            <p style="color: var(--accent-cyan); font-size: 10px; font-weight: bold; margin: 0; letter-spacing: 1px;">CEO DA BRAH.BET</p>
+        </div>
+    </div>
+
+    <div style="background: var(--bg-dark); padding: 12px; border-radius: 10px; border-left: 3px solid var(--accent-cyan); position: relative;">
+        <p class="font-russo" style="font-size: 13px; color: var(--text-gray); line-height: 1.4; text-align: left;">
+            "Fala, <span id="nomePatoMestre" style="color: var(--text-white);">Craque</span>! Trate de cravar esses palpites, não me faça passar vergonha na Arena!"
+        </p>
+    </div>
+</div>
       
     </aside>
 
@@ -158,6 +187,12 @@
   // 2. Se o nome existir, injeta na tela
   if (nomeLogado) {
     document.getElementById('textoNome').innerText = nomeLogado;
+
+    // Injeta o primeiro nome do craque na fala do Pato
+    const spanPato = document.getElementById('nomePatoMestre');
+    if (spanPato && nomeLogado) {
+        spanPato.innerText = nomeLogado.split(' ')[0]; 
+    }
     
     // Se ele tiver um time, injeta também
     if (timeLogado && timeLogado !== "undefined") {
@@ -223,6 +258,75 @@ const fotoSalva = localStorage.getItem('foto_craque');
 if (fotoSalva && fotoSalva !== "undefined" && fotoSalva !== "null") {
   document.getElementById('fotoPerfil').src = fotoSalva;
 }
+
+// FUNÇÃO PARA CALCULAR O DESEMPENHO E APROVEITAMENTO
+  async function calcularDesempenho() {
+    // Puxa o ID do usuário que está no localStorage
+    const idUsuario = localStorage.getItem('craqueId');
+    if (!idUsuario) return;
+
+    try {
+      // Bate na nossa rota que já existe para pegar os palpites dele!
+      const resposta = await fetch(`http://localhost:3000/meus-palpites/${idUsuario}`);
+      const palpites = await resposta.json();
+
+      let cravadas = 0;
+      let acertos = 0;
+      let erros = 0;
+      let jogosFinalizados = 0;
+
+      // Passa por cada palpite contando os pontos
+      palpites.forEach(p => {
+        // Só conta os jogos que já foram encerrados pelo ADM (onde tem nota salva)
+        if (p.pontos_obtidos !== null) { 
+          jogosFinalizados++;
+          if (p.pontos_obtidos === 3) cravadas++;
+          else if (p.pontos_obtidos === 1) acertos++;
+          else if (p.pontos_obtidos === 0) erros++;
+        }
+      });
+
+      // 1. Atualiza a listinha de gols, acertos e erros na tela
+      document.getElementById('stat-cravadas').innerText = cravadas;
+      document.getElementById('stat-acertos').innerText = acertos;
+      document.getElementById('stat-erros').innerText = erros;
+
+      // 2. Calcula a porcentagem de acerto (Aproveitamento)
+      if (jogosFinalizados > 0) {
+        // Ele "acertou" se tirou 3 ou 1.
+        const taxaAcerto = Math.round(((cravadas + acertos) / jogosFinalizados) * 100);
+        
+        let icone = "👍";
+        let frase = "Na média,";
+        
+        // Regras de zoeira/elogio baseadas na porcentagem!
+        if (taxaAcerto >= 70) { 
+          icone = "🔥"; 
+          frase = "Tá voando!,"; 
+        } else if (taxaAcerto >= 40) { 
+          icone = "👍"; 
+          frase = "Bom jogador,"; 
+        } else { 
+          icone = "🦆"; 
+          frase = "Pato master,"; 
+        }
+
+        document.getElementById('icone-aproveitamento').innerText = icone;
+        document.getElementById('texto-aproveitamento').innerHTML = `${frase}<br>${taxaAcerto}% de acerto`;
+      } else {
+        document.getElementById('icone-aproveitamento').innerText = "⚽";
+        document.getElementById('texto-aproveitamento').innerHTML = `Sem jogos<br>encerrados ainda`;
+      }
+
+    } catch (erro) {
+      console.error("Erro ao puxar o desempenho:", erro);
+      document.getElementById('texto-aproveitamento').innerHTML = `Erro de conexão`;
+    }
+  }
+
+  // Aciona o cálculo assim que a tela abre!
+  calcularDesempenho();
+  
 </script>
 
 </html>

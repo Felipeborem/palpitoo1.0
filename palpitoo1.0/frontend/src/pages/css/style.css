@@ -625,3 +625,58 @@ h1, h2, h3, .font-russo {
   color: var(--text-gray);
   opacity: 0.5; 
 }
+
+/* =========================================
+   SKELETON LOADING (Animação de Carregamento)
+   ========================================= */
+.skeleton-box {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--borda-divisoria);
+  animation: pulso-esqueleto 1.5s infinite ease-in-out;
+}
+
+.skeleton-text {
+  height: 18px;
+  width: 90px;
+  background-color: var(--borda-divisoria);
+  border-radius: 6px;
+}
+
+.skeleton-text.right { justify-self: end; }
+.skeleton-text.left { justify-self: start; }
+
+.skeleton-placar {
+  width: 115px;
+  height: 55px;
+  background-color: var(--bg-dark);
+  border-radius: 12px;
+  border: 1px solid var(--borda-divisoria);
+}
+
+@keyframes pulso-esqueleto {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.3; }
+}
+
+/* =========================================
+   TRANSIÇÃO SUAVE ENTRE PÁGINAS (FADE IN)
+   ========================================= */
+body {
+  animation: fadeInApp 0.4s ease-out forwards;
+}
+
+@keyframes fadeInApp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px); /* Faz a tela subir bem de leve */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

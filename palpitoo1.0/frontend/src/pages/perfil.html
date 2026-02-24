@@ -13,19 +13,22 @@
 </head>
 <body>
 
-  <header class="cabecalho-palpitoo">
-    <div class="logo-container">
-      <div class="logo-circle"></div>
-      <h1 class="logo-text font-russo">PalpitoO</h1>
-    </div>
+  <header class="navbar">
+    <a href="_index.html" style="text-decoration: none; color: inherit;">
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
+        </div>
+    </a>
     
     <nav>
       <ul class="nav-links">
-        <li><a href="_index.html">Ligas</a></li> 
+        <li><a href="_index.html">Início</a></li> 
+        <li><a href="ligas.html">Ligas</a></li> 
         <li><a href="palpites.html">Palpites</a></li>
         <li><a href="#">Novidades</a></li>
-        <li><a href="#">Social</a></li>
-        <li><a href="#">Carreira</a></li>
+        <li><a href="social.html">Social</a></li>
+        <li><a href="perfil.html" class="ativo">Carreira</a></li>
         <li><a href="#">Ranking</a></li>
       </ul>
     </nav>
@@ -36,9 +39,10 @@
     <section class="cartao bg-escuro animacao-suave text-center">
       
       <div class="mb-20">
-        <img src="https://via.placeholder.com/120" alt="Foto do usuário" class="foto-perfil" style="width: 120px; height: 120px; margin: 0 auto;">
-        <h2 class="font-russo titulo-branco mt-15" style="font-size: 28px;">Roda</h2>
-        <p style="color: var(--text-gray); font-size: 14px; margin-top: 5px;">Membro da Arena desde: Temporada 1</p>
+        <img id="fotoPerfil" src="https://via.placeholder.com/120" alt="Foto do usuário" class="foto-perfil" style="width: 120px; height: 120px; margin: 0 auto;">
+        
+        <h2 id="nomeUsuario" class="font-russo titulo-branco mt-15" style="font-size: 28px;">Carregando...</h2>
+        <p style="color: var(--text-gray); font-size: 14px; margin-top: 5px;">Membro da Arena Brah.Bet</p>
       </div>
 
       <div class="divisor-tracejado mb-20"></div>
@@ -47,12 +51,12 @@
         
         <div class="form-group">
           <label>E-MAIL</label>
-          <input type="email" value="roda@palpitoo.com" readonly style="opacity: 0.6; cursor: not-allowed;">
+          <input id="campoEmail" type="email" value="" readonly style="opacity: 0.6; cursor: not-allowed;">
         </div>
         
         <div class="form-group">
           <label>TIME DO CORAÇÃO</label>
-          <input type="text" placeholder="Ex: Flamengo, Vasco, São Paulo...">
+          <input id="campoTime" type="text" placeholder="Ex: Flamengo, Vasco, São Paulo...">
         </div>
         
         <div class="form-group">
@@ -62,12 +66,58 @@
 
         <button type="button" class="btn-primary" style="margin-top: 30px;">Salvar Alterações</button>
         
-        <a href="login.html" class="btn btn-cancelar font-russo mt-15" style="display: block; text-align: center; text-decoration: none;">Sair da Conta</a>
+        <button type="button" onclick="fazerLogout()" class="btn btn-cancelar font-russo mt-15" style="width: 100%; display: block; text-align: center;">
+          Sair da Conta
+        </button>
         
       </form>
     </section>
 
   </main>
+
+  <script>
+    // Executa assim que a página carrega
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Puxa os dados salvos no navegador (LocalStorage)
+      const nome = localStorage.getItem('nome_craque');
+      const email = localStorage.getItem('email_craque');
+      const time = localStorage.getItem('time_craque');
+      const foto = localStorage.getItem('foto_craque');
+
+      // 2. Trava de segurança: se não tiver nome, não está logado
+      if (!nome) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // 3. Preenche os campos na tela
+      document.getElementById('nomeUsuario').innerText = nome;
+      
+      if (email) {
+        document.getElementById('campoEmail').value = email;
+      }
+      
+      if (time && time !== "undefined" && time !== "null") {
+        document.getElementById('campoTime').value = time;
+      }
+
+      if (foto && foto !== "undefined" && foto !== "null") {
+        document.getElementById('fotoPerfil').src = foto;
+      }
+    });
+
+    // Função de Logout
+    function fazerLogout() {
+      // Confirmação para evitar clique sem querer
+      const sair = confirm("Tem certeza que deseja sair da Arena?");
+      if (sair) {
+        // Limpa toda a memória do localStorage
+        localStorage.clear();
+        // Redireciona para o login
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
 
 </body>
 </html>

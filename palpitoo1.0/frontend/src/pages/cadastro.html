@@ -4,80 +4,77 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palpitoo - Cadastro de Craque</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./css/style.css">
 </head>
-<body class="bg-black flex items-center justify-center min-h-screen">
+<body>
 
-  <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border-t-4 border-green-500">
-    <h2 class="text-3xl font-bold text-center text-blue-800 mb-6">Palpitoo</h2>
-    
-    <form id="meuFormulario" class="flex flex-col gap-4">
+  <main class="hero-section" style="justify-content: center; width: 100%;">
+    <div class="login-area" style="justify-content: center; width: 100%;">
       
-      <div class="flex flex-col items-center mb-2">
-        <img id="previewImagem" src="https://via.placeholder.com/80" alt="Preview" class="w-20 h-20 rounded-full object-cover border-2 border-blue-400 mb-2">
-        <label for="campoFoto" class="cursor-pointer text-sm bg-gray-200 text-gray-700 py-1 px-3 rounded hover:bg-gray-300 transition">
-          📸 Escolher Foto
-        </label>
-        <input type="file" id="campoFoto" accept="image/*" class="hidden" onchange="prepararFoto()">
+      <div class="login-card animacao-suave">
+        <div class="login-header">
+          <h3 class="font-russo" style="color: var(--accent-cyan);">Palpitoo</h3>
+          <p>Crie sua conta na Arena</p>
+        </div>
+        
+        <form id="meuFormulario">
+          
+          <div class="form-group" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <img id="previewImagem" src="https://via.placeholder.com/80" alt="Preview" class="foto-perfil mb-10" style="width: 80px; height: 80px;">
+            <label for="campoFoto" style="cursor: pointer; color: var(--accent-cyan); font-weight: bold; font-size: 14px; text-decoration: underline;">
+              📸 Escolher Foto
+            </label>
+            <input type="file" id="campoFoto" accept="image/*" style="display: none;" onchange="prepararFoto()">
+          </div>
+
+          <div class="form-group">
+            <label for="campoNome">Nome de Craque</label>
+            <input id="campoNome" type="text" placeholder="Seu apelido na liga" required>
+          </div>
+
+          <div class="form-group">
+            <label for="campoEmail">E-mail</label>
+            <input id="campoEmail" type="email" placeholder="Seu melhor e-mail" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="campoSenha">Senha</label>
+            <input id="campoSenha" type="password" placeholder="Crie uma senha forte" required>
+          </div>
+
+          <div class="form-group">
+            <label for="campoTime">Time do Coração</label>
+            <input id="campoTime" type="text" placeholder="Ex: Galo..." required>
+          </div>
+
+          <button type="button" onclick="enviarDados()" class="btn-primary mt-10">
+            Criar Minha Conta
+          </button>
+        </form>
+
+        <div class="login-footer">
+          Já tem conta? <a href="login.html" class="btn-link">Entrar no Jogo</a>
+        </div>
       </div>
-      <input 
-        id="campoNome"
-        type="text" 
-        placeholder="Seu Nome de Craque" 
-        required
-        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
 
-      <input 
-        id="campoEmail"
-        type="email" 
-        placeholder="E-mail" 
-        required
-        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-      
-      <input 
-        id="campoSenha"
-        type="password" 
-        placeholder="Senha" 
-        required
-        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-      <input 
-        id="campoTime"
-        type="text" 
-        placeholder="Time do Coração"
-        required
-        class="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-      >
-
-      <button
-        type="button" 
-        onclick="enviarDados()"
-        class="bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition mt-2"
-      >
-        Criar Minha Conta
-      </button>
-    </form>
-
-    <p class="text-center mt-4 text-sm text-gray-600">
-      Já tem conta? 
-      <a href="login.html" class="text-blue-600 font-bold hover:underline">Entrar</a>
-    </p>
-  </div>
+    </div>
+  </main>
 
   <script>
-    // Variável para guardar a foto transformada em texto
     let fotoBase64 = "";
 
-    // 1. Função que roda quando o usuário escolhe a foto
     function prepararFoto() {
       const arquivo = document.getElementById('campoFoto').files[0];
       if (arquivo) {
         const reader = new FileReader();
         reader.onloadend = function() {
-          fotoBase64 = reader.result; // Salva o texto da imagem
-          document.getElementById('previewImagem').src = fotoBase64; // Mostra a bolinha com a foto!
+          fotoBase64 = reader.result; 
+          document.getElementById('previewImagem').src = fotoBase64; 
         }
         reader.readAsDataURL(arquivo);
       }
@@ -89,7 +86,6 @@
       const senha = document.getElementById('campoSenha').value;
       const time_favorito = document.getElementById('campoTime').value;
       
-      // Verificação de segurança (adicionei o time_favorito aqui também!)
       if (!nome || !email || !senha || !time_favorito) {
         alert("Preencha todos os campos para entrar em campo!");
         return;
@@ -106,7 +102,7 @@
             email: email, 
             senha: senha,
             time_favorito: time_favorito,
-            foto_perfil: fotoBase64 // <-- A FOTO ESTÁ INDO AQUI!
+            foto_perfil: fotoBase64 
           })
         });
 
@@ -115,12 +111,10 @@
         if (resposta.ok) {
           alert("✅ " + resultado.mensagem);
           
-          // Limpa o formulário e reseta a foto de preview
           document.getElementById('meuFormulario').reset();
           document.getElementById('previewImagem').src = "https://via.placeholder.com/80";
           fotoBase64 = ""; 
           window.location.href = 'login.html'; 
-          console.log("Sucesso no banco:", resultado.usuario);
         } else {
           alert("❌ Ops: " + resultado.erro);
         }

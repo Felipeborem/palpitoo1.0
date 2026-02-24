@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Novidades e Regras</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="_index.html" style="text-decoration: none; color: inherit;">
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
+        </div>
+    </a>
+    
+    <nav>
+      <ul class="nav-links">
+        <li><a href="_index.html">Início</a></li> 
+        <li><a href="ligas.html">Ligas</a></li> 
+        <li><a href="palpites.html">Palpites</a></li>
+        <li><a href="novidades.html" class="ativo">Novidades</a></li>
+        <li><a href="social.html">Social</a></li>
+        <li><a href="carreira.html">Carreira</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container-principal" style="max-width: 900px; margin-top: 40px;">
+    
+    <div class="text-center mb-20 animacao-suave">
+      <h2 class="font-russo titulo-branco" style="font-size: 32px;">Central da <span style="color: var(--accent-cyan);">Brah.Bet</span></h2>
+      <p style="color: var(--text-gray); font-size: 16px;">Regras, Mural do Pato e Atualizações da Liga</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
+      
+      <section class="cartao bg-escuro animacao-suave" style="border-top: 4px solid var(--accent-cyan);">
+        <div style="display: flex; align-items: center; gap: 15px; mb-15">
+          <div style="font-size: 40px; background: var(--bg-dark); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--accent-cyan);">🦆</div>
+          <div>
+            <h3 class="font-russo titulo-branco" style="font-size: 20px; margin: 0;">Mural do Pato</h3>
+            <p style="color: var(--accent-cyan); font-size: 12px; margin: 0;">ÚLTIMOS DECRETOS</p>
+          </div>
+        </div>
+        
+        <div class="divisor-tracejado mb-15 mt-15"></div>
+
+        <ul style="list-style: none; padding: 0;">
+          <li style="background: var(--bg-dark); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 3px solid var(--accent-cyan);">
+            <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 5px;">📅 Temporada 6 - Rodada 2</p>
+            <p class="font-russo" style="font-size: 14px; color: var(--text-white);">"Atenção, bagres! O mercado fecha 3 horas antes do primeiro jogo. Quem não palpitar vai ficar com ZERO!"</p>
+          </li>
+          <li style="background: var(--bg-dark); padding: 15px; border-radius: 12px; border-left: 3px solid var(--text-gray);">
+            <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 5px;">📅 Atualização do Sistema</p>
+            <p class="font-russo" style="font-size: 14px; color: var(--text-gray);">A nova aba 'Social' já está liberada para convocar os rivais.</p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="cartao bg-escuro animacao-suave" style="border-top: 4px solid var(--text-white);">
+        <h3 class="font-russo titulo-branco mb-15" style="font-size: 20px;">⚖️ Regulamento Oficial</h3>
+        
+        <div class="divisor-tracejado mb-15"></div>
+
+        <p class="font-russo text-white mb-10" style="font-size: 16px;">🎯 Sistema de Pontuação</p>
+        
+        <div style="background: var(--bg-dark); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--borda-divisoria);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: var(--text-white);">Placar Exato (Na mosca)</span>
+            <span class="font-russo" style="color: var(--accent-cyan);">+3 PTS</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: var(--text-white);">Acertar Vencedor/Empate</span>
+            <span class="font-russo" style="color: var(--accent-green);">+1 PT</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-gray);">Errar Tudo (Bagre)</span>
+            <span class="font-russo" style="color: var(--vermelho);">0 PTS</span>
+          </div>
+        </div>
+
+        <p class="font-russo text-white mb-10 mt-20" style="font-size: 16px;">🏆 Premiação da Temporada</p>
+        
+        <div style="background: var(--bg-dark); padding: 15px; border-radius: 12px; border: 1px solid #eab308;">
+          <p style="color: #eab308; font-size: 14px; text-align: center; margin: 0;">
+            O Campeão da Temporada 6 leva a <strong>Taça Pato de Ouro</strong> e a glória eterna no mural da Brah.Bet!
+          </p>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // Trava rápida de segurança (Opcional, se quiser forçar o usuário a estar logado para ler as regras)
+    const nomeLogado = localStorage.getItem('nome_craque');
+    if (!nomeLogado) {
+      // window.location.href = 'login.html'; 
+    }
+  </script>
+
+</body>
+</html>

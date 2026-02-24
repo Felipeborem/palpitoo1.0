@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Social</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="_index.html" style="text-decoration: none; color: inherit;">
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
+        </div>
+    </a>
+    
+    <nav>
+      <ul class="nav-links">
+        <li><a href="_index.html">Início</a></li> 
+        <li><a href="ligas.html">Ligas</a></li> 
+        <li><a href="palpites.html">Palpites</a></li>
+        <li><a href="novidades.html">Novidades</a></li>
+        <li><a href="social.html" class="ativo">Social</a></li>
+        <li><a href="carreira.html">Carreira</a></li>
+        
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container-principal" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 40px;">
+    
+    <section class="cartao bg-escuro animacao-suave">
+      <div class="cabecalho-palpite mb-20 text-center">
+        <h2 class="font-russo titulo-branco">Encontrar Craques</h2>
+        <p class="subtitulo-tempo">Convoque mais rivais para a Brah.Bet</p>
+      </div>
+
+      <div class="divisor-tracejado mb-20"></div>
+
+      <div class="form-group" style="display: flex; gap: 10px;">
+        <input type="text" id="inputBusca" placeholder="Digite o nome ou e-mail..." style="margin-bottom: 0;">
+        <button class="btn btn-salvar font-russo" onclick="buscarUsuarios()" style="margin-top: 0; padding: 0 20px;">Buscar</button>
+      </div>
+
+      <div id="lista-busca" class="mt-20">
+        <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px;">
+          <img src="https://via.placeholder.com/50" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px;">
+          <div style="text-align: left; padding-left: 10px;">
+            <p class="font-russo text-white" style="font-size: 16px;">Acácio</p>
+            <p style="color: var(--text-gray); font-size: 12px;">Vasco da Gama</p>
+          </div>
+          <button class="btn btn-salvar font-russo" style="padding: 8px 15px; font-size: 12px; background-color: var(--accent-cyan);">+ Add</button>
+        </div>
+        
+        <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px;">
+          <img src="https://via.placeholder.com/50" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px;">
+          <div style="text-align: left; padding-left: 10px;">
+            <p class="font-russo text-white" style="font-size: 16px;">Fernando</p>
+            <p style="color: var(--text-gray); font-size: 12px;">São Paulo</p>
+          </div>
+          <button class="btn btn-salvar font-russo" style="padding: 8px 15px; font-size: 12px; background-color: var(--accent-cyan);">+ Add</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="cartao bg-escuro animacao-suave">
+      <div class="cabecalho-palpite mb-20 text-center">
+        <h2 class="font-russo titulo-branco">Meus Amigos</h2>
+        <p class="subtitulo-tempo">A tropa abençoada pelo Pato Mestre</p>
+      </div>
+
+      <div class="divisor-tracejado mb-20"></div>
+
+      <div id="lista-amigos">
+        <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px;">
+          <img src="https://via.placeholder.com/50" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px; border-color: var(--accent-green);">
+          <div style="text-align: left; padding-left: 10px;">
+            <p class="font-russo text-white" style="font-size: 16px;">Guigo <span style="font-size: 12px; color: var(--accent-green);">✔️ Amigo</span></p>
+            <p style="color: var(--text-gray); font-size: 12px;">Flamengo</p>
+          </div>
+          <button class="btn btn-cancelar font-russo" style="padding: 8px 15px; font-size: 12px;" title="Remover Amigo">X</button>
+        </div>
+
+        <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px;">
+          <img src="https://via.placeholder.com/50" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px; border-color: var(--accent-green);">
+          <div style="text-align: left; padding-left: 10px;">
+            <p class="font-russo text-white" style="font-size: 16px;">Emanuel <span style="font-size: 12px; color: var(--accent-green);">✔️ Amigo</span></p>
+            <p style="color: var(--text-gray); font-size: 12px;">Fluminense</p>
+          </div>
+          <button class="btn btn-cancelar font-russo" style="padding: 8px 15px; font-size: 12px;" title="Remover Amigo">X</button>
+        </div>
+      </div>
+      
+    </section>
+
+  </main>
+
+  <script>
+    // Checagem de segurança básica: Se não estiver logado, não pode ver a página social
+    const idLogado = localStorage.getItem('craqueId');
+    if (!idLogado) {
+      // window.location.href = 'login.html'; // Descomente quando quiser ativar a trava
+    }
+
+    // Função "fake" (por enquanto) para simular a busca de usuários
+    function buscarUsuarios() {
+      const termo = document.getElementById('inputBusca').value;
+      if (!termo) {
+        alert("Digite um nome para buscar!");
+        return;
+      }
+      
+      // Aqui, futuramente, faremos um fetch('http://localhost:3000/buscar-usuarios?nome=...')
+      console.log("Buscando no banco por:", termo);
+      alert("Procurando por " + termo + " no banco de dados...");
+    }
+
+    // Função "fake" (por enquanto) para simular adição de amigo
+    function adicionarAmigo(idAmigo) {
+      // Aqui faremos o POST para salvar a relação na tabela de amigos
+      console.log("Adicionando amigo ID:", idAmigo);
+      alert("Convite enviado para o craque!");
+    }
+  </script>
+
+</body>
+</html>

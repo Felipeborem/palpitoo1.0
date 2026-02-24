@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Ligas</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="_index.html" style="text-decoration: none; color: inherit;">
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
+        </div>
+    </a>
+    
+    <nav>
+      <ul class="nav-links">
+        <li><a href="_index.html">Início</a></li> 
+        <li><a href="ligas.html" class="ativo">Ligas</a></li> 
+        <li><a href="palpites.html">Palpites</a></li>
+        <li><a href="novidades.html">Novidades</a></li>
+        <li><a href="social.html">Social</a></li>
+        <li><a href="carreira.html">Carreira</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container-principal" style="margin-top: 40px;">
+    
+    <div class="text-center mb-20 animacao-suave">
+      <h2 class="font-russo titulo-branco" style="font-size: 32px;">Suas <span style="color: var(--accent-cyan);">Ligas</span></h2>
+      <p style="color: var(--text-gray); font-size: 16px;">Gerencie seus campeonatos e crie novas disputas</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+      
+      <section class="cartao bg-escuro animacao-suave">
+        <h3 class="font-russo titulo-branco mb-15" style="font-size: 20px;">🏆 Campeonatos Ativos</h3>
+        <div class="divisor-tracejado mb-20"></div>
+
+        <ul style="list-style: none; padding: 0;">
+          
+          <li class="cartao bg-dark animacao-suave" style="padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--accent-cyan); background: var(--bg-dark);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h4 class="font-russo text-white" style="font-size: 16px; margin: 0;">⚜️ Brah.League (Série A)</h4>
+              <span style="background: var(--accent-green); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">OFICIAL</span>
+            </div>
+            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">Mata-mata - 8 Participantes</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <p class="font-russo" style="color: var(--accent-cyan); font-size: 14px; margin: 0;">Sua Posição: 3º</p>
+              <button class="btn btn-salvar font-russo" style="padding: 6px 12px; font-size: 12px; margin: 0;">Acessar</button>
+            </div>
+          </li>
+
+          <li class="cartao bg-dark animacao-suave" style="padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--text-gray); background: var(--bg-dark);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h4 class="font-russo text-white" style="font-size: 16px; margin: 0;">💻 Liga da Computação</h4>
+              <span style="background: var(--borda-divisoria); color: var(--text-gray); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">PRIVADA</span>
+            </div>
+            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">Pontos Corridos - 14 Participantes</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <p class="font-russo" style="color: var(--text-white); font-size: 14px; margin: 0;">Sua Posição: 5º</p>
+              <button class="btn btn-cancelar font-russo" style="padding: 6px 12px; font-size: 12px; margin: 0; color: var(--text-white); border-color: var(--text-white);">Acessar</button>
+            </div>
+          </li>
+
+          <li class="cartao bg-dark animacao-suave" style="padding: 15px; border-left: 4px solid var(--text-gray); background: var(--bg-dark);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h4 class="font-russo text-white" style="font-size: 16px; margin: 0;">🚗 Liga dos Estagiários</h4>
+              <span style="background: var(--borda-divisoria); color: var(--text-gray); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">PRIVADA</span>
+            </div>
+            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">Pontos Corridos - 6 Participantes</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <p class="font-russo" style="color: var(--text-white); font-size: 14px; margin: 0;">Sua Posição: 1º</p>
+              <button class="btn btn-cancelar font-russo" style="padding: 6px 12px; font-size: 12px; margin: 0; color: var(--text-white); border-color: var(--text-white);">Acessar</button>
+            </div>
+          </li>
+
+        </ul>
+      </section>
+
+      <section style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <div class="cartao bg-escuro animacao-suave">
+          <h3 class="font-russo titulo-branco mb-10" style="font-size: 20px;">🔑 Entrar em uma Liga</h3>
+          <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 15px;">Recebeu um código de convite? Digite abaixo para entrar na disputa.</p>
+          
+          <div class="form-group" style="display: flex; gap: 10px; margin-bottom: 0;">
+            <input type="text" id="codigoLiga" placeholder="Ex: BRAH-2026-XYZ" style="margin-bottom: 0; text-transform: uppercase;">
+            <button class="btn btn-salvar font-russo" onclick="entrarNaLiga()" style="margin-top: 0; padding: 0 20px;">Entrar</button>
+          </div>
+        </div>
+
+        <div class="cartao bg-escuro animacao-suave" style="text-align: center; border: 2px dashed var(--accent-cyan); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px 20px;">
+          <div style="font-size: 40px; margin-bottom: 15px;">👑</div>
+          <h3 class="font-russo titulo-branco mb-10" style="font-size: 20px;">Seja o Dono da Liga</h3>
+          <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 20px; max-width: 250px;">Crie seu próprio campeonato, defina as regras e convide a rapaziada.</p>
+          <button class="btn btn-primary" style="width: auto; padding: 12px 30px; font-size: 14px; background-color: var(--accent-cyan);">+ Criar Nova Liga</button>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // Script simulando a entrada em uma liga
+    function entrarNaLiga() {
+      const codigo = document.getElementById('codigoLiga').value;
+      if (!codigo) {
+        alert("Pô, craque! Digita um código válido aí.");
+        return;
+      }
+      
+      // Aqui entraria o fetch para o backend
+      alert("Procurando a liga com o código " + codigo.toUpperCase() + "...");
+      document.getElementById('codigoLiga').value = '';
+    }
+
+    // Trava de segurança
+    const nomeLogado = localStorage.getItem('nome_craque');
+    if (!nomeLogado) {
+      // window.location.href = 'login.html'; 
+    }
+  </script>
+
+</body>
+</html>
