@@ -8,17 +8,209 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/style.css">
+
+  <style>
+    /* ── LINHA DE JOGO ──────────────────────────────────────── */
+    .linha-jogo {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--borda-divisoria);
+      background: var(--bg-dark);
+      margin-bottom: 10px;
+      transition: border-color 0.2s ease;
+    }
+    .linha-jogo:hover { border-color: var(--accent-cyan); }
+    .linha-jogo.finalizado {
+      opacity: 0.6;
+      border-color: #f87171;
+    }
+
+    /* ── NOMES DOS TIMES ── */
+    .nome-time {
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      color: var(--text-white);
+      line-height: 1.3;
+      word-break: break-word;
+    }
+    .time-casa { text-align: right; }
+    .time-fora { text-align: left; }
+
+    /* ── ÁREA DO PLACAR ── */
+    .area-placar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ── INPUT PLACAR ── */
+    .input-placar {
+      width: 48px;
+      height: 48px;
+      text-align: center;
+      font-family: 'Russo One', sans-serif;
+      font-size: 18px;
+      color: var(--text-white);
+      background: var(--bg-escuro, #111827);
+      border: 2px solid var(--borda-divisoria);
+      border-radius: 10px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      /* Remove setas do input number */
+      -moz-appearance: textfield;
+    }
+    .input-placar::-webkit-outer-spin-button,
+    .input-placar::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .input-placar:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(var(--accent-cyan-rgb, 122,30,58), 0.15);
+    }
+    .input-placar:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      border-color: #f87171;
+    }
+
+    /* ── DISPLAY PLACAR (comprovante) ── */
+    .placar-display {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Russo One', sans-serif;
+      font-size: 18px;
+      color: var(--text-white);
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+
+    .versus {
+      font-family: 'Russo One', sans-serif;
+      font-size: 16px;
+      color: var(--text-gray);
+      flex-shrink: 0;
+    }
+
+    /* ── AVISO JOGO ENCERRADO ── */
+    .aviso-encerrado {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 10px;
+      color: #f87171;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    /* ── TÍTULO DE RODADA ── */
+    .titulo-rodada {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0 12px;
+    }
+    .titulo-rodada::before,
+    .titulo-rodada::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--borda-divisoria);
+    }
+    .titulo-rodada span {
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      white-space: nowrap;
+    }
+
+    /* ── STATUS BADGE ── */
+    .status-badge {
+      font-family: 'Russo One', sans-serif;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .status-badge.aberto     { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .status-badge.andamento  { background: rgba(250,204,21,0.12); color: #facc15; border: 1px solid rgba(250,204,21,0.3); }
+    .status-badge.finalizado { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+    /* ── ÁREA CENTRAL DO COMPROVANTE ── */
+    .centro-comprovante {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── PONTOS OBTIDOS ── */
+    .pontos-obtidos {
+      font-family: 'Russo One', sans-serif;
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 8px;
+    }
+    .pontos-obtidos.exato    { background: rgba(34,197,94,0.15);  color: #22c55e; }
+    .pontos-obtidos.vencedor { background: rgba(234,179,8,0.15);  color: #eab308; }
+    .pontos-obtidos.errou    { background: rgba(248,113,113,0.15);color: #f87171; }
+
+    /* ── DIVISOR ── */
+    .divisor-jogo {
+      border: none;
+      border-top: 1px dashed var(--borda-divisoria);
+      margin: 6px 8% 16px;
+    }
+
+    /* ── BOTÕES ── */
+    .botoes-acao {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .botoes-acao .btn { flex: 1; min-width: 120px; max-width: 200px; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 480px) {
+      .linha-jogo {
+        grid-template-columns: 1fr auto 1fr;
+        gap: 8px;
+        padding: 12px 8px;
+      }
+      .nome-time { font-size: 11px; }
+      .input-placar, .placar-display { width: 42px; height: 42px; font-size: 16px; }
+      .botoes-acao .btn { max-width: 100%; }
+    }
+  </style>
 </head>
 <body>
 
   <header class="navbar">
     <a href="_index.html" class="logo-link">
-    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
-</a>
+      <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+    </a>
     <nav>
       <ul class="nav-links">
-        <li><a href="_index.html">Início</a></li> 
-        <li><a href="ligas.html">Ligas</a></li>
+        <li><a href="_index.html">Início</a></li>
+        <li><a href="minhaliga.html">Ligas</a></li>
         <li><a href="palpites.html" class="ativo">Palpites</a></li>
         <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
@@ -28,131 +220,147 @@
   </header>
 
   <main class="container-principal container-palpites">
-    
+
+    <!-- CARD: FAZER PALPITES -->
     <section class="cartao bg-escuro cartao-palpite animacao-suave">
-      
       <div class="cabecalho-palpite mb-20">
-        <h2 class="font-russo titulo-branco text-center">Palpites Brah.bet</h2>
+        <h2 class="font-russo titulo-branco text-center">Palpites da Rodada</h2>
         <p class="subtitulo-tempo text-center">Deixe seus palpites para os próximos jogos</p>
       </div>
 
       <div class="lista-jogos" id="container-jogos">
-        <p class="text-center text-white font-russo mt-10">Buscando tabela de jogos... 🔄</p>
+        <p class="text-center font-russo mt-10" style="color: var(--text-gray);">Buscando tabela de jogos... 🔄</p>
       </div>
 
       <div class="botoes-acao mt-20">
         <button class="btn btn-cancelar font-russo" onclick="limparPalpites()">Limpar</button>
-        <button class="btn btn-salvar font-russo" onclick="enviarTodosPalpites()">Salvar Palpites</button>
+        <button class="btn btn-salvar font-russo"   onclick="enviarTodosPalpites()">Salvar Palpites</button>
       </div>
-
     </section>
 
+    <!-- CARD: COMPROVANTES -->
     <section class="cartao bg-escuro cartao-palpite animacao-suave mt-20">
       <div class="cabecalho-palpite mb-20">
         <h2 class="font-russo titulo-branco text-center">Meus Palpites Registrados</h2>
         <p class="subtitulo-tempo text-center">Acompanhe o andamento das partidas</p>
       </div>
-      
       <div class="lista-jogos" id="resumo-palpites">
-        <p class="text-center text-white font-russo mt-10">Buscando seus comprovantes...</p>
+        <p class="text-center font-russo mt-10" style="color: var(--text-gray);">Buscando seus comprovantes... 🔄</p>
       </div>
     </section>
 
   </main>
 
+  <!-- TOASTS -->
+  <div id="container-avisos"></div>
+
 <script>
   let jogosCarregados = [];
 
-  // 1. FUNÇÃO QUE BUSCA E DESENHA OS JOGOS SEPARADOS POR RODADA
-async function carregarJogos() {
-    try {
-      const resposta = await fetch('http://localhost:3000/jogos');
-      jogosCarregados = await resposta.json();
-      
-      const container = document.getElementById('container-jogos');
-      container.innerHTML = ''; 
+  // ── TOAST (substitui alert()) ────────────────────────────
+  function mostrarAviso(msg, tipo = 'info') {
+    const cont  = document.getElementById('container-avisos');
+    const toast = document.createElement('div');
+    const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+    toast.className = `aviso-toast aviso-${tipo}`;
+    toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
+    cont.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('aviso-saindo');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
 
-      if (jogosCarregados.length === 0) {
-        container.innerHTML = '<p class="text-center text-white font-russo mt-10">Nenhum jogo liberado ainda.</p>';
+  // ── STATUS BADGE ─────────────────────────────────────────
+  function statusBadge(status) {
+    const s = status.toLowerCase();
+    if (s === 'finalizado')  return `<span class="status-badge finalizado">🔒 Finalizado</span>`;
+    if (s === 'em andamento') return `<span class="status-badge andamento">🟡 Em andamento</span>`;
+    return `<span class="status-badge aberto">🟢 Aberto</span>`;
+  }
+
+  // 1. CARREGAR E DESENHAR OS JOGOS POR RODADA ──────────────
+  async function carregarJogos() {
+    try {
+      const resposta    = await fetch('http://localhost:3000/jogos');
+      jogosCarregados   = await resposta.json();
+      const container   = document.getElementById('container-jogos');
+      container.innerHTML = '';
+
+      if (!jogosCarregados.length) {
+        container.innerHTML = '<p class="text-center font-russo mt-10" style="color:var(--text-gray);">Nenhum jogo liberado ainda.</p>';
         return;
       }
 
-      const jogosPorRodada = {};
-      jogosCarregados.forEach(jogo => {
-        const rodada = jogo.rodada || 1;
-        if (!jogosPorRodada[rodada]) jogosPorRodada[rodada] = [];
-        jogosPorRodada[rodada].push(jogo);
+      // Agrupa por rodada
+      const porRodada = {};
+      jogosCarregados.forEach(j => {
+        const r = j.rodada || 1;
+        if (!porRodada[r]) porRodada[r] = [];
+        porRodada[r].push(j);
       });
 
-      for (const rodada in jogosPorRodada) {
+      for (const rodada in porRodada) {
+        // Título da rodada
         container.innerHTML += `
-          <div class="text-center mt-10 mb-5" style="border-bottom: 2px dashed var(--borda-divisoria); padding-bottom: 10px;">
-            <h3 class="font-russo" style="color: var(--accent-cyan); font-size: 20px;">🏆 RODADA ${rodada}</h3>
-          </div>
-        `;
+          <div class="titulo-rodada">
+            <span>🏆 Rodada ${rodada}</span>
+          </div>`;
 
-        jogosPorRodada[rodada].forEach(jogo => {
-          // NOVA LÓGICA: Se o jogo acabou, desabilita o campo e muda a cor
-          const jogoFinalizado = jogo.status.toLowerCase() === "finalizado";
-          const estiloInput = jogoFinalizado ? "opacity: 0.5; cursor: not-allowed; border-color: #f87171;" : "";
-          const propDisabled = jogoFinalizado ? "disabled" : "";
+        porRodada[rodada].forEach(jogo => {
+          const finalizado = jogo.status.toLowerCase() === 'finalizado';
 
           container.innerHTML += `
-            <div class="linha-jogo" style="${jogoFinalizado ? 'filter: grayscale(0.8);' : ''}">
+            <div class="linha-jogo ${finalizado ? 'finalizado' : ''}">
               <span class="nome-time time-casa">${jogo.time_casa}</span>
-              
+
               <div class="area-placar">
-                <input type="number" id="casa_${jogo.id_jogo}" 
-                       class="input-placar font-russo" 
-                       placeholder="0" min="0" 
-                       style="${estiloInput}" ${propDisabled}>
-                
+                <input type="number" id="casa_${jogo.id_jogo}"
+                       class="input-placar font-russo"
+                       placeholder="0" min="0"
+                       ${finalizado ? 'disabled' : ''}>
                 <span class="versus">x</span>
-                
-                <input type="number" id="fora_${jogo.id_jogo}" 
-                       class="input-placar font-russo" 
-                       placeholder="0" min="0" 
-                       style="${estiloInput}" ${propDisabled}>
+                <input type="number" id="fora_${jogo.id_jogo}"
+                       class="input-placar font-russo"
+                       placeholder="0" min="0"
+                       ${finalizado ? 'disabled' : ''}>
               </div>
-              
-              <span class="nome-time time-fora text-left">${jogo.time_fora}</span>
+
+              <span class="nome-time time-fora">${jogo.time_fora}</span>
             </div>
-            ${jogoFinalizado ? '<p class="text-center text-red-500 font-russo" style="font-size: 9px; margin-top: -10px;">🔒 Palpites encerrados para este jogo</p>' : ''}
-          `;
+            ${finalizado ? '<p class="aviso-encerrado">🔒 Palpites encerrados para este jogo</p>' : ''}`;
         });
       }
+
       puxarPalpitesSalvos();
-    } catch (erro) {
-      console.error("Erro:", erro);
+    } catch (err) {
+      console.error('Erro:', err);
+      document.getElementById('container-jogos').innerHTML =
+        '<p class="text-center font-russo mt-10" style="color:#f87171;">Erro ao conectar com o servidor.</p>';
     }
   }
-  // 2. FUNÇÃO QUE RECOLHE OS DADOS DIGITADOS
+
+  // 2. ENVIAR PALPITES ───────────────────────────────────────
   async function enviarTodosPalpites() {
-    const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque'); 
-    
-    if (!idUsuario) {
-      alert("Você precisa estar logado para salvar seus palpites!");
-      return;
-    }
+    const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+    if (!idUsuario) { mostrarAviso('Você precisa estar logado para salvar seus palpites!', 'erro'); return; }
 
     const palpitesParaSalvar = [];
-
     jogosCarregados.forEach(jogo => {
-      const inputCasa = document.getElementById(`casa_${jogo.id_jogo}`).value;
-      const inputFora = document.getElementById(`fora_${jogo.id_jogo}`).value;
-
-      if (inputCasa !== "" && inputFora !== "") {
+      const inputCasa = document.getElementById(`casa_${jogo.id_jogo}`);
+      const inputFora = document.getElementById(`fora_${jogo.id_jogo}`);
+      if (inputCasa && inputFora && inputCasa.value !== '' && inputFora.value !== '') {
         palpitesParaSalvar.push({
-          id_jogo: jogo.id_jogo,
+          id_jogo:   jogo.id_jogo,
           id_usuario: idUsuario,
-          gols_casa: parseInt(inputCasa),
-          gols_fora: parseInt(inputFora)
+          gols_casa: parseInt(inputCasa.value),
+          gols_fora: parseInt(inputFora.value)
         });
       }
     });
 
-    if (palpitesParaSalvar.length === 0) {
-      alert("Preencha pelo menos um placar para salvar!");
+    if (!palpitesParaSalvar.length) {
+      mostrarAviso('Preencha pelo menos um placar para salvar!', 'erro');
       return;
     }
 
@@ -160,118 +368,104 @@ async function carregarJogos() {
       const resposta = await fetch('http://localhost:3000/palpites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ palpites: palpitesParaSalvar }) 
+        body: JSON.stringify({ palpites: palpitesParaSalvar })
       });
-
       const resultado = await resposta.json();
 
       if (resposta.ok) {
-        alert("✅ " + resultado.mensagem);
-        // Atualiza os comprovantes logo após salvar!
+        mostrarAviso(resultado.mensagem, 'sucesso');
         puxarPalpitesSalvos();
       } else {
-        alert("❌ Ops: " + resultado.erro);
+        mostrarAviso(resultado.erro || 'Erro ao salvar.', 'erro');
       }
-    } catch (erro) {
-      console.error("Erro na conexão:", erro);
-      alert("Servidor desligado! Verifique o terminal.");
+    } catch (err) {
+      console.error(err);
+      mostrarAviso('Servidor desligado! Verifique o terminal.', 'erro');
     }
   }
 
-  // 3. FUNÇÃO DO BOTÃO LIMPAR
+  // 3. LIMPAR INPUTS ─────────────────────────────────────────
   function limparPalpites() {
-    const inputs = document.querySelectorAll('.input-placar');
-    inputs.forEach(input => input.value = '');
+    document.querySelectorAll('.input-placar:not(:disabled)').forEach(i => i.value = '');
+    mostrarAviso('Palpites limpos.', 'info');
   }
 
-  // 4. FUNÇÃO QUE PREENCHE OS INPUTS E GERA O RESUMO (AGORA COM RODADAS!)
+  // 4. PUXAR PALPITES SALVOS E GERAR COMPROVANTES ───────────
   async function puxarPalpitesSalvos() {
     const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
     if (!idUsuario) return;
 
     try {
-      const resposta = await fetch(`http://localhost:3000/meus-palpites/${idUsuario}`);
+      const resposta    = await fetch(`http://localhost:3000/meus-palpites/${idUsuario}`);
       const meusPalpites = await resposta.json();
-
       const containerResumo = document.getElementById('resumo-palpites');
-      containerResumo.innerHTML = ''; 
+      containerResumo.innerHTML = '';
 
-      if (meusPalpites.length === 0) {
-        containerResumo.innerHTML = '<p class="text-center text-gray-400 font-russo mt-10">Você ainda não deu nenhum palpite.</p>';
+      if (!meusPalpites.length) {
+        containerResumo.innerHTML =
+          '<p class="text-center font-russo mt-10" style="color:var(--text-gray);">Você ainda não deu nenhum palpite.</p>';
         return;
       }
 
-      // PREENCHE AS CAIXINHAS LÁ EM CIMA PARA EDIÇÃO
-      meusPalpites.forEach(palpite => {
-        const inputCasa = document.getElementById(`casa_${palpite.jogo_id}`);
-        const inputFora = document.getElementById(`fora_${palpite.jogo_id}`);
-        if (inputCasa && inputFora) {
-          inputCasa.value = palpite.gols_casa_palpite;
-          inputFora.value = palpite.gols_fora_palpite;
-        }
+      // Preenche inputs para edição
+      meusPalpites.forEach(p => {
+        const iCasa = document.getElementById(`casa_${p.jogo_id}`);
+        const iFora = document.getElementById(`fora_${p.jogo_id}`);
+        if (iCasa && iFora) { iCasa.value = p.gols_casa_palpite; iFora.value = p.gols_fora_palpite; }
       });
 
-      // AGRUPANDO OS COMPROVANTES POR RODADA TAMBÉM
-      const comprovantesPorRodada = {};
-      
-      meusPalpites.forEach(palpite => {
-        const jogo = jogosCarregados.find(j => j.id_jogo === palpite.jogo_id);
-        if (jogo) {
-          const rodada = jogo.rodada || 1;
-          if (!comprovantesPorRodada[rodada]) comprovantesPorRodada[rodada] = [];
-          
-          comprovantesPorRodada[rodada].push({ palpite, jogo });
-        }
+      // Agrupa comprovantes por rodada
+      const porRodada = {};
+      meusPalpites.forEach(p => {
+        const jogo = jogosCarregados.find(j => j.id_jogo === p.jogo_id);
+        if (!jogo) return;
+        const r = jogo.rodada || 1;
+        if (!porRodada[r]) porRodada[r] = [];
+        porRodada[r].push({ palpite: p, jogo });
       });
 
-      // DESENHANDO OS COMPROVANTES
-      for (const rodada in comprovantesPorRodada) {
+      for (const rodada in porRodada) {
         containerResumo.innerHTML += `
-          <div class="text-center mt-10 mb-5">
-            <h3 class="font-russo" style="color: var(--text-gray); font-size: 16px;">▶ RODADA ${rodada}</h3>
-          </div>
-        `;
+          <div class="titulo-rodada">
+            <span>Rodada ${rodada}</span>
+          </div>`;
 
-        comprovantesPorRodada[rodada].forEach(item => {
-          const { palpite, jogo } = item;
-          
-          let corStatus = "color: #4ade80;"; // Verde para aberto
-          if (jogo.status.toLowerCase() === "em andamento") corStatus = "color: #facc15;"; // Amarelo
-          if (jogo.status.toLowerCase() === "finalizado") corStatus = "color: #f87171;"; // Vermelho
+        porRodada[rodada].forEach(({ palpite, jogo }) => {
+          const s = jogo.status.toLowerCase();
+
+          // Badge de pontos (só mostra se finalizado e tiver pontos)
+          let ptsBadge = '';
+          if (s === 'finalizado' && palpite.pontos_obtidos !== null && palpite.pontos_obtidos !== undefined) {
+            if (palpite.pontos_obtidos === 3)      ptsBadge = '<span class="pontos-obtidos exato">🎯 +3pts — Exato!</span>';
+            else if (palpite.pontos_obtidos === 1)  ptsBadge = '<span class="pontos-obtidos vencedor">✅ +1pt — Vencedor</span>';
+            else                                    ptsBadge = '<span class="pontos-obtidos errou">❌ 0pts — Errou</span>';
+          }
 
           containerResumo.innerHTML += `
-            <div class="linha-jogo" style="margin-bottom: 5px;">
+            <div class="linha-jogo" style="margin-bottom:6px;">
               <span class="nome-time time-casa">${jogo.time_casa}</span>
-              
-              <div style="display: flex; flex-direction: column; align-items: center;">
-                <span class="font-russo" style="${corStatus} font-size: 10px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
-                  ● ${jogo.status}
-                </span>
-                
-                <div class="area-placar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                  <div class="input-placar font-russo" style="display: flex; align-items: center; justify-content: center; background-color: #1f2937; color: white; border: 1px solid #374151;">
-                    ${palpite.gols_casa_palpite}
-                  </div>
+
+              <div class="centro-comprovante">
+                ${statusBadge(jogo.status)}
+                <div class="area-placar">
+                  <div class="placar-display">${palpite.gols_casa_palpite}</div>
                   <span class="versus">x</span>
-                  <div class="input-placar font-russo" style="display: flex; align-items: center; justify-content: center; background-color: #1f2937; color: white; border: 1px solid #374151;">
-                    ${palpite.gols_fora_palpite}
-                  </div>
+                  <div class="placar-display">${palpite.gols_fora_palpite}</div>
                 </div>
+                ${ptsBadge}
               </div>
-              
-              <span class="nome-time time-fora text-left">${jogo.time_fora}</span>
+
+              <span class="nome-time time-fora">${jogo.time_fora}</span>
             </div>
-            <div style="border-bottom: 1px dashed #333; margin: 15px 10% 25px 10%;"></div>
-          `;
+            <hr class="divisor-jogo">`;
         });
       }
-      
-    } catch (erro) {
-      console.error("Erro ao puxar os palpites:", erro);
+
+    } catch (err) {
+      console.error('Erro ao puxar palpites:', err);
     }
   }
 
-  // LIGA O MOTOR!
   carregarJogos();
 </script>
 <script src="main.js"></script>

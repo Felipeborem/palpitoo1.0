@@ -3,25 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palpitoo - Novidades e Regras</title>
-  
+  <title>Palpitoo - Novidades</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
-  
+
   <link rel="stylesheet" href="./css/style.css">
+
+  <style>
+    .feed-item {
+      display: flex;
+      gap: 14px;
+      padding: 16px;
+      background: var(--bg-dark);
+      border-radius: 14px;
+      border: 1px solid var(--borda-divisoria);
+      margin-bottom: 10px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+      animation: fadeSlide 0.4s ease forwards;
+      opacity: 0;
+    }
+    .feed-item:hover {
+      border-color: var(--accent-cyan);
+      transform: translateX(3px);
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .feed-item.tipo-pessoal { border-left: 3px solid var(--accent-cyan); }
+    .feed-item.tipo-liga    { border-left: 3px solid var(--accent-green); }
+    .feed-item.tipo-sistema { border-left: 3px solid #eab308; }
+    .feed-item.tipo-pato    { border-left: 3px solid var(--accent-cyan); background: rgba(122,30,58,0.06); }
+
+    .feed-icone {
+      font-size: 22px;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      background: var(--bg-header);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--borda-divisoria);
+    }
+
+    .feed-corpo { flex-grow: 1; }
+    .feed-titulo {
+      font-family: 'Russo One', sans-serif;
+      font-size: 14px;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+    .feed-descricao {
+      font-size: 13px;
+      color: var(--text-gray);
+      line-height: 1.5;
+    }
+    .feed-tempo {
+      font-size: 10px;
+      color: var(--text-gray);
+      margin-top: 6px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .filtro-btn {
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      border: 1px solid var(--borda-divisoria);
+      background: var(--bg-dark);
+      color: var(--text-gray);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .filtro-btn:hover { border-color: var(--accent-cyan); color: var(--text-white); }
+    .filtro-btn.ativo { background: var(--accent-cyan); color: var(--text-white); border-color: var(--accent-cyan); }
+
+    .regra-linha {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--borda-divisoria);
+    }
+    .regra-linha:last-child { border-bottom: none; }
+
+    .badge-tipo {
+      font-family: 'Russo One', sans-serif;
+      font-size: 9px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .badge-pessoal { background: rgba(122,30,58,0.2);  color: var(--accent-cyan);  border: 1px solid var(--accent-cyan); }
+    .badge-liga    { background: rgba(46,125,50,0.2);  color: #4ade80;              border: 1px solid #4ade80; }
+    .badge-sistema { background: rgba(234,179,8,0.15); color: #eab308;             border: 1px solid #eab308; }
+    .badge-pato    { background: rgba(122,30,58,0.2);  color: var(--accent-cyan);  border: 1px solid var(--accent-cyan); }
+  </style>
 </head>
 <body>
 
   <header class="navbar">
     <a href="_index.html" class="logo-link">
-    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
-</a>
-    
+      <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+    </a>
     <nav>
       <ul class="nav-links">
-        <li><a href="_index.html">Início</a></li> 
-        <li><a href="ligas.html">Ligas</a></li> 
+        <li><a href="_index.html">Início</a></li>
+        <li><a href="ligas.html">Ligas</a></li>
         <li><a href="palpites.html">Palpites</a></li>
         <li><a href="novidades.html" class="ativo">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
@@ -30,80 +130,416 @@
     </nav>
   </header>
 
-  <main class="container-principal" style="max-width: 900px; margin-top: 40px;">
-    
+  <main class="container-principal" style="max-width: 960px; margin-top: 40px;">
+
+    <!-- Cabeçalho -->
     <div class="text-center mb-20 animacao-suave">
       <h2 class="font-russo titulo-branco" style="font-size: 32px;">Central da <span style="color: var(--accent-cyan);">Brah.Bet</span></h2>
-      <p style="color: var(--text-gray); font-size: 16px;">Regras, Mural do Pato e Atualizações da Liga</p>
+      <p style="color: var(--text-gray); font-size: 15px;">Feed da liga, notificações pessoais e decretos do Pato Mestre</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
-      
-      <section class="cartao bg-escuro animacao-suave" style="border-top: 4px solid var(--accent-cyan);">
-        <div style="display: flex; align-items: center; gap: 15px; mb-15">
-          <div style="font-size: 40px; background: var(--bg-dark); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--accent-cyan);">🦆</div>
-          <div>
-            <h3 class="font-russo titulo-branco" style="font-size: 20px; margin: 0;">Mural do Pato</h3>
-            <p style="color: var(--accent-cyan); font-size: 12px; margin: 0;">ÚLTIMOS DECRETOS</p>
-          </div>
-        </div>
-        
-        <div class="divisor-tracejado mb-15 mt-15"></div>
+    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 30px; align-items: start;">
 
-        <ul style="list-style: none; padding: 0;">
-          <li style="background: var(--bg-dark); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 3px solid var(--accent-cyan);">
-            <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 5px;">📅 Temporada 6 - Rodada 2</p>
-            <p class="font-russo" style="font-size: 14px; color: var(--text-white);">"Atenção, bagres! O mercado fecha 3 horas antes do primeiro jogo. Quem não palpitar vai ficar com ZERO!"</p>
-          </li>
-          <li style="background: var(--bg-dark); padding: 15px; border-radius: 12px; border-left: 3px solid var(--text-gray);">
-            <p style="font-size: 12px; color: var(--text-gray); margin-bottom: 5px;">📅 Atualização do Sistema</p>
-            <p class="font-russo" style="font-size: 14px; color: var(--text-gray);">A nova aba 'Social' já está liberada para convocar os rivais.</p>
-          </li>
-        </ul>
-      </section>
+      <!-- ══ COLUNA ESQUERDA: FEED ══ -->
+      <div>
 
-      <section class="cartao bg-escuro animacao-suave" style="border-top: 4px solid var(--text-white);">
-        <h3 class="font-russo titulo-branco mb-15" style="font-size: 20px;">⚖️ Regulamento Oficial</h3>
-        
-        <div class="divisor-tracejado mb-15"></div>
-
-        <p class="font-russo text-white mb-10" style="font-size: 16px;">🎯 Sistema de Pontuação</p>
-        
-        <div style="background: var(--bg-dark); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--borda-divisoria);">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: var(--text-white);">Placar Exato (Na mosca)</span>
-            <span class="font-russo" style="color: var(--accent-cyan);">+3 PTS</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: var(--text-white);">Acertar Vencedor/Empate</span>
-            <span class="font-russo" style="color: var(--accent-green);">+1 PT</span>
-          </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: var(--text-gray);">Errar Tudo (Bagre)</span>
-            <span class="font-russo" style="color: var(--vermelho);">0 PTS</span>
-          </div>
+        <!-- Filtros -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+          <button class="filtro-btn ativo" onclick="filtrar('todos', this)">🌐 Todos</button>
+          <button class="filtro-btn" onclick="filtrar('pessoal', this)">👤 Pessoal</button>
+          <button class="filtro-btn" onclick="filtrar('liga', this)">⚔️ Liga</button>
+          <button class="filtro-btn" onclick="filtrar('sistema', this)">⚙️ Sistema</button>
+          <button class="filtro-btn" onclick="filtrar('pato', this)">🦆 Pato</button>
         </div>
 
-        <p class="font-russo text-white mb-10 mt-20" style="font-size: 16px;">🏆 Premiação da Temporada</p>
-        
-        <div style="background: var(--bg-dark); padding: 15px; border-radius: 12px; border: 1px solid #eab308;">
-          <p style="color: #eab308; font-size: 14px; text-align: center; margin: 0;">
-            O Campeão da Temporada 6 leva a <strong>Taça Pato de Ouro</strong> e a glória eterna no mural da Brah.Bet!
-          </p>
+        <!-- Feed -->
+        <div id="feed-container">
+          <p class="text-center font-russo" style="color: var(--text-gray); margin-top: 30px;">Carregando novidades... 🔄</p>
         </div>
 
-      </section>
+      </div>
 
+      <!-- ══ COLUNA DIREITA: REGULAMENTO ══ -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+
+        <!-- Regulamento -->
+        <section class="cartao bg-escuro animacao-suave" style="border-top: 3px solid var(--text-white);">
+          <h3 class="font-russo titulo-branco mb-15" style="font-size: 17px;">⚖️ Regulamento</h3>
+          <div class="divisor-tracejado mb-15"></div>
+
+          <p class="font-russo" style="font-size: 13px; color: var(--text-gray); margin-bottom: 12px; text-transform: uppercase;">🎯 Pontuação</p>
+
+          <div style="background: var(--bg-dark); padding: 14px; border-radius: 12px; border: 1px solid var(--borda-divisoria);">
+            <div class="regra-linha">
+              <span style="font-size: 13px; color: var(--text-white);">Placar exato</span>
+              <span class="font-russo" style="color: var(--accent-cyan);">+3 PTS</span>
+            </div>
+            <div class="regra-linha">
+              <span style="font-size: 13px; color: var(--text-white);">Acertar vencedor</span>
+              <span class="font-russo" style="color: var(--accent-green);">+1 PT</span>
+            </div>
+            <div class="regra-linha">
+              <span style="font-size: 13px; color: var(--text-gray);">Errar tudo</span>
+              <span class="font-russo" style="color: var(--vermelho);">0 PTS</span>
+            </div>
+          </div>
+
+          <p class="font-russo" style="font-size: 13px; color: var(--text-gray); margin-top: 16px; margin-bottom: 12px; text-transform: uppercase;">🏆 Premiação</p>
+
+          <div style="background: var(--bg-dark); padding: 14px; border-radius: 12px; border: 1px solid #eab308; text-align: center;">
+            <p style="color: #eab308; font-size: 13px; margin: 0; line-height: 1.5;">
+              O Campeão leva a <strong>Taça Pato de Ouro</strong> e a glória eterna no mural da Brah.Bet!
+            </p>
+          </div>
+        </section>
+
+        <!-- Legenda do feed -->
+        <section class="cartao bg-escuro animacao-suave">
+          <h3 class="font-russo titulo-branco mb-15" style="font-size: 17px;">📌 Legenda do Feed</h3>
+          <div class="divisor-tracejado mb-15"></div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 4px; height: 36px; background: var(--accent-cyan); border-radius: 2px; flex-shrink: 0;"></div>
+              <div>
+                <p class="font-russo" style="font-size: 12px; color: var(--text-white);">Pessoal</p>
+                <p style="font-size: 11px; color: var(--text-gray);">Suas posições, pontos e conquistas</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 4px; height: 36px; background: var(--accent-green); border-radius: 2px; flex-shrink: 0;"></div>
+              <div>
+                <p class="font-russo" style="font-size: 12px; color: var(--text-white);">Liga</p>
+                <p style="font-size: 11px; color: var(--text-gray);">Resultados, rodadas e eventos da sua liga</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 4px; height: 36px; background: #eab308; border-radius: 2px; flex-shrink: 0;"></div>
+              <div>
+                <p class="font-russo" style="font-size: 12px; color: var(--text-white);">Sistema</p>
+                <p style="font-size: 11px; color: var(--text-gray);">Atualizações e novidades do Palpitoo</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 4px; height: 36px; background: var(--accent-cyan); border-radius: 2px; flex-shrink: 0;"></div>
+              <div>
+                <p class="font-russo" style="font-size: 12px; color: var(--text-white);">🦆 Decreto do Pato</p>
+                <p style="font-size: 11px; color: var(--text-gray);">Mensagens automáticas do Pato Mestre</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
     </div>
   </main>
 
-  <script>
-    // Trava rápida de segurança (Opcional, se quiser forçar o usuário a estar logado para ler as regras)
-    const nomeLogado = localStorage.getItem('nome_craque');
-    if (!nomeLogado) {
-      // window.location.href = 'login.html'; 
+  <div id="container-avisos"></div>
+
+<script>
+  const idLogado   = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+  const nomeLogado = localStorage.getItem('nome_craque') || 'Craque';
+  let filtroAtivo  = 'todos';
+  let todosFeedItens = [];
+
+  // ── DECRETOS AUTOMÁTICOS DO PATO ─────────────────────────
+  // O Pato Mestre gera frases baseadas nos dados reais do sistema
+  function gerarDecretosPato(dados) {
+    const decretos = [];
+    const { palpites, ranking, ligaAtual } = dados;
+
+    // Decreto baseado em aproveitamento
+    const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
+    if (finalizados.length > 0) {
+      const cravadas = finalizados.filter(p => p.pontos_obtidos === 3).length;
+      const taxa = Math.round((cravadas / finalizados.length) * 100);
+
+      if (taxa >= 50) {
+        decretos.push({
+          tipo: 'pato',
+          icone: '🦆',
+          badge: 'Decreto do Pato',
+          titulo: 'O Pato aprova!',
+          descricao: `"${nomeLogado.split(' ')[0]}, ${taxa}% de cravações?! Quase me envergonhando na frente da galera. Continue assim!"`,
+          tempo: 'Agora'
+        });
+      } else if (taxa === 0) {
+        decretos.push({
+          tipo: 'pato',
+          icone: '🦆',
+          badge: 'Decreto do Pato',
+          titulo: 'O Pato está desapontado',
+          descricao: `"${nomeLogado.split(' ')[0]}... zero cravações. ZERO. Você tá me deixando sem palavras, bagre."`,
+          tempo: 'Agora'
+        });
+      } else {
+        decretos.push({
+          tipo: 'pato',
+          icone: '🦆',
+          badge: 'Decreto do Pato',
+          titulo: 'O Pato observa...',
+          descricao: `"Olho em você, ${nomeLogado.split(' ')[0]}. Apenas ${taxa}% de cravações não é digno da Brah.Bet. Mais esforço!"`,
+          tempo: 'Agora'
+        });
+      }
+    } else {
+      decretos.push({
+        tipo: 'pato',
+        icone: '🦆',
+        badge: 'Decreto do Pato',
+        titulo: 'O Pato convoca!',
+        descricao: `"${nomeLogado.split(' ')[0]}! Nenhum jogo encerrado ainda. A temporada não vai esperar você, vai logo palpitar!"`,
+        tempo: 'Agora'
+      });
     }
-  </script>
+
+    // Decreto baseado na posição no ranking
+    if (ranking && ranking.length > 0) {
+      const minhaPos = ranking.findIndex(r => String(r.id) === String(idLogado));
+      if (minhaPos === 0) {
+        decretos.push({
+          tipo: 'pato',
+          icone: '🦆',
+          badge: 'Decreto do Pato',
+          titulo: 'Decreto de Liderança!',
+          descricao: `"ATENÇÃO a todos os bagres: ${nomeLogado.split(' ')[0]} está na liderança. Não é digno de mim, mas... tá bom."`,
+          tempo: 'Agora'
+        });
+      } else if (minhaPos !== -1 && minhaPos <= 2) {
+        decretos.push({
+          tipo: 'pato',
+          icone: '🦆',
+          badge: 'Decreto do Pato',
+          titulo: 'Você está no pódio!',
+          descricao: `"${nomeLogado.split(' ')[0]} no top 3! Falta pouco pra chegar onde o Pato Mestre manda. Não relaxe!"`,
+          tempo: 'Agora'
+        });
+      }
+    }
+
+    return decretos;
+  }
+
+  // ── GERAR FEED PESSOAL ────────────────────────────────────
+  function gerarFeedPessoal(palpites, ranking) {
+    const itens = [];
+    const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
+
+    if (finalizados.length > 0) {
+      const totalPontos  = finalizados.reduce((s, p) => s + p.pontos_obtidos, 0);
+      const cravadas     = finalizados.filter(p => p.pontos_obtidos === 3).length;
+      const erros        = finalizados.filter(p => p.pontos_obtidos === 0).length;
+
+      if (cravadas > 0) {
+        itens.push({
+          tipo: 'pessoal', icone: '🎯', badge: 'Pessoal',
+          titulo: `${cravadas} cravação${cravadas > 1 ? 'ões' : ''} na temporada!`,
+          descricao: `Você acertou o placar exato em ${cravadas} jogo${cravadas > 1 ? 's' : ''}. Cada um vale 3 pontos — continue assim!`,
+          tempo: 'Esta temporada'
+        });
+      }
+
+      itens.push({
+        tipo: 'pessoal', icone: '📊', badge: 'Pessoal',
+        titulo: `${totalPontos} pontos acumulados`,
+        descricao: `Você somou ${totalPontos} pts em ${finalizados.length} jogo${finalizados.length > 1 ? 's' : ''} encerrado${finalizados.length > 1 ? 's' : ''}. ${erros > 0 ? `Teve ${erros} erro${erros > 1 ? 's' : ''} também — não conta pra ninguém 🤫` : 'Sem erros até agora!'}`,
+        tempo: 'Esta temporada'
+      });
+
+      // Posição no ranking
+      if (ranking && ranking.length > 0) {
+        const pos = ranking.findIndex(r => String(r.id) === String(idLogado));
+        if (pos !== -1) {
+          const emojis = ['🥇', '🥈', '🥉'];
+          const emoji  = pos < 3 ? emojis[pos] : '📍';
+          itens.push({
+            tipo: 'pessoal', icone: emoji, badge: 'Pessoal',
+            titulo: `Você está em ${pos + 1}º lugar`,
+            descricao: `${pos === 0 ? 'Você lidera o ranking geral! Mas não relaxe, a temporada ainda não acabou.' : pos <= 2 ? 'Você está no pódio do ranking geral. Continue firme!' : `Você ocupa a ${pos + 1}ª posição no ranking geral. Hora de dar uma pressão!`}`,
+            tempo: 'Agora'
+          });
+        }
+      }
+    } else {
+      itens.push({
+        tipo: 'pessoal', icone: '⚽', badge: 'Pessoal',
+        titulo: 'Nenhum jogo encerrado ainda',
+        descricao: 'Seus palpites ainda estão aguardando os resultados. Assim que os jogos forem encerrados, sua pontuação aparece aqui.',
+        tempo: 'Agora'
+      });
+    }
+
+    return itens;
+  }
+
+  // ── GERAR FEED DE LIGA ────────────────────────────────────
+  function gerarFeedLiga(jogos, ligaAtual) {
+    const itens = [];
+
+    const finalizados = jogos.filter(j => j.status === 'finalizado');
+    const emAndamento = jogos.filter(j => j.status === 'em andamento');
+
+    // Agrupa jogos por rodada
+    const rodadas = {};
+    finalizados.forEach(j => {
+      const r = j.rodada || 1;
+      if (!rodadas[r]) rodadas[r] = [];
+      rodadas[r].push(j);
+    });
+
+    // Notifica cada rodada encerrada
+    Object.keys(rodadas).sort((a, b) => b - a).forEach(r => {
+      const jogosRodada = rodadas[r];
+      itens.push({
+        tipo: 'liga', icone: '🏁', badge: 'Liga',
+        titulo: `Rodada ${r} encerrada!`,
+        descricao: `${jogosRodada.length} jogo${jogosRodada.length > 1 ? 's' : ''} finalizado${jogosRodada.length > 1 ? 's' : ''}: ${jogosRodada.map(j => `${j.time_casa} ${j.gols_casa_real}x${j.gols_fora_real} ${j.time_fora}`).join(' • ')}`,
+        tempo: `Rodada ${r}`
+      });
+    });
+
+    if (emAndamento.length > 0) {
+      const rodadaAtual = emAndamento[0].rodada || '?';
+      itens.push({
+        tipo: 'liga', icone: '⚡', badge: 'Liga',
+        titulo: `Rodada ${rodadaAtual} em andamento`,
+        descricao: `${emAndamento.length} jogo${emAndamento.length > 1 ? 's' : ''} aguardando resultado. ${emAndamento.map(j => `${j.time_casa} x ${j.time_fora}`).join(' • ')}`,
+        tempo: 'Agora'
+      });
+    }
+
+    if (ligaAtual) {
+      itens.push({
+        tipo: 'liga', icone: '⚔️', badge: 'Liga',
+        titulo: `Você está na liga: ${ligaAtual}`,
+        descricao: 'Acesse a página da sua liga para ver o ranking completo e os palpites da galera.',
+        tempo: 'Esta temporada'
+      });
+    }
+
+    return itens;
+  }
+
+  // ── ITENS FIXOS DE SISTEMA ────────────────────────────────
+  function gerarFeedSistema() {
+    return [
+      {
+        tipo: 'sistema', icone: '🆕', badge: 'Sistema',
+        titulo: 'Perfil Público disponível!',
+        descricao: 'Agora você pode visitar o perfil de qualquer palpiteiro pelo Social e ver a carreira completa dele.',
+        tempo: 'Novidade'
+      },
+      {
+        tipo: 'sistema', icone: '👥', badge: 'Sistema',
+        titulo: 'Seguir Palpiteiros',
+        descricao: 'Você pode seguir seus rivais na aba Social e acompanhar o desempenho deles em tempo real.',
+        tempo: 'Novidade'
+      },
+      {
+        tipo: 'sistema', icone: '⚙️', badge: 'Sistema',
+        titulo: 'Sistema de Ligas Privadas',
+        descricao: 'Crie sua liga, convide os amigos com um código exclusivo e dispute o ranking privado.',
+        tempo: 'Disponível'
+      }
+    ];
+  }
+
+  // ── RENDERIZAR FEED ───────────────────────────────────────
+  function renderizarFeed(itens) {
+    const container = document.getElementById('feed-container');
+
+    const filtrados = filtroAtivo === 'todos'
+      ? itens
+      : itens.filter(i => i.tipo === filtroAtivo);
+
+    if (!filtrados.length) {
+      container.innerHTML = `<p class="text-center font-russo" style="color:var(--text-gray);margin-top:30px;">Nenhuma novidade nesta categoria ainda. 🦆</p>`;
+      return;
+    }
+
+    container.innerHTML = '';
+    filtrados.forEach((item, idx) => {
+      const badgeClass = `badge-${item.tipo}`;
+      container.innerHTML += `
+        <div class="feed-item tipo-${item.tipo}" style="animation-delay: ${idx * 0.05}s;">
+          <div class="feed-icone">${item.icone}</div>
+          <div class="feed-corpo">
+            <span class="badge-tipo ${badgeClass}">${item.badge}</span>
+            <p class="feed-titulo">${item.titulo}</p>
+            <p class="feed-descricao">${item.descricao}</p>
+            <p class="feed-tempo">🕐 ${item.tempo}</p>
+          </div>
+        </div>`;
+    });
+  }
+
+  // ── FILTRAR ───────────────────────────────────────────────
+  function filtrar(tipo, btn) {
+    filtroAtivo = tipo;
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    renderizarFeed(todosFeedItens);
+  }
+
+  // ── MOTOR PRINCIPAL ───────────────────────────────────────
+  async function carregarFeed() {
+    const container = document.getElementById('feed-container');
+
+    try {
+      // Busca dados em paralelo
+      const [resJogos, resPalpites, resRanking] = await Promise.all([
+        fetch('http://localhost:3000/jogos'),
+        idLogado ? fetch(`http://localhost:3000/meus-palpites/${idLogado}`) : Promise.resolve({ json: () => [] }),
+        fetch('http://localhost:3000/ranking')
+      ]);
+
+      const jogos    = await resJogos.json();
+      const palpites = await resPalpites.json();
+      const ranking  = await resRanking.json();
+
+      // Busca liga atual
+      let ligaAtual = null;
+      if (idLogado) {
+        try {
+          const resLiga = await fetch(`http://localhost:3000/minha-liga/${idLogado}`);
+          const dadosLiga = await resLiga.json();
+          if (dadosLiga.liga) ligaAtual = dadosLiga.liga.nome;
+        } catch (e) {}
+      }
+
+      // Monta o feed completo
+      const feedPessoal  = idLogado ? gerarFeedPessoal(palpites, ranking) : [];
+      const feedLiga     = gerarFeedLiga(jogos, ligaAtual);
+      const feedSistema  = gerarFeedSistema();
+      const feedPato     = idLogado ? gerarDecretosPato({ palpites, ranking, ligaAtual }) : [];
+
+      // Mistura tudo: pessoal primeiro, depois pato, depois liga, depois sistema
+      todosFeedItens = [
+        ...feedPato,
+        ...feedPessoal,
+        ...feedLiga,
+        ...feedSistema
+      ];
+
+      renderizarFeed(todosFeedItens);
+
+    } catch (e) {
+      // Servidor offline — mostra feed de sistema + mensagem do Pato
+      todosFeedItens = [
+        {
+          tipo: 'pato', icone: '🦆', badge: 'Decreto do Pato',
+          titulo: 'O Pato está dormindo...',
+          descricao: `"Servidor offline, ${nomeLogado.split(' ')[0]}. Nem eu consigo decretar nada agora. Volta mais tarde!"`,
+          tempo: 'Agora'
+        },
+        ...gerarFeedSistema()
+      ];
+      renderizarFeed(todosFeedItens);
+    }
+  }
+
+  carregarFeed();
+</script>
 
 </body>
 </html>

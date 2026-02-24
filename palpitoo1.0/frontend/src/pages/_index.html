@@ -10,462 +10,460 @@
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="./css/style.css">
+
+  <style>
+    /* ── Cards de Liga ── */
+    .card-liga {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-dark);
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-liga:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 8px 30px rgba(122, 30, 58, 0.15);
+    }
+
+    /* Cabeçalho clicável do card */
+    .card-liga-header {
+      padding: 20px 24px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .card-liga-titulo {
+      font-family: 'Russo One', sans-serif;
+      color: var(--accent-cyan);
+      font-size: 17px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 12px rgba(122, 30, 58, 0.4);
+    }
+
+    .card-liga-subtitulo {
+      font-family: 'Russo One', sans-serif;
+      color: var(--text-white);
+      font-size: 13px;
+      margin-top: 4px;
+      opacity: 0.7;
+    }
+
+    .card-liga-divisor {
+      width: 100%;
+      height: 1px;
+      background-image: linear-gradient(to right, var(--borda-divisoria) 50%, transparent 50%);
+      background-size: 15px 1px;
+      background-repeat: repeat-x;
+    }
+
+    .card-liga-status {
+      display: inline-block;
+      background: var(--bg-dark);
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 20px;
+      padding: 8px 22px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      color: var(--text-white);
+      margin: 14px 0;
+    }
+
+    /* Botão de expandir */
+    .btn-tabelona {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      border-top: 1px dashed var(--borda-divisoria);
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      color: var(--text-gray);
+      cursor: pointer;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .btn-tabelona:hover {
+      color: var(--text-white);
+      background: rgba(255,255,255,0.03);
+    }
+    .btn-tabelona .seta {
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+    .btn-tabelona.aberto .seta {
+      transform: rotate(180deg);
+    }
+
+    /* Tabela expansível */
+    .tabelona-expansivel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      border-top: 0px solid var(--borda-divisoria);
+    }
+    .tabelona-expansivel.aberto {
+      max-height: 600px;
+      border-top: 1px dashed var(--borda-divisoria);
+    }
+    .tabelona-expansivel-inner {
+      padding: 16px 20px 20px;
+    }
+
+    /* Link "ver página completa" */
+    .link-pagina-completa {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 12px;
+      color: var(--accent-cyan);
+      text-decoration: none;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-cyan);
+      transition: background 0.2s ease;
+    }
+    .link-pagina-completa:hover {
+      background: rgba(122, 30, 58, 0.15);
+    }
+
+    /* Item do ranking dentro da tabelona */
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 6px;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+    }
+    .rank-item:hover { background: var(--bg-dark); }
+    .rank-item.rank-eu { background: rgba(122,30,58,0.1); border: 1px solid var(--accent-cyan); }
+    .quadrado { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .verde   { background: var(--accent-green); }
+    .amarelo { background: #eab308; }
+    .laranja { background: #f97316; }
+    .vermelho{ background: var(--vermelho); }
+  </style>
 </head>
 <body>
 
   <header class="navbar">
     <a href="_index.html" class="logo-link">
-    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
-</a>
-    
+      <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+    </a>
     <nav>
       <ul class="nav-links">
-        <li><a href="_index.html" class="ativo">início</a></li> 
-        <li><a href="ligas.html">Ligas</a></li> 
+        <li><a href="_index.html" class="ativo">Início</a></li>
+        <li><a href="minhaliga.html">Ligas</a></li>
         <li><a href="palpites.html">Palpites</a></li>
         <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
         <li><a href="carreira.html">Carreira</a></li>
-        
       </ul>
     </nav>
   </header>
 
   <main class="container-principal dashboard-layout">
-    
+
+    <!-- ══════════════ SIDEBAR ESQUERDA ══════════════ -->
     <aside class="cartao bg-claro cartao-perfil animacao-suave">
-              
-    <div class="perfil-topo" style="display: flex; flex-direction: column; align-items: center;">
-      
-      <img src="https://via.placeholder.com/60" alt="Foto do usuário" id="fotoPerfil" class="foto-perfil" style="border-radius: 50%; width: 80px; height: 80px; object-fit: cover;">
-<!--  
-      <label for="inputFoto" class="cursor-pointer text-sm text-blue-600 font-bold mb-5 hover:underline">
-        Trocar Foto
-      </label>
-      <input type="file" id="inputFoto" accept="image/*" class="hidden" onchange="salvarFoto()">
--->   
-      <h2 class="font-russo titulo-azul" id="textoNome">Carregando...</h2>
-      <p class="font-russo text-gray-600 mt-5" style="font-size: 0.9em;">
-        Time: <span id="textoTime" class="text-blue-800">Nenhum</span>
-      </p>
-    </div>
-  
+
+      <div class="perfil-topo" style="display:flex;flex-direction:column;align-items:center;">
+        <img src="https://via.placeholder.com/80" alt="Foto" id="fotoPerfil"
+             class="foto-perfil" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+        <h2 class="font-russo titulo-azul" id="textoNome">Carregando...</h2>
+        <p class="font-russo text-gray-600 mt-5" style="font-size:0.9em;">
+          Time: <span id="textoTime" style="color:var(--accent-cyan);">Nenhum</span>
+        </p>
+      </div>
+
       <hr class="linha-divisoria mt-15 mb-15">
-      
-<h3 class="font-russo titulo-azul">Desempenho na temporada</h3>
+
+      <h3 class="font-russo titulo-azul">Desempenho na temporada</h3>
       <ul class="lista-desempenho mt-10">
         <li>
-          <span class="icone">🎯</span> 
-          <strong id="stat-cravadas">0</strong> 
-          <span style="font-size: 0.7em; color: gray; margin-left: 5px;">Cravações (3pts)</span>
+          <span class="icone">🎯</span>
+          <strong id="stat-cravadas">0</strong>
+          <span style="font-size:0.7em;color:gray;margin-left:5px;">Cravações (3pts)</span>
         </li>
         <li>
-          <span class="icone">✔️</span> 
-          <strong id="stat-acertos">0</strong> 
-          <span style="font-size: 0.7em; color: gray; margin-left: 5px;">Acertos (1pt)</span>
+          <span class="icone">✔️</span>
+          <strong id="stat-acertos">0</strong>
+          <span style="font-size:0.7em;color:gray;margin-left:5px;">Acertos (1pt)</span>
         </li>
         <li>
-          <span class="icone">✖️</span> 
-          <strong id="stat-erros">0</strong> 
-          <span style="font-size: 0.7em; color: gray; margin-left: 5px;">Erros (0pt)</span>
+          <span class="icone">✖️</span>
+          <strong id="stat-erros">0</strong>
+          <span style="font-size:0.7em;color:gray;margin-left:5px;">Erros (0pt)</span>
         </li>
       </ul>
-      
+
       <h3 class="font-russo titulo-azul mt-20">Aproveitamento</h3>
       <div class="aproveitamento-box mt-10">
         <span class="icone-grande" id="icone-aproveitamento">⏳</span>
         <p><strong id="texto-aproveitamento">Calculando...<br>--% de acerto</strong></p>
       </div>
-      
+
       <hr class="linha-divisoria final-linha">
-      
-      <a href="perfil.html" class="perfil-rodape font-russo" style="text-decoration: none; display: flex;">
+
+      <a href="perfil.html" class="perfil-rodape font-russo" style="text-decoration:none;display:flex;">
         <span class="icone">⚙️</span>
         <span class="texto-hover">Alterar Perfil</span>
       </a>
-      
+
     </aside>
 
-            <!--Liga global-->
+    <!-- ══════════════ COLUNA CENTRAL ══════════════ -->
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:20px;">
 
-    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; gap: 20px;">
+      <!-- ── CARD: GLOBAL LEAGUE ── -->
+      <div class="card-liga">
 
-  <section class="cartao bg-escuro cartao-centro texto-centralizado animacao-suave" style="width: 100%; max-width: 600px;">
-    
-    <div class="divisor-tracejado mb-10"></div>
-    
-    <p class="font-russo destaque-dourado brilha-suave">⚜️ GLOBAL - LEAGUE ⚜️</p>
-    <p class="font-russo mb-10">- (RANKING GERAL) -</p>
-    
-    <div class="divisor-tracejado mb-10"></div>
-    <p class="status-texto font-russo destaque-status">👑 Status: TOP 8 CRAQUES</p>
-    <div class="divisor-tracejado mb-20 mt-10"></div>
-    
-    <div class="tabelona-container text-left">
-      <p class="font-russo mb-10 text-left" style="text-align: center;">⬇️ Tabelona ⬇️</p>
-      
-      <ul id="tabelona-ranking" class="tabelona-lista font-russo">
-        <li class="text-center py-4 text-gray-400 text-sm">Carregando pontuações da galera... 🔄</li>
-      </ul>
-      
-    </div>
-  </section>
-
-  <section class="cartao bg-escuro cartao-centro texto-centralizado animacao-suave" style="width: 100%; max-width: 600px;">
-
-    <div class="divisor-tracejado mb-10"></div>
-
-    <p class="font-russo destaque-dourado brilha-suave" id="titulo-minha-liga">⚜️ MINHA LIGA ⚜️</p>
-    <p class="font-russo mb-10">- (RANKING PRIVADO) -</p>
-
-    <div class="divisor-tracejado mb-10"></div>
-
-    <p class="status-texto font-russo destaque-status">🔥 Status: TOP 8 DA LIGA</p>
-
-    <div class="divisor-tracejado mb-20 mt-10"></div>
-
-    <div class="tabelona-container text-left">
-
-      <p class="font-russo mb-10 text-left" style="text-align: center;">⬇️ Tabelona da Liga ⬇️</p>
-
-      <ul id="tabelona-ranking-liga" class="tabelona-lista font-russo">
-        <li class="text-center py-4 text-gray-400 text-sm">Procurando sua liga secreta... 🕵️‍♂️</li>
-      </ul>
-
-    </div>
-
-  </section>
-  
-<!--<div class="cartao bg-escuro mb-20 animacao-suave">
-        <h2 class="font-russo titulo-branco text-center mb-20">Destaques<br>rodada 1</h2>
-        
-        <div class="bloco-destaque mb-15">
-          <h3 class="font-russo titulo-branco">Craque</h3>
-          <p class="cor-emerald font-russo efeito-texto">Guigo 4pts</p>
+        <div class="card-liga-header">
+          <div class="card-liga-divisor" style="margin-bottom:14px;"></div>
+          <p class="card-liga-titulo">⚜️ GLOBAL - LEAGUE ⚜️</p>
+          <p class="card-liga-subtitulo">- (RANKING GERAL) -</p>
+          <div class="card-liga-divisor" style="margin-top:14px;margin-bottom:10px;"></div>
+          <span class="card-liga-status" id="status-global">👑 Status: TOP 8 CRAQUES</span>
+          <div class="card-liga-divisor" style="margin-top:10px;"></div>
         </div>
-        
-        <div class="bloco-destaque">
-          <h3 class="font-russo titulo-branco">Bostinha</h3>
-          <p class="cor-vermelha font-russo efeito-texto">Acacio 0pts</p>
-          <p class="cor-vermelha font-russo efeito-texto">Fernando 0pts</p>
+
+        <button class="btn-tabelona" id="btn-global" onclick="toggleTabelona('global')">
+          <span class="seta">⬇️</span> Tabelona <span class="seta">⬇️</span>
+        </button>
+
+        <div class="tabelona-expansivel" id="tabela-global">
+          <div class="tabelona-expansivel-inner">
+            <ul id="lista-global" style="list-style:none;padding:0;">
+              <li class="rank-item" style="justify-content:center;color:var(--text-gray);">
+                Carregando... 🔄
+              </li>
+            </ul>
+            <a href="ligas.html" class="link-pagina-completa">
+              Ver Tabela Completa →
+            </a>
+          </div>
         </div>
+
       </div>
 
-      <div class="cartao bg-escuro animacao-suave" style="position: relative; overflow: hidden; border: 1px solid var(--accent-cyan);">
-    
-    <div style="position: absolute; bottom: -20px; right: -20px; font-size: 100px; opacity: 0.05; pointer-events: none;">🦆</div>
-PATO MESTRE-->
-  <!--  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
-        <div style="width: 45px; height: 45px; background: var(--bg-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid var(--accent-cyan); box-shadow: 0 0 10px rgba(122, 30, 58, 0.4);">
-            🦆
+      <!-- ── CARD: MINHA LIGA ── -->
+      <div class="card-liga">
+
+        <div class="card-liga-header">
+          <div class="card-liga-divisor" style="margin-bottom:14px;"></div>
+          <p class="card-liga-titulo" id="titulo-minha-liga">⚜️ MINHA LIGA ⚜️</p>
+          <p class="card-liga-subtitulo">- (RANKING PRIVADO) -</p>
+          <div class="card-liga-divisor" style="margin-top:14px;margin-bottom:10px;"></div>
+          <span class="card-liga-status" id="status-minha-liga">🔥 Status: TOP 8 DA LIGA</span>
+          <div class="card-liga-divisor" style="margin-top:10px;"></div>
         </div>
-        <div class="text-left">
-            <h3 class="font-russo titulo-branco" style="font-size: 16px; margin: 0;">Pato Mestre</h3>
-            <p style="color: var(--accent-cyan); font-size: 10px; font-weight: bold; margin: 0; letter-spacing: 1px;">CEO DA BRAH.BET</p>
+
+        <button class="btn-tabelona" id="btn-minha-liga" onclick="toggleTabelona('minha-liga')">
+          <span class="seta">⬇️</span> Tabelona da Liga <span class="seta">⬇️</span>
+        </button>
+
+        <div class="tabelona-expansivel" id="tabela-minha-liga">
+          <div class="tabelona-expansivel-inner">
+            <ul id="lista-minha-liga" style="list-style:none;padding:0;">
+              <li class="rank-item" style="justify-content:center;color:var(--text-gray);">
+                Procurando sua liga secreta... 🕵️‍♂️
+              </li>
+            </ul>
+            <a href="minhaliga.html" class="link-pagina-completa" id="link-minha-liga">
+              Ver Página da Liga →
+            </a>
+          </div>
         </div>
+
+      </div>
+
     </div>
+    <!-- fim coluna central -->
 
-    <div style="background: var(--bg-dark); padding: 12px; border-radius: 10px; border-left: 3px solid var(--accent-cyan); position: relative;">
-        <p class="font-russo" style="font-size: 13px; color: var(--text-gray); line-height: 1.4; text-align: left;">
-            "Fala, <span id="nomePatoMestre" style="color: var(--text-white);">Craque</span>! Trate de cravar esses palpites, não me faça passar vergonha na Arena!"
-        </p>
-    </div>
-</div>
-      -->
+    <aside class="coluna-destaques"></aside>
 
-
-
-
-
-
-</div> <aside class="coluna-destaques">
-  </aside>
-
-<aside class="coluna-destaques">
-  </aside>
   </main>
-</body>
+
+  <div id="container-avisos"></div>
+
 <script>
-  // 1. Puxamos os dados exatamente como vamos salvar no login
+  // ── DADOS DO USUÁRIO ──────────────────────────────────────
   const nomeLogado = localStorage.getItem('nome_craque');
   const timeLogado = localStorage.getItem('time_craque');
-  const fotoLogada = localStorage.getItem('foto_craque'); // <-- Puxa a foto!
+  const fotoLogada = localStorage.getItem('foto_craque');
+  const idLogado   = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
 
   if (nomeLogado) {
     document.getElementById('textoNome').innerText = nomeLogado;
-    
-    if (timeLogado && timeLogado !== "undefined") {
+    if (timeLogado && timeLogado !== 'undefined') {
       document.getElementById('textoTime').innerText = timeLogado;
     }
-
-    // SE TIVER FOTO, SUBSTITUI A IMAGEM PADRÃO!
-    if (fotoLogada && fotoLogada !== "undefined" && fotoLogada !== "null") {
-      document.getElementById('fotoPerfil').src = fotoLogada;
-    }
-
-  } else {
-    // window.location.href = 'login.html'; 
   }
-  console.log("Nome encontrado no navegador:", nomeLogado);
-  console.log("Time encontrado no navegador:", timeLogado);
-
-  // 2. Se o nome existir, injeta na tela
-  if (nomeLogado) {
-    document.getElementById('textoNome').innerText = nomeLogado;
-
-    // Injeta o primeiro nome do craque na fala do Pato
-    const spanPato = document.getElementById('nomePatoMestre');
-    if (spanPato && nomeLogado) {
-        spanPato.innerText = nomeLogado.split(' ')[0]; 
-    }
-    
-    // Se ele tiver um time, injeta também
-    if (timeLogado && timeLogado !== "undefined") {
-      document.getElementById('textoTime').innerText = timeLogado;
-    }
-  } else {
-    // Se não achar ninguém, redireciona pro login para proteger a página!
-    console.log("Ninguém logado! Bloqueando acesso...");
-    // Remova as barras "//" da linha abaixo quando o login estiver 100% pronto
-    // window.location.href = 'login.html'; 
+  if (fotoLogada && fotoLogada !== 'undefined' && fotoLogada !== 'null') {
+    document.getElementById('fotoPerfil').src = fotoLogada;
   }
 
-  //foto do user
-  // Função que roda quando o usuário escolhe uma foto do computador/celular
-async function salvarFoto() {
-  const arquivo = document.getElementById('inputFoto').files[0];
-  if (!arquivo) return;
+  // ── TOGGLE TABELONA ──────────────────────────────────────
+  function toggleTabelona(qual) {
+    const tabela = document.getElementById(`tabela-${qual}`);
+    const btn    = document.getElementById(`btn-${qual}`);
+    const aberto = tabela.classList.contains('aberto');
 
-  // Precisamos do e-mail do usuário para saber quem está trocando a foto
-  const emailLogado = localStorage.getItem('email_craque'); 
-  if (!emailLogado) {
-    alert("Erro: E-mail não encontrado. Faça login novamente.");
-    return;
+    tabela.classList.toggle('aberto', !aberto);
+    btn.classList.toggle('aberto', !aberto);
+
+    // Muda o emoji da seta quando aberto
+    const setas = btn.querySelectorAll('.seta');
+    setas.forEach(s => s.innerText = aberto ? '⬇️' : '⬆️');
   }
 
-  // Isso aqui transforma a imagem em um texto Base64
-  const reader = new FileReader();
-  reader.onloadend = async function() {
-    const fotoBase64 = reader.result;
-
-    // Mostra a foto na tela na mesma hora
-    document.getElementById('fotoPerfil').src = fotoBase64;
-
-    try {
-      // Manda a foto pro servidor
-      const resposta = await fetch('http://localhost:3000/atualizar-foto', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email: emailLogado, 
-          foto_base64: fotoBase64 
-        })
-      });
-
-      const resultado = await resposta.json();
-      
-      if (resposta.ok) {
-        // Salva a foto na memória do navegador para não sumir quando atualizar a página
-        localStorage.setItem('foto_craque', fotoBase64);
-        console.log("Foto salva no banco de dados!");
-      }
-    } catch (erro) {
-      console.error("Erro ao enviar foto:", erro);
-    }
-  };
-  
-  // Inicia a transformação da imagem
-  reader.readAsDataURL(arquivo);
-}
-
-// Quando a página carregar, puxa a foto da memória (adicione isso no seu script principal)
-const fotoSalva = localStorage.getItem('foto_craque');
-if (fotoSalva && fotoSalva !== "undefined" && fotoSalva !== "null") {
-  document.getElementById('fotoPerfil').src = fotoSalva;
-}
-
-// FUNÇÃO PARA CALCULAR O DESEMPENHO E APROVEITAMENTO
+  // ── DESEMPENHO ────────────────────────────────────────────
   async function calcularDesempenho() {
-    // Puxa o ID do usuário que está no localStorage
-    const idUsuario = localStorage.getItem('craqueId');
-    if (!idUsuario) return;
-
+    if (!idLogado) return;
     try {
-      // Bate na nossa rota que já existe para pegar os palpites dele!
-      const resposta = await fetch(`http://localhost:3000/meus-palpites/${idUsuario}`);
+      const resposta = await fetch(`http://localhost:3000/meus-palpites/${idLogado}`);
       const palpites = await resposta.json();
 
-      let cravadas = 0;
-      let acertos = 0;
-      let erros = 0;
-      let jogosFinalizados = 0;
+      let cravadas = 0, acertos = 0, erros = 0, finalizados = 0;
 
-      // Passa por cada palpite contando os pontos
       palpites.forEach(p => {
-        // Só conta os jogos que já foram encerrados pelo ADM (onde tem nota salva)
-        if (p.pontos_obtidos !== null) { 
-          jogosFinalizados++;
+        if (p.pontos_obtidos !== null) {
+          finalizados++;
           if (p.pontos_obtidos === 3) cravadas++;
           else if (p.pontos_obtidos === 1) acertos++;
-          else if (p.pontos_obtidos === 0) erros++;
+          else erros++;
         }
       });
 
-      // 1. Atualiza a listinha de gols, acertos e erros na tela
       document.getElementById('stat-cravadas').innerText = cravadas;
-      document.getElementById('stat-acertos').innerText = acertos;
-      document.getElementById('stat-erros').innerText = erros;
+      document.getElementById('stat-acertos').innerText  = acertos;
+      document.getElementById('stat-erros').innerText    = erros;
 
-      // 2. Calcula a porcentagem de acerto (Aproveitamento)
-      if (jogosFinalizados > 0) {
-        // Ele "acertou" se tirou 3 ou 1.
-        const taxaAcerto = Math.round(((cravadas + acertos) / jogosFinalizados) * 100);
-        
-        let icone = "👍";
-        let frase = "Na média,";
-        
-        // Regras de zoeira/elogio baseadas na porcentagem!
-        if (taxaAcerto >= 70) { 
-          icone = "🔥"; 
-          frase = "Tá voando!,"; 
-        } else if (taxaAcerto >= 40) { 
-          icone = "👍"; 
-          frase = "Bom jogador,"; 
-        } else { 
-          icone = "🦆"; 
-          frase = "Pato master,"; 
-        }
-
+      if (finalizados > 0) {
+        const taxa = Math.round(((cravadas + acertos) / finalizados) * 100);
+        let icone = '👍', frase = 'Bom jogador,';
+        if (taxa >= 70) { icone = '🔥'; frase = 'Tá voando!,'; }
+        else if (taxa < 40) { icone = '🦆'; frase = 'Pato master,'; }
         document.getElementById('icone-aproveitamento').innerText = icone;
-        document.getElementById('texto-aproveitamento').innerHTML = `${frase}<br>${taxaAcerto}% de acerto`;
+        document.getElementById('texto-aproveitamento').innerHTML = `${frase}<br>${taxa}% de acerto`;
       } else {
-        document.getElementById('icone-aproveitamento').innerText = "⚽";
-        document.getElementById('texto-aproveitamento').innerHTML = `Sem jogos<br>encerrados ainda`;
+        document.getElementById('icone-aproveitamento').innerText = '⚽';
+        document.getElementById('texto-aproveitamento').innerHTML = 'Sem jogos<br>encerrados ainda';
       }
-
-    } catch (erro) {
-      console.error("Erro ao puxar o desempenho:", erro);
-      document.getElementById('texto-aproveitamento').innerHTML = `Erro de conexão`;
+    } catch (e) {
+      document.getElementById('texto-aproveitamento').innerHTML = 'Erro de conexão';
     }
   }
 
-  // Aciona o cálculo assim que a tela abre!
-  calcularDesempenho();
-  // -------------------------------------------------------------------------
-  // FUNÇÃO: CARREGAR O RANKING GLOBAL NO TOP 8
+  // ── RANKING GLOBAL ────────────────────────────────────────
   async function carregarRankingGlobal() {
     try {
-      // Bate na rota de ranking que já criamos no server.js
-      const resposta = await fetch('http://localhost:3000/ranking');
-      const jogadores = await resposta.json();
-      
-      const ulRanking = document.getElementById('tabelona-ranking');
-      ulRanking.innerHTML = ''; 
+      const res      = await fetch('http://localhost:3000/ranking');
+      const jogadores = await res.json();
+      const ul       = document.getElementById('lista-global');
+      ul.innerHTML   = '';
 
-      if (jogadores.length === 0) {
-        ulRanking.innerHTML = '<li class="text-center text-gray-500 py-4">Nenhum palpite computado ainda. 🦆</li>';
+      if (!jogadores.length) {
+        ul.innerHTML = '<li class="rank-item" style="justify-content:center;color:var(--text-gray);">Nenhum palpite computado ainda. 🦆</li>';
         return;
       }
 
-      // Separa apenas os 8 primeiros colocados (Top 8)
-      const top8 = jogadores.slice(0, 8);
-
-      top8.forEach((jogador, index) => {
-        const posicao = index + 1;
-        
-        // Define a cor da bolinha/quadrado dependendo da posição (igual ao seu layout)
-        let corQuadrado = 'vermelho'; // Z4 por padrão
-        if (posicao <= 3) corQuadrado = 'verde'; // Pódio/G3
-        else if (posicao <= 5) corQuadrado = 'amarelo'; // Meio de tabela
-        else if (posicao === 6) corQuadrado = 'laranja'; // Risco
-
-        // Pega só o primeiro nome em letras maiúsculas para caber bonitinho
-        const primeiroNome = jogador.nome.split(' ')[0].toUpperCase();
-
-        // Injeta a linha na tela
-        ulRanking.innerHTML += `
-          <li class="item-interativo">
-            <span class="quadrado ${corQuadrado}"></span> 
-            ${posicao}º = ${primeiroNome} - ${jogador.total_pontos}
-          </li>
-        `;
+      const cores = ['verde','verde','verde','amarelo','amarelo','laranja','vermelho','vermelho'];
+      jogadores.slice(0, 8).forEach((j, i) => {
+        const ehEu = String(j.id) === String(idLogado);
+        const nome = j.nome.split(' ')[0].toUpperCase();
+        ul.innerHTML += `
+          <li class="rank-item ${ehEu ? 'rank-eu' : ''}">
+            <span class="quadrado ${cores[i] || 'vermelho'}"></span>
+            <span style="color:var(--text-gray);min-width:24px;">${i+1}º</span>
+            <span style="flex-grow:1;color:${ehEu ? 'var(--accent-cyan)' : 'var(--text-white)'};">${nome} ${ehEu ? '(você)' : ''}</span>
+            <span style="color:var(--accent-cyan);">${j.total_pontos} pts</span>
+          </li>`;
       });
 
-    } catch (erro) {
-      console.error("Erro ao carregar o ranking central:", erro);
-      document.getElementById('tabelona-ranking').innerHTML = '<li class="text-red-500 text-center py-4">Erro ao conectar com a CBF.</li>';
+      // Atualiza o status com a posição do usuário
+      if (idLogado) {
+        const pos = jogadores.findIndex(j => String(j.id) === String(idLogado));
+        if (pos !== -1) {
+          document.getElementById('status-global').innerText = `👑 Status: ${pos + 1}º LUGAR GERAL`;
+        }
+      }
+    } catch (e) {
+      document.getElementById('lista-global').innerHTML =
+        '<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao conectar com a CBF.</li>';
     }
   }
 
-  // Aciona a função assim que o cara logar no site!
-  carregarRankingGlobal();
-  // -------------------------------------------------------------------------
-  // FUNÇÃO: CARREGAR O RANKING DA PRIMEIRA LIGA DO USUÁRIO
+  // ── RANKING MINHA LIGA ────────────────────────────────────
   async function carregarRankingMinhaLiga() {
-    const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
-    if (!idUsuario) return;
-
+    if (!idLogado) return;
     try {
-      // 1. Descobre de qual liga o cara participa
-      const resLigas = await fetch(`http://localhost:3000/minhas-ligas/${idUsuario}`);
-      const ligas = await resLigas.json();
-      
-      const ulRankingLiga = document.getElementById('tabelona-ranking-liga');
-      const tituloLiga = document.getElementById('titulo-minha-liga');
+      const resLigas = await fetch(`http://localhost:3000/minhas-ligas/${idLogado}`);
+      const ligas    = await resLigas.json();
+      const ul       = document.getElementById('lista-minha-liga');
 
-      // Se ele não tiver liga, a gente avisa e põe um link pra ele criar uma!
-      if (ligas.length === 0) {
-        ulRankingLiga.innerHTML = '<li class="text-center text-gray-500 py-4" style="line-height: 1.5;">Você não participa de nenhuma liga privada. 🦆<br><br><a href="ligas.html" style="color: var(--accent-cyan); text-decoration: underline; font-size: 12px;">Crie ou entre em uma!</a></li>';
-        tituloLiga.innerText = "⚜️ SEM LIGA ⚜️";
+      if (!ligas.length) {
+        ul.innerHTML = `
+          <li class="rank-item" style="justify-content:center;flex-direction:column;gap:8px;text-align:center;color:var(--text-gray);">
+            Você não está em nenhuma liga ainda. 🦆
+            <a href="minhaliga.html" style="color:var(--accent-cyan);font-size:12px;text-decoration:underline;">Criar ou entrar em uma</a>
+          </li>`;
+        document.getElementById('titulo-minha-liga').innerText = '⚜️ SEM LIGA ⚜️';
+        document.getElementById('status-minha-liga').innerText = '🦆 Sem Liga';
         return;
       }
 
-      // 2. Se ele tiver várias, a gente pega a primeira da lista
-      const idMinhaLiga = ligas[0].id_liga;
+      const idLiga    = ligas[0].id_liga;
+      const resRanking = await fetch(`http://localhost:3000/ranking-liga/${idLiga}`);
+      const dadosLiga  = await resRanking.json();
 
-      // 3. Puxa o ranking só dessa liga
-      const resRanking = await fetch(`http://localhost:3000/ranking-liga/${idMinhaLiga}`);
-      const dadosLiga = await resRanking.json();
-      
-      // Muda o título do cartão para o nome real da liga dele!
-      tituloLiga.innerText = `⚜️ ${dadosLiga.nomeLiga.toUpperCase()} ⚜️`;
-      ulRankingLiga.innerHTML = ''; 
+      document.getElementById('titulo-minha-liga').innerText = `⚜️ ${dadosLiga.nomeLiga.toUpperCase()} ⚜️`;
+      document.getElementById('link-minha-liga').href = `minhaliga.html?id=${idLiga}`;
+      ul.innerHTML = '';
 
-      if (dadosLiga.ranking.length === 0) {
-        ulRankingLiga.innerHTML = '<li class="text-center text-gray-500 py-4">Ninguém pontuou nessa liga ainda.</li>';
+      if (!dadosLiga.ranking.length) {
+        ul.innerHTML = '<li class="rank-item" style="justify-content:center;color:var(--text-gray);">Ninguém pontuou ainda.</li>';
         return;
       }
 
-      const top8 = dadosLiga.ranking.slice(0, 8);
-
-      top8.forEach((jogador, index) => {
-        const posicao = index + 1;
-        
-        let corQuadrado = 'vermelho'; 
-        if (posicao <= 3) corQuadrado = 'verde'; 
-        else if (posicao <= 5) corQuadrado = 'amarelo'; 
-        else if (posicao === 6) corQuadrado = 'laranja'; 
-
-        const primeiroNome = jogador.nome.split(' ')[0].toUpperCase();
-
-        ulRankingLiga.innerHTML += `
-          <li class="item-interativo">
-            <span class="quadrado ${corQuadrado}"></span> 
-            ${posicao}º = ${primeiroNome} - ${jogador.total_pontos}
-          </li>
-        `;
+      const cores = ['verde','verde','verde','amarelo','amarelo','laranja','vermelho','vermelho'];
+      dadosLiga.ranking.slice(0, 8).forEach((j, i) => {
+        const ehEu = String(j.id) === String(idLogado);
+        const nome = j.nome.split(' ')[0].toUpperCase();
+        ul.innerHTML += `
+          <li class="rank-item ${ehEu ? 'rank-eu' : ''}">
+            <span class="quadrado ${cores[i] || 'vermelho'}"></span>
+            <span style="color:var(--text-gray);min-width:24px;">${i+1}º</span>
+            <span style="flex-grow:1;color:${ehEu ? 'var(--accent-cyan)' : 'var(--text-white)'};">${nome} ${ehEu ? '(você)' : ''}</span>
+            <span style="color:var(--accent-cyan);">${j.total_pontos} pts</span>
+          </li>`;
       });
 
-    } catch (erro) {
-      console.error("Erro ao carregar o ranking da liga:", erro);
-      document.getElementById('tabelona-ranking-liga').innerHTML = '<li class="text-red-500 text-center py-4">Erro ao buscar sua liga.</li>';
+      // Atualiza status com posição na liga
+      const pos = dadosLiga.ranking.findIndex(j => String(j.id) === String(idLogado));
+      if (pos !== -1) {
+        document.getElementById('status-minha-liga').innerText = `🔥 Status: ${pos + 1}º DA LIGA`;
+      }
+
+    } catch (e) {
+      document.getElementById('lista-minha-liga').innerHTML =
+        '<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao buscar sua liga.</li>';
     }
   }
 
-  // Aciona a função assim que a tela abre!
+  // ── INICIAR ───────────────────────────────────────────────
+  calcularDesempenho();
+  carregarRankingGlobal();
   carregarRankingMinhaLiga();
-
-  
 </script>
 
+</body>
 </html>

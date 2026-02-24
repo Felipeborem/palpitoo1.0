@@ -10,18 +10,130 @@
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="./css/style.css">
+
+  <style>
+    .palpiteiro-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--borda-divisoria);
+      background: var(--bg-dark);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      flex-grow: 1;
+    }
+    .palpiteiro-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateX(4px);
+      background: rgba(122, 30, 58, 0.06);
+    }
+    .palpiteiro-info { flex-grow: 1; min-width: 0; }
+    .palpiteiro-nome {
+      font-family: 'Russo One', sans-serif;
+      font-size: 15px;
+      color: var(--text-white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .palpiteiro-time {
+      font-size: 11px;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .palpiteiro-pts {
+      font-family: 'Russo One', sans-serif;
+      font-size: 14px;
+      color: var(--accent-cyan);
+      white-space: nowrap;
+    }
+    .btn-seguir {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 11px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-seguir.seguir { background: var(--accent-cyan); color: #fff; }
+    .btn-seguir.seguir:hover { opacity: 0.85; }
+    .btn-seguir.seguindo {
+      background: transparent;
+      color: #f87171;
+      border: 1px solid #f87171;
+    }
+    .btn-seguir.seguindo:hover { background: #f87171; color: #fff; }
+    .btn-seguir:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .foto-palpiteiro {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--borda-divisoria);
+      flex-shrink: 0;
+      transition: border-color 0.2s ease;
+    }
+    .palpiteiro-card:hover .foto-palpiteiro { border-color: var(--accent-cyan); }
+
+    .badge-liga {
+      display: inline-block;
+      background: rgba(122,30,58,0.15);
+      border: 1px solid var(--accent-cyan);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 10px;
+      color: var(--accent-cyan);
+      font-family: 'Russo One', sans-serif;
+      margin-top: 3px;
+    }
+    .input-busca-social {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--bg-dark);
+      border: 2px solid var(--borda-divisoria);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-white);
+      outline: none;
+      transition: border-color 0.3s;
+      font-family: 'Russo One', sans-serif;
+    }
+    .input-busca-social:focus { border-color: var(--accent-cyan); }
+    .input-busca-social::placeholder { color: var(--text-gray); font-weight: 400; }
+
+    .card-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 24px 10px;
+      color: var(--text-gray);
+      font-size: 13px;
+    }
+    .empty-state .emoji { font-size: 32px; margin-bottom: 6px; }
+  </style>
 </head>
 <body>
 
   <header class="navbar">
     <a href="_index.html" class="logo-link">
-    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
-</a>
-    
+      <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+    </a>
     <nav>
       <ul class="nav-links">
-        <li><a href="_index.html">Início</a></li> 
-        <li><a href="ligas.html">Ligas</a></li> 
+        <li><a href="_index.html">Início</a></li>
+        <li><a href="minhaliga.html">Ligas</a></li>
         <li><a href="palpites.html">Palpites</a></li>
         <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html" class="ativo">Social</a></li>
@@ -30,164 +142,176 @@
     </nav>
   </header>
 
-  <main class="container-principal" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-top: 40px;">
-    
-    <section class="cartao bg-escuro animacao-suave">
-      <div class="cabecalho-palpite mb-20 text-center">
-        <h2 class="font-russo titulo-branco">Encontrar Craques</h2>
-        <p class="subtitulo-tempo">Convoque mais rivais para a Brah.Bet</p>
-      </div>
+  <main class="container-principal" style="max-width: 860px; margin-top: 40px;">
 
-      <div class="divisor-tracejado mb-20"></div>
+    <div class="text-center mb-20 animacao-suave">
+      <h2 class="font-russo titulo-branco" style="font-size: 28px;">Arena <span style="color: var(--accent-cyan);">Social</span></h2>
+      <p style="color: var(--text-gray); margin-top: 6px; font-size: 14px;">Siga palpiteiros, acompanhe a carreira deles e chame pra sua liga.</p>
+    </div>
 
-      <div class="form-group" style="display: flex; gap: 10px;">
-        <input type="text" id="inputBusca" placeholder="Digite o nome..." style="margin-bottom: 0;">
-        <button class="btn btn-salvar font-russo" onclick="buscarUsuarios()" style="margin-top: 0; padding: 0 20px;">Buscar</button>
-      </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 30px;">
 
-      <div id="lista-busca" class="mt-20">
-        <p class="text-center text-gray-500 font-salsa">Pesquise por nome acima...</p>
-      </div>
-    </section>
+      <!-- BUSCAR -->
+      <section class="cartao bg-escuro animacao-suave">
+        <h3 class="font-russo titulo-branco mb-15" style="font-size: 18px;">🔍 Encontrar Palpiteiros</h3>
+        <div class="divisor-tracejado mb-20"></div>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <input type="text" id="inputBusca" class="input-busca-social" placeholder="Nome do palpiteiro..."
+                 onkeydown="if(event.key==='Enter') buscarPalpiteiros()">
+          <button class="btn btn-salvar font-russo" onclick="buscarPalpiteiros()" style="padding: 0 18px; white-space: nowrap;">Buscar</button>
+        </div>
+        <div id="lista-busca">
+          <div class="empty-state"><div class="emoji">🦆</div><p>Pesquise por nome acima...</p></div>
+        </div>
+      </section>
 
-    <section class="cartao bg-escuro animacao-suave">
-      <div class="cabecalho-palpite mb-20 text-center">
-        <h2 class="font-russo titulo-branco">Meus Amigos</h2>
-        <p class="subtitulo-tempo">A tropa abençoada pelo Pato Mestre</p>
-      </div>
+      <!-- SEGUINDO -->
+      <section class="cartao bg-escuro animacao-suave">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+          <h3 class="font-russo titulo-branco" style="font-size: 18px;">👥 Seguindo</h3>
+          <span id="contador-seguindo" style="font-family:'Russo One',sans-serif; font-size: 13px; color: var(--accent-cyan);"></span>
+        </div>
+        <div class="divisor-tracejado mb-20"></div>
+        <div id="lista-seguindo">
+          <div class="empty-state"><div class="emoji">🔄</div><p>Carregando...</p></div>
+        </div>
+      </section>
 
-      <div class="divisor-tracejado mb-20"></div>
-
-      <div id="lista-amigos">
-        <p class="text-center text-gray-500 font-salsa">Carregando seus amigos... 🔄</p>
-      </div>
-      
-    </section>
-
+    </div>
   </main>
 
-  <script>
-    // Puxa o ID do usuário logado
-    const idLogado = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+  <div id="container-avisos"></div>
 
-    // 1. FUNÇÃO PARA BUSCAR USUÁRIOS NO SERVIDOR
-    async function buscarUsuarios() {
-        const termo = document.getElementById('inputBusca').value.trim();
-        if (!termo) return alert("Digite um nome para buscar!");
+<script>
+  const idLogado = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
 
-        try {
-            const resposta = await fetch(`http://localhost:3000/buscar-usuarios?nome=${termo}`);
-            const usuarios = await resposta.json();
-            
-            const listaBusca = document.getElementById('lista-busca');
-            listaBusca.innerHTML = '';
+  function mostrarAviso(msg, tipo = 'info') {
+    const cont  = document.getElementById('container-avisos');
+    const toast = document.createElement('div');
+    const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+    toast.className = `aviso-toast aviso-${tipo}`;
+    toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
+    cont.appendChild(toast);
+    setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
 
-            if (usuarios.length === 0) {
-                listaBusca.innerHTML = '<p class="text-center text-gray-500">Nenhum craque encontrado com esse nome. 🦆</p>';
-                return;
-            }
+  function renderCard(u, seguindo) {
+    const foto = u.foto_perfil
+      || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.nome)}&background=random&size=46`;
+    const liga = u.liga_atual
+      ? `<span class="badge-liga">⚔️ ${u.liga_atual}</span>` : '';
+    const pts  = u.total_pontos != null
+      ? `<span class="palpiteiro-pts">${u.total_pontos} pts</span>` : '';
 
-            usuarios.forEach(u => {
-                // Não mostra você mesmo na lista de busca
-                if (u.id == idLogado) return;
+    return `
+      <div class="card-row">
+        <a href="perfilpublico.html?id=${u.id}" class="palpiteiro-card">
+          <img src="${foto}" alt="" class="foto-palpiteiro"
+               onerror="this.src='https://ui-avatars.com/api/?name=?&background=random&size=46'">
+          <div class="palpiteiro-info">
+            <p class="palpiteiro-nome">${u.nome}</p>
+            <p class="palpiteiro-time">⚽ ${u.time_favorito || 'Sem time'}</p>
+            ${liga}
+          </div>
+          ${pts}
+        </a>
+        <button class="btn-seguir ${seguindo ? 'seguindo' : 'seguir'}"
+                onclick="toggleSeguir(${u.id}, this)">
+          ${seguindo ? 'Seguindo' : '+ Seguir'}
+        </button>
+      </div>`;
+  }
 
-                listaBusca.innerHTML += `
-                    <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px; margin-bottom: 15px;">
-                        <img src="${u.foto_perfil || 'https://via.placeholder.com/50'}" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                        <div style="text-align: left; padding-left: 15px;">
-                            <p class="font-russo text-white" style="font-size: 16px;">${u.nome}</p>
-                            <p style="color: var(--text-gray); font-size: 12px;">${u.time_favorito || 'Sem Time'}</p>
-                        </div>
-                        <button class="btn btn-salvar font-russo" onclick="adicionarAmigo(${u.id})" style="padding: 8px 15px; font-size: 12px; background-color: var(--accent-cyan);">+ Add</button>
-                    </div>
-                `;
-            });
-        } catch (erro) {
-            console.error("Erro na busca:", erro);
-        }
+  async function buscarPalpiteiros() {
+    const termo = document.getElementById('inputBusca').value.trim();
+    if (!termo) { mostrarAviso('Digite um nome para buscar!', 'erro'); return; }
+
+    const lista = document.getElementById('lista-busca');
+    lista.innerHTML = '<div class="empty-state"><div class="emoji">🔄</div><p>Buscando...</p></div>';
+
+    try {
+      const [resBusca, resSeguindo] = await Promise.all([
+        fetch(`http://localhost:3000/buscar-usuarios?nome=${encodeURIComponent(termo)}`),
+        idLogado ? fetch(`http://localhost:3000/seguindo/${idLogado}`) : Promise.resolve({ json: () => [] })
+      ]);
+
+      const usuarios     = await resBusca.json();
+      const seguindoList = await resSeguindo.json();
+      const idsSeguindo  = new Set(seguindoList.map(s => String(s.id)));
+
+      lista.innerHTML = '';
+      const filtrados = usuarios.filter(u => String(u.id) !== String(idLogado));
+
+      if (!filtrados.length) {
+        lista.innerHTML = '<div class="empty-state"><div class="emoji">🦆</div><p>Nenhum palpiteiro encontrado.</p></div>';
+        return;
+      }
+      filtrados.forEach(u => { lista.innerHTML += renderCard(u, idsSeguindo.has(String(u.id))); });
+
+    } catch (e) {
+      lista.innerHTML = '<div class="empty-state"><div class="emoji">⚠️</div><p>Erro ao conectar com o servidor.</p></div>';
     }
+  }
 
-    // 2. FUNÇÃO PARA ADICIONAR UM AMIGO
-    async function adicionarAmigo(idAmigo) {
-        try {
-            const resposta = await fetch('http://localhost:3000/adicionar-amigo', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    usuario_id: idLogado, 
-                    amigo_id: idAmigo 
-                })
-            });
-
-            if (resposta.ok) {
-                alert("✅ Craque convocado para sua tropa!");
-                carregarAmigos(); // Atualiza a lista de amigos na hora
-            } else {
-                alert("❌ Você já é amigo deste jogador!");
-            }
-        } catch (erro) {
-            console.error("Erro ao adicionar amigo:", erro);
-        }
+  async function carregarSeguindo() {
+    const lista = document.getElementById('lista-seguindo');
+    if (!idLogado) {
+      lista.innerHTML = '<div class="empty-state"><div class="emoji">🔒</div><p>Faça login para ver quem você segue.</p></div>';
+      return;
     }
+    try {
+      const res      = await fetch(`http://localhost:3000/seguindo/${idLogado}`);
+      const seguindo = await res.json();
 
-    // 3. FUNÇÃO PARA CARREGAR A LISTA DE AMIGOS DO USUÁRIO
-    async function carregarAmigos() {
-        if (!idLogado) return;
+      document.getElementById('contador-seguindo').innerText =
+        `${seguindo.length} palpiteiro${seguindo.length !== 1 ? 's' : ''}`;
+      lista.innerHTML = '';
 
-        try {
-            const resposta = await fetch(`http://localhost:3000/meus-amigos/${idLogado}`);
-            const amigos = await resposta.json();
-            
-            const listaAmigos = document.getElementById('lista-amigos');
-            listaAmigos.innerHTML = '';
-
-            if (amigos.length === 0) {
-                listaAmigos.innerHTML = '<p class="text-center text-gray-500 font-salsa">Você ainda não tem amigos. Busque novos craques ao lado! 🦆</p>';
-                return;
-            }
-
-            amigos.forEach(a => {
-                listaAmigos.innerHTML += `
-                    <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px; margin-bottom: 15px;">
-                        <img src="${a.foto_perfil || 'https://via.placeholder.com/50'}" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border-color: var(--accent-green);">
-                        <div style="text-align: left; padding-left: 15px;">
-                            <p class="font-russo text-white" style="font-size: 16px;">${a.nome} <span style="font-size: 12px; color: var(--accent-green);">✔️ Seguidor</span></p>
-                            <p style="color: var(--text-gray); font-size: 12px;">${a.time_favorito || 'Sem Time'}</p>
-                        </div>
-                        <button class="btn btn-cancelar font-russo" onclick="removerAmigo(${a.id})" style="padding: 8px 15px; font-size: 12px;" title="Remover Amigo">X</button>
-                    </div>
-                `;
-            });
-        } catch (erro) {
-            console.error("Erro ao carregar amigos:", erro);
-        }
+      if (!seguindo.length) {
+        lista.innerHTML = '<div class="empty-state"><div class="emoji">🦆</div><p>Você ainda não segue ninguém. Busque um palpiteiro ao lado!</p></div>';
+        return;
+      }
+      seguindo.forEach(u => { lista.innerHTML += renderCard(u, true); });
+    } catch (e) {
+      lista.innerHTML = '<div class="empty-state"><div class="emoji">⚠️</div><p>Erro ao carregar.</p></div>';
     }
+  }
 
-    // 4. FUNÇÃO PARA REMOVER UM AMIGO
-    async function removerAmigo(idAmigo) {
-        if (!confirm("Deseja mesmo remover este craque da sua lista?")) return;
+  async function toggleSeguir(idAlvo, btn) {
+    if (!idLogado) { mostrarAviso('Você precisa estar logado!', 'erro'); return; }
+    const estaSeguindo = btn.classList.contains('seguindo');
+    btn.disabled = true;
 
-        try {
-            const resposta = await fetch('http://localhost:3000/remover-amigo', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    usuario_id: idLogado, 
-                    amigo_id: idAmigo 
-                })
-            });
+    try {
+      const url    = estaSeguindo ? 'http://localhost:3000/deixar-seguir' : 'http://localhost:3000/seguir';
+      const method = estaSeguindo ? 'DELETE' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seguidor_id: idLogado, seguido_id: idAlvo })
+      });
 
-            if (resposta.ok) {
-                carregarAmigos(); // Atualiza a lista na tela
-            }
-        } catch (erro) {
-            console.error("Erro ao remover amigo:", erro);
+      if (res.ok) {
+        if (estaSeguindo) {
+          btn.classList.replace('seguindo', 'seguir');
+          btn.innerText = '+ Seguir';
+          mostrarAviso('Deixou de seguir.', 'info');
+        } else {
+          btn.classList.replace('seguir', 'seguindo');
+          btn.innerText = 'Seguindo';
+          mostrarAviso('Palpiteiro seguido! 🦆', 'sucesso');
         }
+        carregarSeguindo();
+      }
+    } catch (e) {
+      mostrarAviso('Erro ao conectar com o servidor.', 'erro');
+    } finally {
+      btn.disabled = false;
     }
+  }
 
-    // Inicia a lista de amigos assim que a página abre
-    carregarAmigos();
-  </script>
+  carregarSeguindo();
+</script>
 
 </body>
 </html>

@@ -11,11 +11,8 @@ console.log("Host carregado:", process.env.DATABASE_URL ? "Sim" : "Não");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: true // Ativa o SSL explicitamente
+  ssl: { rejectUnauthorized: false }
 });
-
-// linha global (só para testar):
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // Rota de teste
 app.get('/', (req, res) => {
@@ -240,7 +237,7 @@ app.get('/ranking', async (req, res) => {
 // ROTA PARA CRIAR UMA NOVA LIGA
 app.post('/criar-liga', async (req, res) => {
   try {
-    const { nome_liga, dono_id } = req.body;
+    const { nome_liga, id_dono } = req.body;
 
     // Gera um código aleatório de 6 letras/números (Ex: X7B9KQ)
     const codigo_convite = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -248,7 +245,7 @@ app.post('/criar-liga', async (req, res) => {
     // 1. Salva a liga nova no banco
     const novaLiga = await pool.query(
       'INSERT INTO ligas (nome, codigo_convite, dono_id) VALUES ($1, $2, $3) RETURNING *',
-      [nome_liga, codigo_convite, dono_id]
+      [nome_liga, codigo_convite, id_dono]
     );
 
     const idLigaGerada = novaLiga.rows[0].id_liga;
@@ -256,7 +253,7 @@ app.post('/criar-liga', async (req, res) => {
     // 2. Coloca o dono automaticamente dentro da liga que ele acabou de criar
     await pool.query(
       'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2)',
-      [idLigaGerada, dono_id]
+      [idLigaGerada, id_dono]
     );
 
     res.status(201).json({ 
@@ -273,7 +270,7 @@ app.post('/criar-liga', async (req, res) => {
 // ROTA PARA ENTRAR EM UMA LIGA USANDO O CÓDIGO
 app.post('/entrar-liga', async (req, res) => {
   try {
-    const { codigo_convite, usuario_id } = req.body;
+    const { codigo_convite, id_usuario } = req.body;
 
     // 1. Verifica se a liga com esse código existe
     const buscaLiga = await pool.query('SELECT * FROM ligas WHERE codigo_convite = $1', [codigo_convite]);
@@ -287,7 +284,7 @@ app.post('/entrar-liga', async (req, res) => {
     // 2. Tenta colocar o usuário na liga
     await pool.query(
       'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2)',
-      [liga_id, usuario_id]
+      [liga_id, id_usuario]
     );
 
     res.json({ mensagem: `Bem-vindo à liga ${buscaLiga.rows[0].nome}!` });
@@ -423,28 +420,11 @@ app.get('/ranking-liga/:id_liga', async (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// ROTA SOCIAL: BUSCAR USUÁRIOS POR NOME
-app.get('/buscar-usuarios', async (req, res) => {
-  try {
-    const { nome } = req.query; // Pega o nome da URL (ex: ?nome=Acacio)
-    
-    const resultado = await pool.query(
-      "SELECT id, nome, time_favorito, foto_perfil FROM usuarios WHERE nome ILIKE $1 LIMIT 10",
-      [`%${nome}%`] // Os símbolos de % permitem achar "Acácio" buscando apenas por "Aca"
-    );
-    
-    res.json(resultado.rows);
-  } catch (err) {
-    console.error("Erro na busca do servidor:", err);
-    res.status(500).json({ erro: 'Erro interno na busca.' });
-  }
-});
-// -----------------------------------------------------------------------------
 // ROTA SOCIAL: ADICIONAR AMIGO
 app.post('/adicionar-amigo', async (req, res) => {
   try {
-    const { usuario_id, amigo_id } = req.body;
-    await pool.query('INSERT INTO amigos (usuario_id, amigo_id) VALUES ($1, $2)', [usuario_id, amigo_id]);
+    const { id_usuario, id_amigo } = req.body;
+    await pool.query('INSERT INTO amigos (usuario_id, amigo_id) VALUES ($1, $2)', [id_usuario, id_amigo]);
     res.json({ mensagem: 'Amigo adicionado!' });
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao adicionar amigo.' });
@@ -472,15 +452,392 @@ app.get('/meus-amigos/:id', async (req, res) => {
 // ROTA SOCIAL: REMOVER AMIGO
 app.delete('/remover-amigo', async (req, res) => {
   try {
-    const { usuario_id, amigo_id } = req.body;
-    await pool.query('DELETE FROM amigos WHERE usuario_id = $1 AND amigo_id = $2', [usuario_id, amigo_id]);
+    const { id_usuario, id_amigo } = req.body;
+    await pool.query('DELETE FROM amigos WHERE usuario_id = $1 AND amigo_id = $2', [id_usuario, id_amigo]);
     res.json({ mensagem: 'Amigo removido.' });
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao remover amigo.' });
   }
 });
 
+
 // -----------------------------------------------------------------------------
+// ROTA PARA BUSCAR A LIGA DE UM USUÁRIO (usada pelo minhaliga.html)
+app.get('/minha-liga/:id_usuario', async (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+    const resultado = await pool.query(`
+      SELECT l.id_liga, l.nome, l.codigo_convite, l.dono_id
+      FROM ligas l
+      JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+      WHERE ul.usuario_id = $1
+      LIMIT 1
+    `, [id_usuario]);
+
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ erro: 'Usuário não está em nenhuma liga.' });
+    }
+
+    res.json({ liga: resultado.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar liga do usuário.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA PARA BUSCAR UMA LIGA PELO ID (usada pelo minhaliga.html?id=X)
+app.get('/liga/:id_liga', async (req, res) => {
+  try {
+    const { id_liga } = req.params;
+    const resultado = await pool.query(
+      'SELECT * FROM ligas WHERE id_liga = $1',
+      [id_liga]
+    );
+
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ erro: 'Liga não encontrada.' });
+    }
+
+    res.json({ liga: resultado.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar liga.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA PARA SAIR DE UMA LIGA
+app.post('/sair-liga', async (req, res) => {
+  try {
+    const { id_usuario } = req.body;
+    await pool.query(
+      'DELETE FROM usuarios_ligas WHERE usuario_id = $1',
+      [id_usuario]
+    );
+    res.json({ mensagem: 'Você saiu da liga com sucesso.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao sair da liga.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA PARA BUSCAR PALPITES DA GALERA EM UMA LIGA (usada pelo minhaliga.html)
+app.get('/palpites-liga/:id_liga', async (req, res) => {
+  try {
+    const { id_liga } = req.params;
+    const resultado = await pool.query(`
+      SELECT
+        p.id_palpite,
+        p.usuario_id    AS id_usuario,
+        p.gols_casa_palpite AS gols_casa,
+        p.gols_fora_palpite AS gols_fora,
+        p.pontos_obtidos,
+        u.nome,
+        u.foto_perfil,
+        j.status,
+        CONCAT(j.time_casa, ' x ', j.time_fora) AS jogo
+      FROM palpites p
+      JOIN usuarios u  ON u.id  = p.usuario_id
+      JOIN jogos j     ON j.id_jogo = p.jogo_id
+      JOIN usuarios_ligas ul ON ul.usuario_id = p.usuario_id
+      WHERE ul.liga_id = $1
+      ORDER BY j.id_jogo ASC, u.nome ASC
+    `, [id_liga]);
+
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar palpites da liga.' });
+  }
+});
+
+
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: SEGUIR UM PALPITEIRO
+app.post('/seguir', async (req, res) => {
+  try {
+    const { seguidor_id, seguido_id } = req.body;
+    if (String(seguidor_id) === String(seguido_id)) {
+      return res.status(400).json({ erro: 'Você não pode seguir a si mesmo!' });
+    }
+    await pool.query(
+      'INSERT INTO seguidores (seguidor_id, seguido_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+      [seguidor_id, seguido_id]
+    );
+    res.json({ mensagem: 'Palpiteiro seguido!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao seguir palpiteiro.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: DEIXAR DE SEGUIR
+app.delete('/deixar-seguir', async (req, res) => {
+  try {
+    const { seguidor_id, seguido_id } = req.body;
+    await pool.query(
+      'DELETE FROM seguidores WHERE seguidor_id = $1 AND seguido_id = $2',
+      [seguidor_id, seguido_id]
+    );
+    res.json({ mensagem: 'Deixou de seguir.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao deixar de seguir.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: BUSCAR QUEM O USUÁRIO SEGUE
+app.get('/seguindo/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resultado = await pool.query(`
+      SELECT
+        u.id,
+        u.nome,
+        u.time_favorito,
+        u.foto_perfil,
+        COALESCE(SUM(p.pontos_obtidos), 0) AS total_pontos,
+        (SELECT l.nome FROM ligas l
+         JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+         WHERE ul.usuario_id = u.id LIMIT 1) AS liga_atual
+      FROM seguidores s
+      JOIN usuarios u ON u.id = s.seguido_id
+      LEFT JOIN palpites p ON p.usuario_id = u.id
+      WHERE s.seguidor_id = $1
+      GROUP BY u.id, u.nome, u.time_favorito, u.foto_perfil
+      ORDER BY u.nome ASC
+    `, [id]);
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar seguindo.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: PERFIL PÚBLICO DE UM PALPITEIRO
+app.get('/perfil-publico/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Dados básicos do usuário
+    const usuario = await pool.query(
+      'SELECT id, nome, email, time_favorito, foto_perfil, criado_em FROM usuarios WHERE id = $1',
+      [id]
+    );
+    if (!usuario.rows.length) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+
+    // Estatísticas gerais
+    const stats = await pool.query(`
+      SELECT
+        COUNT(*)                                            AS total_palpites,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 3)         AS acertos_exatos,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 1)         AS acertos_vencedor,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 0
+                           AND pontos_obtidos IS NOT NULL) AS erros,
+        COALESCE(SUM(pontos_obtidos), 0)                   AS total_pontos
+      FROM palpites
+      WHERE usuario_id = $1
+    `, [id]);
+
+    // Liga atual
+    const ligaAtual = await pool.query(`
+      SELECT l.id_liga, l.nome, l.codigo_convite
+      FROM ligas l
+      JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+      WHERE ul.usuario_id = $1
+      LIMIT 1
+    `, [id]);
+
+    // Últimos 10 palpites com resultado do jogo
+    const palpitesRecentes = await pool.query(`
+      SELECT
+        p.gols_casa_palpite,
+        p.gols_fora_palpite,
+        p.pontos_obtidos,
+        j.time_casa,
+        j.time_fora,
+        j.gols_casa_real,
+        j.gols_fora_real,
+        j.status,
+        j.rodada,
+        j.data_jogo
+      FROM palpites p
+      JOIN jogos j ON j.id_jogo = p.jogo_id
+      WHERE p.usuario_id = $1
+      ORDER BY j.data_jogo DESC NULLS LAST
+      LIMIT 10
+    `, [id]);
+
+    // Contagem de seguidores e seguindo
+    const seguidores = await pool.query(
+      'SELECT COUNT(*) AS total FROM seguidores WHERE seguido_id = $1', [id]
+    );
+    const seguindo = await pool.query(
+      'SELECT COUNT(*) AS total FROM seguidores WHERE seguidor_id = $1', [id]
+    );
+
+    res.json({
+      usuario:          usuario.rows[0],
+      stats:            stats.rows[0],
+      liga_atual:       ligaAtual.rows[0] || null,
+      palpites_recentes: palpitesRecentes.rows,
+      seguidores:       Number(seguidores.rows[0].total),
+      seguindo:         Number(seguindo.rows[0].total),
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao carregar perfil.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: BUSCAR USUÁRIOS POR NOME (com pontos e liga)
+app.get('/buscar-usuarios', async (req, res) => {
+  try {
+    const { nome } = req.query;
+    const resultado = await pool.query(`
+      SELECT
+        u.id,
+        u.nome,
+        u.time_favorito,
+        u.foto_perfil,
+        COALESCE(SUM(p.pontos_obtidos), 0) AS total_pontos,
+        (SELECT l.nome FROM ligas l
+         JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+         WHERE ul.usuario_id = u.id LIMIT 1) AS liga_atual
+      FROM usuarios u
+      LEFT JOIN palpites p ON p.usuario_id = u.id
+      WHERE u.nome ILIKE $1
+      GROUP BY u.id, u.nome, u.time_favorito, u.foto_perfil
+      ORDER BY u.nome ASC
+      LIMIT 10
+    `, [`%${nome}%`]);
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro interno na busca.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// ROTAS LEGADAS DO PERFIL PÚBLICO (compatibilidade com versões antigas do HTML)
+
+// GET /usuario/:id
+app.get('/usuario/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuario = await pool.query(
+      'SELECT id, nome, email, time_favorito, foto_perfil, criado_em FROM usuarios WHERE id = $1', [id]
+    );
+    if (!usuario.rows.length) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+
+    const stats = await pool.query(`
+      SELECT
+        COUNT(*)                                            AS total_palpites,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 3)         AS acertos_exatos,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 1)         AS acertos_vencedor,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 0
+                           AND pontos_obtidos IS NOT NULL) AS erros,
+        COALESCE(SUM(pontos_obtidos), 0)                   AS total_pontos
+      FROM palpites WHERE usuario_id = $1
+    `, [id]);
+
+    const seguidores = await pool.query('SELECT COUNT(*) AS total FROM seguidores WHERE seguido_id  = $1', [id]);
+    const seguindo   = await pool.query('SELECT COUNT(*) AS total FROM seguidores WHERE seguidor_id = $1', [id]);
+    const ligaAtual  = await pool.query(`
+      SELECT l.id_liga, l.nome FROM ligas l
+      JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+      WHERE ul.usuario_id = $1 LIMIT 1
+    `, [id]);
+
+    res.json({
+      ...usuario.rows[0],
+      ...stats.rows[0],
+      seguidores: Number(seguidores.rows[0].total),
+      seguindo:   Number(seguindo.rows[0].total),
+      liga_atual: ligaAtual.rows[0] || null,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar usuário.' });
+  }
+});
+
+// GET /desempenho/:id
+app.get('/desempenho/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resultado = await pool.query(`
+      SELECT
+        COUNT(*)                                            AS total_palpites,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 3)         AS acertos_exatos,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 1)         AS acertos_vencedor,
+        COUNT(*) FILTER (WHERE pontos_obtidos = 0
+                           AND pontos_obtidos IS NOT NULL) AS erros,
+        COALESCE(SUM(pontos_obtidos), 0)                   AS total_pontos
+      FROM palpites WHERE usuario_id = $1
+    `, [id]);
+    res.json(resultado.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar desempenho.' });
+  }
+});
+
+// GET /carreira/:id
+app.get('/carreira/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const ligas = await pool.query(`
+      SELECT l.id_liga, l.nome, l.codigo_convite
+      FROM ligas l
+      JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+      WHERE ul.usuario_id = $1
+    `, [id]);
+    res.json({ ligas: ligas.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar carreira.' });
+  }
+});
+
+// GET /ultimos-palpites/:id
+app.get('/ultimos-palpites/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resultado = await pool.query(`
+      SELECT
+        p.gols_casa_palpite,
+        p.gols_fora_palpite,
+        p.pontos_obtidos,
+        j.time_casa,
+        j.time_fora,
+        j.gols_casa_real,
+        j.gols_fora_real,
+        j.status,
+        j.rodada,
+        j.data_jogo
+      FROM palpites p
+      JOIN jogos j ON j.id_jogo = p.jogo_id
+      WHERE p.usuario_id = $1
+      ORDER BY j.data_jogo DESC NULLS LAST
+      LIMIT 10
+    `, [id]);
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar palpites.' });
+  }
+});
+
 // LIGA O MOTOR! (Sempre deve ficar no final do arquivo)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

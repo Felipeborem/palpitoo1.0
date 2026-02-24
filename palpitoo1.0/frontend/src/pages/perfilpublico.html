@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo - Perfil do Palpiteiro</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./css/style.css">
+
+  <style>
+    /* ── Abas ── */
+    .abas-perfil {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .aba-btn {
+      flex: 1;
+      padding: 12px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      text-transform: uppercase;
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 12px;
+      cursor: pointer;
+      background: var(--bg-dark);
+      color: var(--text-gray);
+      transition: all 0.2s ease;
+    }
+    .aba-btn.ativa {
+      background: var(--accent-cyan);
+      color: var(--text-white);
+      border-color: var(--accent-cyan);
+    }
+    .painel-aba { display: none; }
+    .painel-aba.ativo { display: block; }
+
+    /* ── Stat boxes ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-box {
+      background: var(--bg-dark);
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 14px;
+      padding: 16px 10px;
+      text-align: center;
+      transition: border-color 0.2s ease;
+    }
+    .stat-box:hover { border-color: var(--accent-cyan); }
+    .stat-valor {
+      font-family: 'Russo One', sans-serif;
+      font-size: 26px;
+      color: var(--accent-cyan);
+    }
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    /* ── Barra de aproveitamento ── */
+    .barra-container {
+      background: var(--bg-dark);
+      border-radius: 20px;
+      height: 10px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .barra-fill {
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(to right, var(--accent-green), var(--accent-cyan));
+      transition: width 0.8s ease;
+    }
+
+    /* ── Histórico de ligas ── */
+    .liga-historico-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px dashed var(--borda-divisoria);
+    }
+    .liga-historico-item:last-child { border-bottom: none; }
+
+    /* ── Últimos palpites ── */
+    .palpite-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--bg-dark);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border: 1px solid var(--borda-divisoria);
+    }
+    .palpite-jogo {
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      color: var(--text-white);
+    }
+    .palpite-placar {
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      color: var(--accent-cyan);
+    }
+    .palpite-pts {
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      min-width: 50px;
+      text-align: right;
+    }
+    .pts-3 { color: #4ade80; }
+    .pts-1 { color: #eab308; }
+    .pts-0 { color: #f87171; }
+
+    /* ── Troféu ── */
+    .trofeu-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align: center;
+      transition: border-color 0.2s ease;
+    }
+    .trofeu-card:hover { border-color: #eab308; }
+
+    /* ── Badge de posição ── */
+    .posicao-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      background: rgba(122,30,58,0.15);
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* ── Botão seguir no topo ── */
+    .btn-seguir-topo {
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 14px;
+    }
+    .btn-seguir-topo.seguir {
+      background: var(--accent-cyan);
+      color: var(--text-white);
+    }
+    .btn-seguir-topo.seguir:hover { opacity: 0.85; }
+    .btn-seguir-topo.seguindo {
+      background: transparent;
+      color: var(--vermelho);
+      border: 1px solid var(--vermelho);
+    }
+    .btn-seguir-topo.seguindo:hover { background: var(--vermelho); color: var(--text-white); }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="_index.html" class="logo-link">
+      <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="_index.html">Início</a></li>
+        <li><a href="ligas.html">Ligas</a></li>
+        <li><a href="palpites.html">Palpites</a></li>
+        <li><a href="novidades.html">Novidades</a></li>
+        <li><a href="social.html" class="ativo">Social</a></li>
+        <li><a href="carreira.html">Carreira</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container-principal" style="max-width: 860px; margin-top: 40px;">
+
+    <!-- ══ TOPO: IDENTIDADE DO PALPITEIRO ══ -->
+    <section class="cartao bg-escuro animacao-suave text-center mb-20"
+             style="border-top: 3px solid var(--accent-cyan); position: relative; overflow: hidden;">
+
+      <div style="position:absolute;top:-40px;right:-40px;font-size:140px;opacity:0.03;pointer-events:none;">🦆</div>
+
+      <img id="fotoPerfil" src="https://via.placeholder.com/100" alt="Foto"
+           class="foto-perfil" style="width:100px;height:100px;margin:0 auto;border-color:var(--accent-cyan);border-width:3px;">
+
+      <h2 id="nomeUsuario" class="font-russo titulo-branco mt-15" style="font-size:26px;">Carregando...</h2>
+      <p id="timeUsuario" style="color:var(--text-gray);font-size:13px;margin-top:4px;text-transform:uppercase;">— • —</p>
+
+      <div style="display:flex;justify-content:center;gap:20px;margin-top:16px;flex-wrap:wrap;">
+        <div>
+          <p class="font-russo" style="font-size:11px;color:var(--text-gray);">SEGUIDORES</p>
+          <p class="font-russo" id="contSeguidores" style="font-size:20px;color:var(--text-white);">—</p>
+        </div>
+        <div style="width:1px;background:var(--borda-divisoria);"></div>
+        <div>
+          <p class="font-russo" style="font-size:11px;color:var(--text-gray);">SEGUINDO</p>
+          <p class="font-russo" id="contSeguindo" style="font-size:20px;color:var(--text-white);">—</p>
+        </div>
+        <div style="width:1px;background:var(--borda-divisoria);"></div>
+        <div>
+          <p class="font-russo" style="font-size:11px;color:var(--text-gray);">LIGA ATUAL</p>
+          <p class="font-russo" id="ligaAtual" style="font-size:14px;color:var(--accent-cyan);">—</p>
+        </div>
+      </div>
+
+      <div>
+        <button id="btnSeguir" class="btn-seguir-topo seguir" onclick="toggleSeguir()">
+          + Seguir
+        </button>
+      </div>
+
+      <a href="social.html" style="display:inline-block;margin-top:12px;font-size:11px;color:var(--text-gray);">
+        ← Voltar ao Social
+      </a>
+    </section>
+
+    <!-- ══ ABAS ══ -->
+    <div class="abas-perfil">
+      <button class="aba-btn ativa" id="aba-btn-temporada" onclick="trocarAba('temporada')">
+        ⚡ Temporada Atual
+      </button>
+      <button class="aba-btn" id="aba-btn-carreira" onclick="trocarAba('carreira')">
+        📜 Carreira Histórica
+      </button>
+    </div>
+
+    <!-- ══ ABA: TEMPORADA ATUAL ══ -->
+    <div id="painel-temporada" class="painel-aba ativo">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;">
+
+        <!-- Desempenho atual -->
+        <section class="cartao bg-escuro animacao-suave">
+          <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">📊 Desempenho na Temporada</h3>
+          <div class="divisor-tracejado mb-20"></div>
+
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-valor" id="t-pontos">—</div>
+              <div class="stat-label">Pontos Totais</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="t-cravadas">—</div>
+              <div class="stat-label">Cravações 🎯</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="t-acertos">—</div>
+              <div class="stat-label">Acertos ✅</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="t-erros">—</div>
+              <div class="stat-label">Erros ❌</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="t-palpites">—</div>
+              <div class="stat-label">Palpites Feitos</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="t-aproveitamento">—</div>
+              <div class="stat-label">Aproveitamento</div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-dark);border:1px solid var(--borda-divisoria);border-radius:12px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--text-gray);">Taxa de acerto</span>
+              <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--accent-cyan);" id="t-taxa-label">—%</span>
+            </div>
+            <div class="barra-container">
+              <div class="barra-fill" id="t-barra" style="width:0%"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Posição e últimos palpites -->
+        <div style="display:flex;flex-direction:column;gap:24px;">
+
+          <section class="cartao bg-escuro animacao-suave">
+            <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">🏆 Posição na Liga</h3>
+            <div class="divisor-tracejado mb-20"></div>
+
+            <div style="text-align:center;padding:10px 0;">
+              <div style="font-size:50px;margin-bottom:8px;" id="t-posicao-icone">—</div>
+              <span class="posicao-badge" id="t-posicao-texto">Carregando...</span>
+              <p style="color:var(--text-gray);font-size:12px;margin-top:10px;" id="t-nome-liga">—</p>
+            </div>
+          </section>
+
+          <section class="cartao bg-escuro animacao-suave">
+            <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">🕐 Últimos Palpites</h3>
+            <div class="divisor-tracejado mb-20"></div>
+
+            <div id="lista-ultimos-palpites">
+              <p class="text-center" style="color:var(--text-gray);font-size:13px;">Carregando...</p>
+            </div>
+          </section>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ ABA: CARREIRA HISTÓRICA ══ -->
+    <div id="painel-carreira" class="painel-aba">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;">
+
+        <!-- Stats totais de carreira -->
+        <section class="cartao bg-escuro animacao-suave">
+          <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">📈 Carreira Total</h3>
+          <div class="divisor-tracejado mb-20"></div>
+
+          <div class="stat-grid">
+            <div class="stat-box">
+              <div class="stat-valor" id="c-pontos">—</div>
+              <div class="stat-label">Pontos de Carreira</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="c-palpites">—</div>
+              <div class="stat-label">Total de Palpites</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="c-ligas">—</div>
+              <div class="stat-label">Ligas Disputadas</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="c-cravadas">—</div>
+              <div class="stat-label">Cravações 🎯</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="c-acertos">—</div>
+              <div class="stat-label">Acertos ✅</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-valor" id="c-aproveitamento">—</div>
+              <div class="stat-label">Aproveitamento</div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg-dark);border:1px solid var(--borda-divisoria);border-radius:12px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--text-gray);">Taxa histórica de acerto</span>
+              <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--accent-cyan);" id="c-taxa-label">—%</span>
+            </div>
+            <div class="barra-container">
+              <div class="barra-fill" id="c-barra" style="width:0%"></div>
+            </div>
+          </div>
+        </section>
+
+        <div style="display:flex;flex-direction:column;gap:24px;">
+
+          <!-- Sala de troféus -->
+          <section class="cartao bg-escuro animacao-suave">
+            <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">🏅 Sala de Troféus</h3>
+            <div class="divisor-tracejado mb-20"></div>
+
+            <div id="sala-trofeus" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Carregando...</p>
+            </div>
+          </section>
+
+          <!-- Histórico de ligas -->
+          <section class="cartao bg-escuro animacao-suave">
+            <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">📜 Histórico de Ligas</h3>
+            <div class="divisor-tracejado mb-20"></div>
+
+            <div id="historico-ligas">
+              <p class="text-center" style="color:var(--text-gray);font-size:13px;">Carregando...</p>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="container-avisos"></div>
+
+<script>
+  const idLogado = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+  const params   = new URLSearchParams(window.location.search);
+  const idPerfil = params.get('id');
+
+  // ── TOAST ─────────────────────────────────────────────────
+  function mostrarAviso(msg, tipo = 'info') {
+    const cont  = document.getElementById('container-avisos');
+    const toast = document.createElement('div');
+    const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+    toast.className = `aviso-toast aviso-${tipo}`;
+    toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
+    cont.appendChild(toast);
+    setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
+
+  // ── TROCAR ABA ────────────────────────────────────────────
+  function trocarAba(qual) {
+    document.getElementById('painel-temporada').classList.toggle('ativo', qual === 'temporada');
+    document.getElementById('painel-carreira').classList.toggle('ativo', qual === 'carreira');
+    document.getElementById('aba-btn-temporada').classList.toggle('ativa', qual === 'temporada');
+    document.getElementById('aba-btn-carreira').classList.toggle('ativa', qual === 'carreira');
+  }
+
+  // ── TOGGLE SEGUIR ─────────────────────────────────────────
+  async function toggleSeguir() {
+    if (!idLogado) { mostrarAviso('Você precisa estar logado!', 'erro'); return; }
+    const btn = document.getElementById('btnSeguir');
+    const estaSeguindo = btn.classList.contains('seguindo');
+
+    try {
+      if (estaSeguindo) {
+        const res = await fetch('http://localhost:3000/deixar-seguir', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ seguidor_id: idLogado, seguido_id: idPerfil })
+        });
+        if (res.ok) {
+          btn.classList.replace('seguindo', 'seguir');
+          btn.innerText = '+ Seguir';
+          mostrarAviso('Deixou de seguir.', 'info');
+          atualizarContadores();
+        }
+      } else {
+        const res = await fetch('http://localhost:3000/seguir', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ seguidor_id: idLogado, seguido_id: idPerfil })
+        });
+        if (res.ok) {
+          btn.classList.replace('seguir', 'seguindo');
+          btn.innerText = 'Seguindo';
+          mostrarAviso('Palpiteiro seguido!', 'sucesso');
+          atualizarContadores();
+        }
+      }
+    } catch (e) { mostrarAviso('Erro ao conectar.', 'erro'); }
+  }
+
+  // ── CARREGAR PERFIL BÁSICO ────────────────────────────────
+  async function carregarPerfil() {
+    if (!idPerfil) { window.location.href = 'social.html'; return; }
+
+    try {
+      const res  = await fetch(`http://localhost:3000/usuario/${idPerfil}`);
+      const data = await res.json();
+
+      document.title = `Palpitoo - ${data.nome}`;
+      document.getElementById('nomeUsuario').innerText = data.nome;
+      document.getElementById('timeUsuario').innerText = data.time_favorito || '— sem time —';
+      if (data.foto_perfil) document.getElementById('fotoPerfil').src = data.foto_perfil;
+      if (data.liga_atual)  document.getElementById('ligaAtual').innerText = data.liga_atual;
+
+      // Esconde botão de seguir se for o próprio perfil
+      if (String(idPerfil) === String(idLogado)) {
+        document.getElementById('btnSeguir').style.display = 'none';
+      }
+
+      atualizarContadores();
+      verificarSeSeguindo();
+
+    } catch (e) {
+      document.getElementById('nomeUsuario').innerText = 'Palpiteiro não encontrado';
+    }
+  }
+
+  async function atualizarContadores() {
+    try {
+      const res  = await fetch(`http://localhost:3000/contadores/${idPerfil}`);
+      const data = await res.json();
+      document.getElementById('contSeguidores').innerText = data.seguidores ?? '—';
+      document.getElementById('contSeguindo').innerText   = data.seguindo   ?? '—';
+    } catch (e) {}
+  }
+
+  async function verificarSeSeguindo() {
+    if (!idLogado || String(idLogado) === String(idPerfil)) return;
+    try {
+      const res  = await fetch(`http://localhost:3000/esta-seguindo?seguidor=${idLogado}&seguido=${idPerfil}`);
+      const data = await res.json();
+      const btn  = document.getElementById('btnSeguir');
+      if (data.seguindo) {
+        btn.classList.replace('seguir', 'seguindo');
+        btn.innerText = 'Seguindo';
+      }
+    } catch (e) {}
+  }
+
+  // ── TEMPORADA ATUAL ───────────────────────────────────────
+  async function carregarTemporada() {
+    try {
+      const res  = await fetch(`http://localhost:3000/desempenho/${idPerfil}`);
+      const data = await res.json();
+
+      document.getElementById('t-pontos').innerText       = data.pontos        ?? 0;
+      document.getElementById('t-cravadas').innerText     = data.cravadas      ?? 0;
+      document.getElementById('t-acertos').innerText      = data.acertos       ?? 0;
+      document.getElementById('t-erros').innerText        = data.erros         ?? 0;
+      document.getElementById('t-palpites').innerText     = data.total_palpites ?? 0;
+
+      const taxa = data.total_palpites > 0
+        ? Math.round(((data.cravadas + data.acertos) / data.total_palpites) * 100)
+        : 0;
+
+      document.getElementById('t-aproveitamento').innerText = `${taxa}%`;
+      document.getElementById('t-taxa-label').innerText     = `${taxa}%`;
+      setTimeout(() => {
+        document.getElementById('t-barra').style.width = `${taxa}%`;
+      }, 100);
+
+      // Posição na liga
+      if (data.posicao_liga) {
+        const medalhas = { 1:'🥇', 2:'🥈', 3:'🥉' };
+        document.getElementById('t-posicao-icone').innerText = medalhas[data.posicao_liga] || '🏅';
+        document.getElementById('t-posicao-texto').innerText = `${data.posicao_liga}º lugar`;
+        document.getElementById('t-nome-liga').innerText     = data.nome_liga || '';
+      } else {
+        document.getElementById('t-posicao-icone').innerText = '🦆';
+        document.getElementById('t-posicao-texto').innerText = 'Sem liga';
+      }
+
+    } catch (e) {
+      document.getElementById('t-pontos').innerText = 'Erro';
+    }
+
+    // Últimos palpites
+    try {
+      const res     = await fetch(`http://localhost:3000/ultimos-palpites/${idPerfil}`);
+      const palpites = await res.json();
+      const lista    = document.getElementById('lista-ultimos-palpites');
+      lista.innerHTML = '';
+
+      if (!palpites.length) {
+        lista.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;">Sem palpites recentes.</p>';
+        return;
+      }
+
+      palpites.slice(0, 6).forEach(p => {
+        const ptsCls = p.pontos === 3 ? 'pts-3' : p.pontos === 1 ? 'pts-1' : 'pts-0';
+        const ptsLabel = p.pontos === 3 ? '🎯 +3' : p.pontos === 1 ? '✅ +1' : '❌ 0';
+        const resultado = p.status === 'finalizado'
+          ? `<span style="font-size:11px;color:var(--text-gray);">(${p.gols_casa_real} x ${p.gols_fora_real})</span>`
+          : `<span style="font-size:11px;color:var(--accent-cyan);">em andamento</span>`;
+
+        lista.innerHTML += `
+          <div class="palpite-item">
+            <div>
+              <p class="palpite-jogo">${p.time_casa} x ${p.time_fora}</p>
+              ${resultado}
+            </div>
+            <span class="palpite-placar">${p.gols_casa_palpite} x ${p.gols_fora_palpite}</span>
+            <span class="palpite-pts ${ptsCls}">${ptsLabel}</span>
+          </div>`;
+      });
+    } catch (e) {}
+  }
+
+  // ── CARREIRA HISTÓRICA ────────────────────────────────────
+  async function carregarCarreira() {
+    try {
+      const res  = await fetch(`http://localhost:3000/carreira/${idPerfil}`);
+      const data = await res.json();
+
+      document.getElementById('c-pontos').innerText       = data.pontos_total    ?? 0;
+      document.getElementById('c-palpites').innerText     = data.palpites_total  ?? 0;
+      document.getElementById('c-ligas').innerText        = data.ligas_total     ?? 0;
+      document.getElementById('c-cravadas').innerText     = data.cravadas_total  ?? 0;
+      document.getElementById('c-acertos').innerText      = data.acertos_total   ?? 0;
+
+      const taxa = data.palpites_total > 0
+        ? Math.round(((data.cravadas_total + data.acertos_total) / data.palpites_total) * 100)
+        : 0;
+
+      document.getElementById('c-aproveitamento').innerText = `${taxa}%`;
+      document.getElementById('c-taxa-label').innerText     = `${taxa}%`;
+      setTimeout(() => { document.getElementById('c-barra').style.width = `${taxa}%`; }, 100);
+
+      // Troféus
+      const trofeus = document.getElementById('sala-trofeus');
+      trofeus.innerHTML = '';
+      if (!data.trofeus || !data.trofeus.length) {
+        trofeus.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Nenhum troféu ainda. 🦆</p>';
+      } else {
+        data.trofeus.forEach(t => {
+          trofeus.innerHTML += `
+            <div class="trofeu-card">
+              <div style="font-size:34px;margin-bottom:8px;">${t.icone || '🏆'}</div>
+              <p class="font-russo" style="font-size:13px;color:var(--accent-cyan);">${t.nome}</p>
+              <p style="font-size:10px;color:var(--text-gray);margin-top:4px;">${t.descricao || ''}</p>
+            </div>`;
+        });
+      }
+
+      // Histórico de ligas
+      const hist = document.getElementById('historico-ligas');
+      hist.innerHTML = '';
+      if (!data.historico_ligas || !data.historico_ligas.length) {
+        hist.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;">Nenhuma liga participada ainda.</p>';
+      } else {
+        data.historico_ligas.forEach(l => {
+          const corPos = l.posicao === 1 ? '#eab308' : l.posicao === 2 ? '#d1d5db' : 'var(--accent-cyan)';
+          const iconPos = l.posicao === 1 ? '🏆 Campeão' : l.posicao === 2 ? '🥈 Vice' : `${l.posicao}º Lugar`;
+          hist.innerHTML += `
+            <div class="liga-historico-item">
+              <div>
+                <p class="font-russo" style="font-size:14px;color:var(--text-white);">${l.nome_liga}</p>
+                <p style="font-size:11px;color:var(--text-gray);">${l.temporada || ''}</p>
+              </div>
+              <div style="text-align:right;">
+                <p class="font-russo" style="font-size:15px;color:${corPos};">${iconPos}</p>
+                <p style="font-size:12px;color:var(--accent-cyan);">${l.pontos} pts</p>
+              </div>
+            </div>`;
+        });
+      }
+
+    } catch (e) {
+      document.getElementById('c-pontos').innerText = 'Erro';
+    }
+  }
+
+  // ── INICIAR ───────────────────────────────────────────────
+  carregarPerfil();
+  carregarTemporada();
+  carregarCarreira();
+</script>
+
+</body>
+</html>
