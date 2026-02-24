@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Liga - Brah.bet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="logo-link">
+            <div class="logo-container">
+                <div class="logo-icon">B</div>
+                <span class="logo-text">BRAH.BET</span>
+            </div>
+        </a>
+        <ul class="nav-menu">
+            <li><a href="#" class="nav-link">Início</a></li>
+            <li><a href="#" class="nav-link active">Minha Liga</a></li>
+        </ul>
+    </nav>
+
+    <div class="container-principal">
+        
+        <div class="cartao bg-escuro animacao-suave text-center mb-20">
+            <h1>LIGA DOS CAMPEÕES DO BAIRRO</h1>
+            <p class="destaque-dourado">Temporada 2026</p>
+            <div class="mt-15">
+                <span class="destaque-status brilha-suave">🟢 Rodada 12 em andamento</span>
+            </div>
+        </div>
+
+        <div class="container-palpites">
+            
+            <div class="cartao cartao-palpite bg-claro animacao-suave" style="flex: 1.5;">
+                <h2 class="mb-10 text-center">JOGOS DA RODADA</h2>
+                <hr class="linha-divisoria mb-20">
+                
+                <div class="linha-jogo">
+                    <span class="nome-time time-casa">FLAMENGO</span>
+                    <div class="area-placar">
+                        <input type="number" class="input-placar" min="0" placeholder="-">
+                        <span class="versus">X</span>
+                        <input type="number" class="input-placar" min="0" placeholder="-">
+                    </div>
+                    <span class="nome-time time-fora">SANTOS</span>
+                </div>
+                <div class="text-center mb-15"><span class="subtitulo-tempo">SÁB - 16:00</span></div>
+
+                <div class="linha-jogo">
+                    <span class="nome-time time-casa">SÃO PAULO</span>
+                    <div class="area-placar">
+                        <input type="number" class="input-placar" min="0" placeholder="-">
+                        <span class="versus">X</span>
+                        <input type="number" class="input-placar" min="0" placeholder="-">
+                    </div>
+                    <span class="nome-time time-fora">CRUZEIRO</span>
+                </div>
+                <div class="text-center mb-15"><span class="subtitulo-tempo">DOM - 11:00</span></div>
+
+                <div class="botoes-acao mt-20">
+                    <button class="btn btn-salvar">SALVAR PALPITES</button>
+                </div>
+            </div>
+
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+                
+                <div class="cartao bg-escuro animacao-suave">
+                    <h2 class="mb-10">PALPITES DA GALERA</h2>
+                    <hr class="linha-divisoria mb-15">
+                    <ul class="tabelona-lista">
+                        <li class="item-interativo">
+                            <div class="foto-perfil" style="width: 30px; height: 30px; border-radius: 50%; background: var(--borda-divisoria);"></div>
+                            <div style="flex-grow: 1;"><strong>Você</strong></div>
+                            <div class="destaque-dourado" style="font-size: 14px;">FLA 2x1 SAN</div>
+                        </li>
+                        <li class="item-interativo">
+                            <div class="foto-perfil" style="width: 30px; height: 30px; border-radius: 50%; background: var(--borda-divisoria);"></div>
+                            <div style="flex-grow: 1;">Joãozinho</div>
+                            <div class="text-gray" style="font-size: 14px; opacity: 0.6;">Oculto 🔒</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="cartao bg-escuro animacao-suave">
+                    <h2 class="mb-10">ÚLTIMA RODADA (11)</h2>
+                    <hr class="linha-divisoria mb-15">
+                    <ul class="lista-desempenho">
+                        <li>
+                            <div class="icone">🥇</div>
+                            <div style="flex-grow: 1; font-size: 16px;">Maria123</div>
+                            <div style="display: flex; gap: 4px;">
+                                <span class="quadrado verde" title="Acerto Exato"></span>
+                                <span class="quadrado verde" title="Acerto Exato"></span>
+                                <span class="quadrado amarelo" title="Acerto de Vencedor"></span>
+                            </div>
+                            <strong class="destaque-dourado" style="margin-left: 10px; font-size: 16px;">18 pts</strong>
+                        </li>
+                        <li>
+                            <div class="icone">🥈</div>
+                            <div style="flex-grow: 1; font-size: 16px;">Você</div>
+                            <div style="display: flex; gap: 4px;">
+                                <span class="quadrado verde" title="Acerto Exato"></span>
+                                <span class="quadrado amarelo" title="Acerto de Vencedor"></span>
+                                <span class="quadrado vermelho" title="Erro"></span>
+                            </div>
+                            <strong class="destaque-dourado" style="margin-left: 10px; font-size: 16px;">9 pts</strong>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="container-avisos"></div>
+
+</body>
+</html>

@@ -680,3 +680,72 @@ body {
     transform: translateY(0);
   }
 }
+
+/* =========================================
+   LOGO OFICIAL DA BRAH.BET
+   ========================================= */
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo-imagem {
+    height: 60px; /* Se achar que a logo ficou muito grande ou pequena, é só mudar esse número */
+    width: auto;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.logo-link:hover .logo-imagem {
+    transform: scale(1.05); /* Dá uma leve "crescida" na logo ao passar o mouse */
+}
+
+/* =========================================
+   SISTEMA DE AVISOS (TOASTS FLUTUANTES)
+   ========================================= */
+#container-avisos {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aviso-toast {
+  min-width: 250px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  font-family: 'Russo One', sans-serif;
+  font-size: 14px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 5px solid;
+  animation: deslizarAviso 0.3s ease-out forwards;
+}
+
+/* Cores por tipo de aviso */
+.aviso-sucesso { border-left-color: #4ade80; } /* Verde */
+.aviso-erro { border-left-color: #f87171; } /* Vermelho */
+.aviso-info { border-left-color: #eab308; } /* Amarelo */
+
+/* Animação para o aviso sumir da tela */
+.aviso-saindo {
+  animation: sumirAviso 0.3s ease-in forwards;
+}
+
+@keyframes deslizarAviso {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes sumirAviso {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}

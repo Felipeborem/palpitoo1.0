@@ -237,6 +237,250 @@ app.get('/ranking', async (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
+// ROTA PARA CRIAR UMA NOVA LIGA
+app.post('/criar-liga', async (req, res) => {
+  try {
+    const { nome_liga, dono_id } = req.body;
+
+    // Gera um código aleatório de 6 letras/números (Ex: X7B9KQ)
+    const codigo_convite = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    // 1. Salva a liga nova no banco
+    const novaLiga = await pool.query(
+      'INSERT INTO ligas (nome, codigo_convite, dono_id) VALUES ($1, $2, $3) RETURNING *',
+      [nome_liga, codigo_convite, dono_id]
+    );
+
+    const idLigaGerada = novaLiga.rows[0].id_liga;
+
+    // 2. Coloca o dono automaticamente dentro da liga que ele acabou de criar
+    await pool.query(
+      'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2)',
+      [idLigaGerada, dono_id]
+    );
+
+    res.status(201).json({ 
+      mensagem: 'Liga criada com sucesso!', 
+      liga: novaLiga.rows[0] 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao criar a liga.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA PARA ENTRAR EM UMA LIGA USANDO O CÓDIGO
+app.post('/entrar-liga', async (req, res) => {
+  try {
+    const { codigo_convite, usuario_id } = req.body;
+
+    // 1. Verifica se a liga com esse código existe
+    const buscaLiga = await pool.query('SELECT * FROM ligas WHERE codigo_convite = $1', [codigo_convite]);
+    
+    if (buscaLiga.rows.length === 0) {
+      return res.status(404).json({ erro: 'Liga não encontrada. Verifique o código!' });
+    }
+
+    const liga_id = buscaLiga.rows[0].id_liga;
+
+    // 2. Tenta colocar o usuário na liga
+    await pool.query(
+      'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2)',
+      [liga_id, usuario_id]
+    );
+
+    res.json({ mensagem: `Bem-vindo à liga ${buscaLiga.rows[0].nome}!` });
+
+  } catch (err) {
+    // Se der erro de "duplicate key", é porque ele já está na liga
+    if (err.code === '23505') {
+      return res.status(400).json({ erro: 'Você já participa desta liga, craque!' });
+    }
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao entrar na liga.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA PARA BUSCAR AS LIGAS QUE O USUÁRIO PARTICIPA
+app.get('/minhas-ligas/:usuario_id', async (req, res) => {
+  try {
+    const { usuario_id } = req.params;
+
+    // Essa query faz um JOIN para buscar os dados da liga através da tabela ponte
+    const resultado = await pool.query(`
+      SELECT l.id_liga, l.nome, l.codigo_convite, l.dono_id 
+      FROM ligas l
+      JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+      WHERE ul.usuario_id = $1
+    `, [usuario_id]);
+
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar suas ligas.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA ADMIN: BUSCAR TODAS AS LIGAS DO SISTEMA
+app.get('/todas-ligas', async (req, res) => {
+  try {
+    // Busca a liga, cruza com a tabela de usuários para pegar o nome do dono, 
+    // e ainda conta quantos membros tem lá dentro!
+    const resultado = await pool.query(`
+      SELECT l.id_liga, l.nome, l.codigo_convite, u.nome AS nome_dono,
+             (SELECT COUNT(*) FROM usuarios_ligas ul WHERE ul.liga_id = l.id_liga) as total_membros
+      FROM ligas l
+      LEFT JOIN usuarios u ON l.dono_id = u.id
+      ORDER BY l.id_liga ASC
+    `);
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar todas as ligas.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA ADMIN: BUSCAR MEMBROS DE UMA LIGA ESPECÍFICA
+app.get('/liga-membros/:id_liga', async (req, res) => {
+  try {
+    const { id_liga } = req.params;
+    const resultado = await pool.query(`
+      SELECT u.id, u.nome, u.email, u.time_favorito
+      FROM usuarios u
+      JOIN usuarios_ligas ul ON u.id = ul.usuario_id
+      WHERE ul.liga_id = $1
+    `, [id_liga]); 
+
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar membros da liga.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA ADMIN: CRIAR UM NOVO JOGO// -----------------------------------------------------------------------------
+// ROTA ADMIN: CRIAR UM NOVO JOGO (AGORA COM RODADA!)
+
+app.post('/criar-jogo', async (req, res) => {
+  try {
+    const { time_casa, time_fora, rodada } = req.body;
+
+    if (!time_casa || !time_fora || !rodada) {
+      return res.status(400).json({ erro: 'Preencha os times e a rodada!' });
+    }
+
+    // Insere no banco agora com a coluna RODADA
+    const resultado = await pool.query(
+      `INSERT INTO jogos (time_casa, time_fora, status, rodada) 
+       VALUES ($1, $2, 'em andamento', $3) RETURNING *`,
+      [time_casa, time_fora, rodada]
+    );
+
+    res.status(201).json({ 
+      mensagem: `Jogo cadastrado na Rodada ${rodada}!`, 
+      jogo: resultado.rows[0] 
+    });
+  } catch (err) {
+    console.error("Erro ao criar jogo:", err);
+    res.status(500).json({ erro: 'Erro ao cadastrar o jogo no banco de dados.' });
+  }
+});
+// -----------------------------------------------------------------------------
+// ROTA PARA BUSCAR O RANKING DE UMA LIGA PRIVADA ESPECÍFICA
+app.get('/ranking-liga/:id_liga', async (req, res) => {
+  try {
+    const { id_liga } = req.params;
+    
+    // 1. Busca os pontos só da galera que tá nessa liga
+    const resultado = await pool.query(`
+      SELECT 
+        u.id,
+        u.nome, 
+        u.time_favorito, 
+        COALESCE(SUM(p.pontos_obtidos), 0) AS total_pontos
+      FROM usuarios u
+      JOIN usuarios_ligas ul ON u.id = ul.usuario_id
+      LEFT JOIN palpites p ON u.id = p.usuario_id
+      WHERE ul.liga_id = $1
+      GROUP BY u.id, u.nome, u.time_favorito
+      ORDER BY total_pontos DESC
+    `, [id_liga]);
+    
+    // 2. Busca também o nome da Liga para a gente colocar no título do site
+    const ligaInfo = await pool.query('SELECT nome FROM ligas WHERE id_liga = $1', [id_liga]);
+    const nomeLiga = ligaInfo.rows.length > 0 ? ligaInfo.rows[0].nome : 'Liga Privada';
+
+    res.json({ nomeLiga, ranking: resultado.rows });
+  } catch (err) {
+    console.error("Erro ao gerar ranking da liga:", err);
+    res.status(500).json({ erro: 'Erro ao gerar o ranking da liga.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: BUSCAR USUÁRIOS POR NOME
+app.get('/buscar-usuarios', async (req, res) => {
+  try {
+    const { nome } = req.query; // Pega o nome da URL (ex: ?nome=Acacio)
+    
+    const resultado = await pool.query(
+      "SELECT id, nome, time_favorito, foto_perfil FROM usuarios WHERE nome ILIKE $1 LIMIT 10",
+      [`%${nome}%`] // Os símbolos de % permitem achar "Acácio" buscando apenas por "Aca"
+    );
+    
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error("Erro na busca do servidor:", err);
+    res.status(500).json({ erro: 'Erro interno na busca.' });
+  }
+});
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: ADICIONAR AMIGO
+app.post('/adicionar-amigo', async (req, res) => {
+  try {
+    const { usuario_id, amigo_id } = req.body;
+    await pool.query('INSERT INTO amigos (usuario_id, amigo_id) VALUES ($1, $2)', [usuario_id, amigo_id]);
+    res.json({ mensagem: 'Amigo adicionado!' });
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao adicionar amigo.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: LISTAR AMIGOS
+app.get('/meus-amigos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const resultado = await pool.query(`
+      SELECT u.id, u.nome, u.time_favorito, u.foto_perfil 
+      FROM usuarios u
+      JOIN amigos a ON u.id = a.amigo_id
+      WHERE a.usuario_id = $1
+    `, [id]);
+    res.json(resultado.rows);
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao listar amigos.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA SOCIAL: REMOVER AMIGO
+app.delete('/remover-amigo', async (req, res) => {
+  try {
+    const { usuario_id, amigo_id } = req.body;
+    await pool.query('DELETE FROM amigos WHERE usuario_id = $1 AND amigo_id = $2', [usuario_id, amigo_id]);
+    res.json({ mensagem: 'Amigo removido.' });
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao remover amigo.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
 // LIGA O MOTOR! (Sempre deve ficar no final do arquivo)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

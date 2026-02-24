@@ -12,21 +12,17 @@
 <body>
 
   <header class="navbar">
-    <a href="http://localhost:5501/palpitoo1.0/frontend/src/pages/inicio.html" style="text-decoration: none; color: inherit;">
-        <div class="logo-container">
-            <div class="logo-icon">P</div>
-            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
-        </div>
-    </a>
+    <a href="_index.html" class="logo-link">
+    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+</a>
     <nav>
       <ul class="nav-links">
-        <li><a href="_index.html">início</a></li> 
+        <li><a href="_index.html">Início</a></li> 
         <li><a href="ligas.html">Ligas</a></li>
         <li><a href="palpites.html" class="ativo">Palpites</a></li>
         <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
         <li><a href="carreira.html">Carreira</a></li>
-       
       </ul>
     </nav>
   </header>
@@ -37,27 +33,11 @@
       
       <div class="cabecalho-palpite mb-20">
         <h2 class="font-russo titulo-branco text-center">Palpites Brah.bet</h2>
-        <p class="subtitulo-tempo text-center">⏳ 3h até fim dos palpites</p>
+        <p class="subtitulo-tempo text-center">Deixe seus palpites para os próximos jogos</p>
       </div>
 
-
-<!-- DIV PRINCIPAL DE LISTAS DE JOGOS-->
       <div class="lista-jogos" id="container-jogos">
-        <div class="skeleton-box">
-          <div class="skeleton-text right"></div>
-          <div class="skeleton-placar"></div>
-          <div class="skeleton-text left"></div>
-        </div>
-        <div class="skeleton-box">
-          <div class="skeleton-text right"></div>
-          <div class="skeleton-placar"></div>
-          <div class="skeleton-text left"></div>
-        </div>
-        <div class="skeleton-box" style="border-bottom: none;">
-          <div class="skeleton-text right"></div>
-          <div class="skeleton-placar"></div>
-          <div class="skeleton-text left"></div>
-        </div>
+        <p class="text-center text-white font-russo mt-10">Buscando tabela de jogos... 🔄</p>
       </div>
 
       <div class="botoes-acao mt-20">
@@ -67,8 +47,6 @@
 
     </section>
 
-
-<!-- 2° CABEÇALHO - PALPITES E ANDAMENTO DOS JOGOS DO USER-->
     <section class="cartao bg-escuro cartao-palpite animacao-suave mt-20">
       <div class="cabecalho-palpite mb-20">
         <h2 class="font-russo titulo-branco text-center">Meus Palpites Registrados</h2>
@@ -81,51 +59,76 @@
     </section>
 
   </main>
+
 <script>
-  // Variável global para lembrarmos quais jogos estão na tela
   let jogosCarregados = [];
 
-  // 1. FUNÇÃO QUE BUSCA E DESENHA OS JOGOS
-  async function carregarJogos() {
+  // 1. FUNÇÃO QUE BUSCA E DESENHA OS JOGOS SEPARADOS POR RODADA
+async function carregarJogos() {
     try {
       const resposta = await fetch('http://localhost:3000/jogos');
       jogosCarregados = await resposta.json();
       
       const container = document.getElementById('container-jogos');
-      container.innerHTML = ''; // Limpa a mensagem de carregando
+      container.innerHTML = ''; 
 
       if (jogosCarregados.length === 0) {
         container.innerHTML = '<p class="text-center text-white font-russo mt-10">Nenhum jogo liberado ainda.</p>';
         return;
       }
 
-      // Desenha o HTML usando as SUAS classes CSS para cada jogo do banco
+      const jogosPorRodada = {};
       jogosCarregados.forEach(jogo => {
+        const rodada = jogo.rodada || 1;
+        if (!jogosPorRodada[rodada]) jogosPorRodada[rodada] = [];
+        jogosPorRodada[rodada].push(jogo);
+      });
+
+      for (const rodada in jogosPorRodada) {
         container.innerHTML += `
-          <div class="linha-jogo">
-            <span class="nome-time time-casa">${jogo.time_casa}</span>
-            
-            <div class="area-placar">
-              <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0">
-              <span class="versus">x</span>
-              <input type="number" id="fora_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0">
-            </div>
-            
-            <span class="nome-time time-fora text-left">${jogo.time_fora}</span>
+          <div class="text-center mt-10 mb-5" style="border-bottom: 2px dashed var(--borda-divisoria); padding-bottom: 10px;">
+            <h3 class="font-russo" style="color: var(--accent-cyan); font-size: 20px;">🏆 RODADA ${rodada}</h3>
           </div>
         `;
-      puxarPalpitesSalvos()
-      });
+
+        jogosPorRodada[rodada].forEach(jogo => {
+          // NOVA LÓGICA: Se o jogo acabou, desabilita o campo e muda a cor
+          const jogoFinalizado = jogo.status.toLowerCase() === "finalizado";
+          const estiloInput = jogoFinalizado ? "opacity: 0.5; cursor: not-allowed; border-color: #f87171;" : "";
+          const propDisabled = jogoFinalizado ? "disabled" : "";
+
+          container.innerHTML += `
+            <div class="linha-jogo" style="${jogoFinalizado ? 'filter: grayscale(0.8);' : ''}">
+              <span class="nome-time time-casa">${jogo.time_casa}</span>
+              
+              <div class="area-placar">
+                <input type="number" id="casa_${jogo.id_jogo}" 
+                       class="input-placar font-russo" 
+                       placeholder="0" min="0" 
+                       style="${estiloInput}" ${propDisabled}>
+                
+                <span class="versus">x</span>
+                
+                <input type="number" id="fora_${jogo.id_jogo}" 
+                       class="input-placar font-russo" 
+                       placeholder="0" min="0" 
+                       style="${estiloInput}" ${propDisabled}>
+              </div>
+              
+              <span class="nome-time time-fora text-left">${jogo.time_fora}</span>
+            </div>
+            ${jogoFinalizado ? '<p class="text-center text-red-500 font-russo" style="font-size: 9px; margin-top: -10px;">🔒 Palpites encerrados para este jogo</p>' : ''}
+          `;
+        });
+      }
+      puxarPalpitesSalvos();
     } catch (erro) {
-      console.error("Erro ao buscar jogos:", erro);
-      document.getElementById('container-jogos').innerHTML = '<p class="text-center text-red-500 font-russo mt-10">Erro ao conectar com o servidor.</p>';
+      console.error("Erro:", erro);
     }
   }
-
   // 2. FUNÇÃO QUE RECOLHE OS DADOS DIGITADOS
   async function enviarTodosPalpites() {
-    // Puxa o ID do usuário que guardamos no Login!
-    const idUsuario = localStorage.getItem('craqueId'); 
+    const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque'); 
     
     if (!idUsuario) {
       alert("Você precisa estar logado para salvar seus palpites!");
@@ -134,12 +137,10 @@
 
     const palpitesParaSalvar = [];
 
-    // Passa por todos os jogos que estão na tela
     jogosCarregados.forEach(jogo => {
       const inputCasa = document.getElementById(`casa_${jogo.id_jogo}`).value;
       const inputFora = document.getElementById(`fora_${jogo.id_jogo}`).value;
 
-      // Só cria o palpite se o cara digitou números nos dois campos
       if (inputCasa !== "" && inputFora !== "") {
         palpitesParaSalvar.push({
           id_jogo: jogo.id_jogo,
@@ -155,30 +156,27 @@
       return;
     }
 
-    // Aqui é onde enviaremos pro servidor (faremos isso no próximo passo)
-    // 🚀 ENVIANDO O PACOTE PARA O SERVIDOR!
-        try {
-          const resposta = await fetch('http://localhost:3000/palpites', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ palpites: palpitesParaSalvar }) // Envia a caixa de palpites
-          });
+    try {
+      const resposta = await fetch('http://localhost:3000/palpites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ palpites: palpitesParaSalvar }) 
+      });
 
-          const resultado = await resposta.json();
+      const resultado = await resposta.json();
 
-          if (resposta.ok) {
-            alert("✅ " + resultado.mensagem);
-          } else {
-            alert("❌ Ops: " + resultado.erro);
-          }
-        } catch (erro) {
-          console.error("Erro na conexão:", erro);
-          alert("Servidor desligado! Verifique o terminal.");
-        }
+      if (resposta.ok) {
+        alert("✅ " + resultado.mensagem);
+        // Atualiza os comprovantes logo após salvar!
+        puxarPalpitesSalvos();
+      } else {
+        alert("❌ Ops: " + resultado.erro);
       }
-
+    } catch (erro) {
+      console.error("Erro na conexão:", erro);
+      alert("Servidor desligado! Verifique o terminal.");
+    }
+  }
 
   // 3. FUNÇÃO DO BOTÃO LIMPAR
   function limparPalpites() {
@@ -186,47 +184,61 @@
     inputs.forEach(input => input.value = '');
   }
 
-  // Aciona a busca de jogos assim que a página carrega
-  carregarJogos();
-// 4. FUNÇÃO QUE PREENCHE OS INPUTS E GERA O RESUMO
+  // 4. FUNÇÃO QUE PREENCHE OS INPUTS E GERA O RESUMO (AGORA COM RODADAS!)
   async function puxarPalpitesSalvos() {
-    const idUsuario = localStorage.getItem('craqueId');
+    const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
     if (!idUsuario) return;
 
     try {
       const resposta = await fetch(`http://localhost:3000/meus-palpites/${idUsuario}`);
       const meusPalpites = await resposta.json();
 
-      // Pega a caixa do segundo cartão
       const containerResumo = document.getElementById('resumo-palpites');
-      containerResumo.innerHTML = ''; // Limpa o texto de "buscando"
+      containerResumo.innerHTML = ''; 
 
       if (meusPalpites.length === 0) {
         containerResumo.innerHTML = '<p class="text-center text-gray-400 font-russo mt-10">Você ainda não deu nenhum palpite.</p>';
         return;
       }
 
-      // Passa por cada palpite que veio do banco
+      // PREENCHE AS CAIXINHAS LÁ EM CIMA PARA EDIÇÃO
       meusPalpites.forEach(palpite => {
-        
-        // 1. PREENCHE AS CAIXINHAS LÁ EM CIMA (Para ele poder editar se quiser)
         const inputCasa = document.getElementById(`casa_${palpite.jogo_id}`);
         const inputFora = document.getElementById(`fora_${palpite.jogo_id}`);
         if (inputCasa && inputFora) {
           inputCasa.value = palpite.gols_casa_palpite;
           inputFora.value = palpite.gols_fora_palpite;
         }
+      });
 
-        // 2. ACHA DE QUAL JOGO É ESSE PALPITE PARA PEGAR OS NOMES E O STATUS
+      // AGRUPANDO OS COMPROVANTES POR RODADA TAMBÉM
+      const comprovantesPorRodada = {};
+      
+      meusPalpites.forEach(palpite => {
         const jogo = jogosCarregados.find(j => j.id_jogo === palpite.jogo_id);
-
         if (jogo) {
-          // Define a cor da bolinha de status em código Hexadecimal
+          const rodada = jogo.rodada || 1;
+          if (!comprovantesPorRodada[rodada]) comprovantesPorRodada[rodada] = [];
+          
+          comprovantesPorRodada[rodada].push({ palpite, jogo });
+        }
+      });
+
+      // DESENHANDO OS COMPROVANTES
+      for (const rodada in comprovantesPorRodada) {
+        containerResumo.innerHTML += `
+          <div class="text-center mt-10 mb-5">
+            <h3 class="font-russo" style="color: var(--text-gray); font-size: 16px;">▶ RODADA ${rodada}</h3>
+          </div>
+        `;
+
+        comprovantesPorRodada[rodada].forEach(item => {
+          const { palpite, jogo } = item;
+          
           let corStatus = "color: #4ade80;"; // Verde para aberto
           if (jogo.status.toLowerCase() === "em andamento") corStatus = "color: #facc15;"; // Amarelo
           if (jogo.status.toLowerCase() === "finalizado") corStatus = "color: #f87171;"; // Vermelho
 
-          // 3. DESENHA O COMPROVANTE FIXO RESPEITANDO O SEU CSS
           containerResumo.innerHTML += `
             <div class="linha-jogo" style="margin-bottom: 5px;">
               <span class="nome-time time-casa">${jogo.time_casa}</span>
@@ -240,9 +252,7 @@
                   <div class="input-placar font-russo" style="display: flex; align-items: center; justify-content: center; background-color: #1f2937; color: white; border: 1px solid #374151;">
                     ${palpite.gols_casa_palpite}
                   </div>
-                  
                   <span class="versus">x</span>
-                  
                   <div class="input-placar font-russo" style="display: flex; align-items: center; justify-content: center; background-color: #1f2937; color: white; border: 1px solid #374151;">
                     ${palpite.gols_fora_palpite}
                   </div>
@@ -251,16 +261,19 @@
               
               <span class="nome-time time-fora text-left">${jogo.time_fora}</span>
             </div>
-            
             <div style="border-bottom: 1px dashed #333; margin: 15px 10% 25px 10%;"></div>
           `;
-        }
-      });
+        });
+      }
       
     } catch (erro) {
       console.error("Erro ao puxar os palpites:", erro);
     }
   }
+
+  // LIGA O MOTOR!
+  carregarJogos();
 </script>
+<script src="main.js"></script>
 </body>
 </html>

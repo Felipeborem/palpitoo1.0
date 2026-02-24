@@ -14,12 +14,9 @@
 <body>
 
   <header class="navbar">
-    <a href="http://localhost:5501/palpitoo1.0/frontend/src/pages/inicio.html" style="text-decoration: none; color: inherit;">
-        <div class="logo-container">
-            <div class="logo-icon">P</div>
-            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
-        </div>
-    </a>
+    <a href="_index.html" class="logo-link">
+    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+</a>
     
     <nav>
       <ul class="nav-links">
@@ -89,38 +86,57 @@
       
     </aside>
 
-    <section class="cartao bg-escuro cartao-centro texto-centralizado animacao-suave">
-      
-      <div class="divisor-tracejado mb-10"></div>
-      
-      <p class="font-russo destaque-dourado brilha-suave">⚜️ BRAH.LEAGUE ⚜️</p>
-      <p class="font-russo destaque-dourado">⚜️ TEMP 6 ⚜️</p>
-      <p class="font-russo mb-10">- (SERIE A) -</p>
-      
-      <div class="divisor-tracejado mb-10"></div>
-      
-      <p class="status-texto font-russo destaque-status">🔮 Status: RODADA 2 em andamento</p>
-      
-      <div class="divisor-tracejado mb-20 mt-10"></div>
-      
-      <div class="tabelona-container text-left">
-        <p class="font-russo mb-10 text-left">⬇️ Tabelona ⬇️</p>
-        <ul class="tabelona-lista font-russo">
-          <li class="item-interativo"><span class="quadrado verde"></span> 1º = GUIGO - 4</li>
-          <li class="item-interativo"><span class="quadrado verde"></span> 2º = EMANUEL - 3</li>
-          <li class="item-interativo"><span class="quadrado verde"></span> 3º = RODA - 1</li>
-          <li class="item-interativo"><span class="quadrado amarelo"></span> 4º = RODRIGO P. - 1</li>
-          <li class="item-interativo"><span class="quadrado amarelo"></span> 5º = STHEL - 1</li>
-          <li class="item-interativo"><span class="quadrado laranja"></span> 6º = OLIVER - 1</li>
-          <li class="item-interativo"><span class="quadrado vermelho"></span> 7º = ACACIO - 0</li>
-          <li class="item-interativo"><span class="quadrado vermelho"></span> 8º = FERNANDO - 0</li>
-        </ul>
-      </div>
-    </section>
+            <!--Liga global-->
 
-    <aside class="coluna-destaques">
+    <div style="display: flex; flex-direction: column; align-items: center; width: 100%; gap: 20px;">
+
+  <section class="cartao bg-escuro cartao-centro texto-centralizado animacao-suave" style="width: 100%; max-width: 600px;">
+    
+    <div class="divisor-tracejado mb-10"></div>
+    
+    <p class="font-russo destaque-dourado brilha-suave">⚜️ GLOBAL - LEAGUE ⚜️</p>
+    <p class="font-russo mb-10">- (RANKING GERAL) -</p>
+    
+    <div class="divisor-tracejado mb-10"></div>
+    <p class="status-texto font-russo destaque-status">👑 Status: TOP 8 CRAQUES</p>
+    <div class="divisor-tracejado mb-20 mt-10"></div>
+    
+    <div class="tabelona-container text-left">
+      <p class="font-russo mb-10 text-left" style="text-align: center;">⬇️ Tabelona ⬇️</p>
       
-      <div class="cartao bg-escuro mb-20 animacao-suave">
+      <ul id="tabelona-ranking" class="tabelona-lista font-russo">
+        <li class="text-center py-4 text-gray-400 text-sm">Carregando pontuações da galera... 🔄</li>
+      </ul>
+      
+    </div>
+  </section>
+
+  <section class="cartao bg-escuro cartao-centro texto-centralizado animacao-suave" style="width: 100%; max-width: 600px;">
+
+    <div class="divisor-tracejado mb-10"></div>
+
+    <p class="font-russo destaque-dourado brilha-suave" id="titulo-minha-liga">⚜️ MINHA LIGA ⚜️</p>
+    <p class="font-russo mb-10">- (RANKING PRIVADO) -</p>
+
+    <div class="divisor-tracejado mb-10"></div>
+
+    <p class="status-texto font-russo destaque-status">🔥 Status: TOP 8 DA LIGA</p>
+
+    <div class="divisor-tracejado mb-20 mt-10"></div>
+
+    <div class="tabelona-container text-left">
+
+      <p class="font-russo mb-10 text-left" style="text-align: center;">⬇️ Tabelona da Liga ⬇️</p>
+
+      <ul id="tabelona-ranking-liga" class="tabelona-lista font-russo">
+        <li class="text-center py-4 text-gray-400 text-sm">Procurando sua liga secreta... 🕵️‍♂️</li>
+      </ul>
+
+    </div>
+
+  </section>
+  
+<!--<div class="cartao bg-escuro mb-20 animacao-suave">
         <h2 class="font-russo titulo-branco text-center mb-20">Destaques<br>rodada 1</h2>
         
         <div class="bloco-destaque mb-15">
@@ -138,8 +154,8 @@
       <div class="cartao bg-escuro animacao-suave" style="position: relative; overflow: hidden; border: 1px solid var(--accent-cyan);">
     
     <div style="position: absolute; bottom: -20px; right: -20px; font-size: 100px; opacity: 0.05; pointer-events: none;">🦆</div>
-
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+PATO MESTRE-->
+  <!--  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
         <div style="width: 45px; height: 45px; background: var(--bg-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid var(--accent-cyan); box-shadow: 0 0 10px rgba(122, 30, 58, 0.4);">
             🦆
         </div>
@@ -155,9 +171,18 @@
         </p>
     </div>
 </div>
-      
-    </aside>
+      -->
 
+
+
+
+
+
+</div> <aside class="coluna-destaques">
+  </aside>
+
+<aside class="coluna-destaques">
+  </aside>
   </main>
 </body>
 <script>
@@ -326,6 +351,120 @@ if (fotoSalva && fotoSalva !== "undefined" && fotoSalva !== "null") {
 
   // Aciona o cálculo assim que a tela abre!
   calcularDesempenho();
+  // -------------------------------------------------------------------------
+  // FUNÇÃO: CARREGAR O RANKING GLOBAL NO TOP 8
+  async function carregarRankingGlobal() {
+    try {
+      // Bate na rota de ranking que já criamos no server.js
+      const resposta = await fetch('http://localhost:3000/ranking');
+      const jogadores = await resposta.json();
+      
+      const ulRanking = document.getElementById('tabelona-ranking');
+      ulRanking.innerHTML = ''; 
+
+      if (jogadores.length === 0) {
+        ulRanking.innerHTML = '<li class="text-center text-gray-500 py-4">Nenhum palpite computado ainda. 🦆</li>';
+        return;
+      }
+
+      // Separa apenas os 8 primeiros colocados (Top 8)
+      const top8 = jogadores.slice(0, 8);
+
+      top8.forEach((jogador, index) => {
+        const posicao = index + 1;
+        
+        // Define a cor da bolinha/quadrado dependendo da posição (igual ao seu layout)
+        let corQuadrado = 'vermelho'; // Z4 por padrão
+        if (posicao <= 3) corQuadrado = 'verde'; // Pódio/G3
+        else if (posicao <= 5) corQuadrado = 'amarelo'; // Meio de tabela
+        else if (posicao === 6) corQuadrado = 'laranja'; // Risco
+
+        // Pega só o primeiro nome em letras maiúsculas para caber bonitinho
+        const primeiroNome = jogador.nome.split(' ')[0].toUpperCase();
+
+        // Injeta a linha na tela
+        ulRanking.innerHTML += `
+          <li class="item-interativo">
+            <span class="quadrado ${corQuadrado}"></span> 
+            ${posicao}º = ${primeiroNome} - ${jogador.total_pontos}
+          </li>
+        `;
+      });
+
+    } catch (erro) {
+      console.error("Erro ao carregar o ranking central:", erro);
+      document.getElementById('tabelona-ranking').innerHTML = '<li class="text-red-500 text-center py-4">Erro ao conectar com a CBF.</li>';
+    }
+  }
+
+  // Aciona a função assim que o cara logar no site!
+  carregarRankingGlobal();
+  // -------------------------------------------------------------------------
+  // FUNÇÃO: CARREGAR O RANKING DA PRIMEIRA LIGA DO USUÁRIO
+  async function carregarRankingMinhaLiga() {
+    const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+    if (!idUsuario) return;
+
+    try {
+      // 1. Descobre de qual liga o cara participa
+      const resLigas = await fetch(`http://localhost:3000/minhas-ligas/${idUsuario}`);
+      const ligas = await resLigas.json();
+      
+      const ulRankingLiga = document.getElementById('tabelona-ranking-liga');
+      const tituloLiga = document.getElementById('titulo-minha-liga');
+
+      // Se ele não tiver liga, a gente avisa e põe um link pra ele criar uma!
+      if (ligas.length === 0) {
+        ulRankingLiga.innerHTML = '<li class="text-center text-gray-500 py-4" style="line-height: 1.5;">Você não participa de nenhuma liga privada. 🦆<br><br><a href="ligas.html" style="color: var(--accent-cyan); text-decoration: underline; font-size: 12px;">Crie ou entre em uma!</a></li>';
+        tituloLiga.innerText = "⚜️ SEM LIGA ⚜️";
+        return;
+      }
+
+      // 2. Se ele tiver várias, a gente pega a primeira da lista
+      const idMinhaLiga = ligas[0].id_liga;
+
+      // 3. Puxa o ranking só dessa liga
+      const resRanking = await fetch(`http://localhost:3000/ranking-liga/${idMinhaLiga}`);
+      const dadosLiga = await resRanking.json();
+      
+      // Muda o título do cartão para o nome real da liga dele!
+      tituloLiga.innerText = `⚜️ ${dadosLiga.nomeLiga.toUpperCase()} ⚜️`;
+      ulRankingLiga.innerHTML = ''; 
+
+      if (dadosLiga.ranking.length === 0) {
+        ulRankingLiga.innerHTML = '<li class="text-center text-gray-500 py-4">Ninguém pontuou nessa liga ainda.</li>';
+        return;
+      }
+
+      const top8 = dadosLiga.ranking.slice(0, 8);
+
+      top8.forEach((jogador, index) => {
+        const posicao = index + 1;
+        
+        let corQuadrado = 'vermelho'; 
+        if (posicao <= 3) corQuadrado = 'verde'; 
+        else if (posicao <= 5) corQuadrado = 'amarelo'; 
+        else if (posicao === 6) corQuadrado = 'laranja'; 
+
+        const primeiroNome = jogador.nome.split(' ')[0].toUpperCase();
+
+        ulRankingLiga.innerHTML += `
+          <li class="item-interativo">
+            <span class="quadrado ${corQuadrado}"></span> 
+            ${posicao}º = ${primeiroNome} - ${jogador.total_pontos}
+          </li>
+        `;
+      });
+
+    } catch (erro) {
+      console.error("Erro ao carregar o ranking da liga:", erro);
+      document.getElementById('tabelona-ranking-liga').innerHTML = '<li class="text-red-500 text-center py-4">Erro ao buscar sua liga.</li>';
+    }
+  }
+
+  // Aciona a função assim que a tela abre!
+  carregarRankingMinhaLiga();
+
   
 </script>
 

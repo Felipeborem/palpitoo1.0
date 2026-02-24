@@ -14,12 +14,9 @@
 <body>
 
   <header class="navbar">
-    <a href="_index.html" style="text-decoration: none; color: inherit;">
-        <div class="logo-container">
-            <div class="logo-icon">P</div>
-            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
-        </div>
-    </a>
+    <a href="_index.html" class="logo-link">
+    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+</a>
     
     <nav>
       <ul class="nav-links">
@@ -46,44 +43,8 @@
         <h3 class="font-russo titulo-branco mb-15" style="font-size: 20px;">🏆 Campeonatos Ativos</h3>
         <div class="divisor-tracejado mb-20"></div>
 
-        <ul style="list-style: none; padding: 0;">
-          
-          <li class="cartao bg-dark animacao-suave" style="padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--accent-cyan); background: var(--bg-dark);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 class="font-russo text-white" style="font-size: 16px; margin: 0;">⚜️ Brah.League (Série A)</h4>
-              <span style="background: var(--accent-green); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">OFICIAL</span>
-            </div>
-            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">Mata-mata - 8 Participantes</p>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <p class="font-russo" style="color: var(--accent-cyan); font-size: 14px; margin: 0;">Sua Posição: 3º</p>
-              <button class="btn btn-salvar font-russo" style="padding: 6px 12px; font-size: 12px; margin: 0;">Acessar</button>
-            </div>
-          </li>
-
-          <li class="cartao bg-dark animacao-suave" style="padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--text-gray); background: var(--bg-dark);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 class="font-russo text-white" style="font-size: 16px; margin: 0;">💻 Liga da Computação</h4>
-              <span style="background: var(--borda-divisoria); color: var(--text-gray); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">PRIVADA</span>
-            </div>
-            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">Pontos Corridos - 14 Participantes</p>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <p class="font-russo" style="color: var(--text-white); font-size: 14px; margin: 0;">Sua Posição: 5º</p>
-              <button class="btn btn-cancelar font-russo" style="padding: 6px 12px; font-size: 12px; margin: 0; color: var(--text-white); border-color: var(--text-white);">Acessar</button>
-            </div>
-          </li>
-
-          <li class="cartao bg-dark animacao-suave" style="padding: 15px; border-left: 4px solid var(--text-gray); background: var(--bg-dark);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h4 class="font-russo text-white" style="font-size: 16px; margin: 0;">🚗 Liga dos Estagiários</h4>
-              <span style="background: var(--borda-divisoria); color: var(--text-gray); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">PRIVADA</span>
-            </div>
-            <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">Pontos Corridos - 6 Participantes</p>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <p class="font-russo" style="color: var(--text-white); font-size: 14px; margin: 0;">Sua Posição: 1º</p>
-              <button class="btn btn-cancelar font-russo" style="padding: 6px 12px; font-size: 12px; margin: 0; color: var(--text-white); border-color: var(--text-white);">Acessar</button>
-            </div>
-          </li>
-
+        <ul id="lista-ligas-ativas" style="list-style: none; padding: 0;">
+          <li class="text-center text-gray-400 font-russo py-4">Buscando seus campeonatos... 🔄</li>
         </ul>
       </section>
 
@@ -94,7 +55,7 @@
           <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 15px;">Recebeu um código de convite? Digite abaixo para entrar na disputa.</p>
           
           <div class="form-group" style="display: flex; gap: 10px; margin-bottom: 0;">
-            <input type="text" id="codigoLiga" placeholder="Ex: BRAH-2026-XYZ" style="margin-bottom: 0; text-transform: uppercase;">
+            <input type="text" id="codigoLiga" placeholder="Ex: X7B9KQ" style="margin-bottom: 0; text-transform: uppercase;">
             <button class="btn btn-salvar font-russo" onclick="entrarNaLiga()" style="margin-top: 0; padding: 0 20px;">Entrar</button>
           </div>
         </div>
@@ -103,7 +64,8 @@
           <div style="font-size: 40px; margin-bottom: 15px;">👑</div>
           <h3 class="font-russo titulo-branco mb-10" style="font-size: 20px;">Seja o Dono da Liga</h3>
           <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 20px; max-width: 250px;">Crie seu próprio campeonato, defina as regras e convide a rapaziada.</p>
-          <button class="btn btn-primary" style="width: auto; padding: 12px 30px; font-size: 14px; background-color: var(--accent-cyan);">+ Criar Nova Liga</button>
+          
+          <button class="btn btn-primary font-russo" onclick="criarLiga()" style="width: auto; padding: 12px 30px; font-size: 14px; background-color: var(--accent-cyan);">+ Criar Nova Liga</button>
         </div>
 
       </section>
@@ -112,24 +74,133 @@
   </main>
 
   <script>
-    // Script simulando a entrada em uma liga
-    function entrarNaLiga() {
-      const codigo = document.getElementById('codigoLiga').value;
+    // 1. Puxa o ID do usuário (o mesmo que a gente usou no Ranking e Desempenho)
+    const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque'); 
+
+    if (!idUsuario) {
+      console.log("Usuário não logado! Bloqueando acesso...");
+      // Descomente a linha abaixo quando o sistema de login estiver 100% blindado
+      // window.location.href = 'login.html'; 
+    }
+
+    // -------------------------------------------------------------------------
+    // FUNÇÃO: CARREGAR AS LIGAS QUE O USUÁRIO JÁ PARTICIPA
+    async function carregarLigas() {
+      if (!idUsuario) return;
+
+      try {
+        const resposta = await fetch(`http://localhost:3000/minhas-ligas/${idUsuario}`);
+        const ligas = await resposta.json();
+        
+        const ul = document.getElementById('lista-ligas-ativas');
+        ul.innerHTML = ''; // Limpa a mensagem de carregamento
+
+        if (ligas.length === 0) {
+          ul.innerHTML = '<li class="text-center" style="color: var(--text-gray); font-family: \'Russo One\', sans-serif; padding: 20px 0;">Você ainda não participa de nenhuma liga. Crie ou entre em uma! 🦆</li>';
+          return;
+        }
+
+        ligas.forEach(liga => {
+          // Checa se o usuário é o dono da liga para colocar uma tag diferente
+          const ehDono = liga.dono_id == idUsuario;
+          
+          let tagBadge = '';
+          if (ehDono) {
+            tagBadge = `<span style="background: var(--accent-cyan); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">DONO DA LIGA</span>`;
+          } else {
+            tagBadge = `<span style="background: var(--borda-divisoria); color: var(--text-gray); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;">PARTICIPANTE</span>`;
+          }
+
+          // Monta o "cartãozinho" da liga
+          ul.innerHTML += `
+            <li class="cartao bg-dark animacao-suave" style="padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--accent-cyan); background: var(--bg-dark);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h4 class="font-russo text-white" style="font-size: 16px; margin: 0;">⚜️ ${liga.nome}</h4>
+                ${tagBadge}
+              </div>
+              <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">
+                Código de Convite: <strong style="color: white; font-size: 14px; letter-spacing: 1px;">${liga.codigo_convite}</strong>
+              </p>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <p class="font-russo" style="color: var(--text-gray); font-size: 14px; margin: 0;">Geral</p>
+                <a href="ranking.html" class="btn btn-salvar font-russo" style="padding: 6px 12px; font-size: 12px; margin: 0; text-decoration: none; display: inline-block;">Ver Ranking</a>
+              </div>
+            </li>
+          `;
+        });
+      } catch (erro) {
+        console.error("Erro ao carregar as ligas:", erro);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // FUNÇÃO: ENTRAR EM UMA LIGA USANDO O CÓDIGO
+    async function entrarNaLiga() {
+      const codigo = document.getElementById('codigoLiga').value.trim().toUpperCase();
+      
       if (!codigo) {
         alert("Pô, craque! Digita um código válido aí.");
         return;
       }
       
-      // Aqui entraria o fetch para o backend
-      alert("Procurando a liga com o código " + codigo.toUpperCase() + "...");
-      document.getElementById('codigoLiga').value = '';
+      try {
+        const resposta = await fetch('http://localhost:3000/entrar-liga', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            codigo_convite: codigo, 
+            usuario_id: idUsuario 
+          })
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+          alert("✅ " + resultado.mensagem);
+          document.getElementById('codigoLiga').value = '';
+          carregarLigas(); // Atualiza a lista na mesma hora!
+        } else {
+          alert("❌ " + resultado.erro);
+        }
+      } catch (erro) {
+        console.error(erro);
+        alert("Erro ao conectar com o servidor.");
+      }
     }
 
-    // Trava de segurança
-    const nomeLogado = localStorage.getItem('nome_craque');
-    if (!nomeLogado) {
-      // window.location.href = 'login.html'; 
+    // -------------------------------------------------------------------------
+    // FUNÇÃO: CRIAR UMA NOVA LIGA
+    async function criarLiga() {
+      const nomeLiga = prompt("Qual vai ser o nome da sua nova Liga? (Ex: Liga dos Campeões da Firma)");
+      
+      if (!nomeLiga || nomeLiga.trim() === "") return; // Se o cara cancelar, não faz nada
+
+      try {
+        const resposta = await fetch('http://localhost:3000/criar-liga', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            nome_liga: nomeLiga.trim(), 
+            dono_id: idUsuario 
+          })
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+          alert(`✅ ${resultado.mensagem}\n\nMande este código para os seus amigos entrarem: ${resultado.liga.codigo_convite}`);
+          carregarLigas(); // Atualiza a lista para a nova liga aparecer na hora!
+        } else {
+          alert("❌ " + resultado.erro);
+        }
+      } catch (erro) {
+        console.error(erro);
+        alert("Erro ao criar a liga no servidor.");
+      }
     }
+
+    // Aciona a busca das ligas assim que a tela abre!
+    carregarLigas();
   </script>
 
 </body>

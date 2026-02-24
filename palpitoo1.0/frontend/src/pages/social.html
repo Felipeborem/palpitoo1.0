@@ -14,12 +14,9 @@
 <body>
 
   <header class="navbar">
-    <a href="_index.html" style="text-decoration: none; color: inherit;">
-        <div class="logo-container">
-            <div class="logo-icon">P</div>
-            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
-        </div>
-    </a>
+    <a href="_index.html" class="logo-link">
+    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+</a>
     
     <nav>
       <ul class="nav-links">
@@ -29,7 +26,6 @@
         <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html" class="ativo">Social</a></li>
         <li><a href="carreira.html">Carreira</a></li>
-        
       </ul>
     </nav>
   </header>
@@ -45,28 +41,12 @@
       <div class="divisor-tracejado mb-20"></div>
 
       <div class="form-group" style="display: flex; gap: 10px;">
-        <input type="text" id="inputBusca" placeholder="Digite o nome ou e-mail..." style="margin-bottom: 0;">
+        <input type="text" id="inputBusca" placeholder="Digite o nome..." style="margin-bottom: 0;">
         <button class="btn btn-salvar font-russo" onclick="buscarUsuarios()" style="margin-top: 0; padding: 0 20px;">Buscar</button>
       </div>
 
       <div id="lista-busca" class="mt-20">
-        <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px;">
-          <img src="https://via.placeholder.com/50" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px;">
-          <div style="text-align: left; padding-left: 10px;">
-            <p class="font-russo text-white" style="font-size: 16px;">Acácio</p>
-            <p style="color: var(--text-gray); font-size: 12px;">Vasco da Gama</p>
-          </div>
-          <button class="btn btn-salvar font-russo" style="padding: 8px 15px; font-size: 12px; background-color: var(--accent-cyan);">+ Add</button>
-        </div>
-        
-        <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px;">
-          <img src="https://via.placeholder.com/50" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px;">
-          <div style="text-align: left; padding-left: 10px;">
-            <p class="font-russo text-white" style="font-size: 16px;">Fernando</p>
-            <p style="color: var(--text-gray); font-size: 12px;">São Paulo</p>
-          </div>
-          <button class="btn btn-salvar font-russo" style="padding: 8px 15px; font-size: 12px; background-color: var(--accent-cyan);">+ Add</button>
-        </div>
+        <p class="text-center text-gray-500 font-salsa">Pesquise por nome acima...</p>
       </div>
     </section>
 
@@ -79,23 +59,7 @@
       <div class="divisor-tracejado mb-20"></div>
 
       <div id="lista-amigos">
-        <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px;">
-          <img src="https://via.placeholder.com/50" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px; border-color: var(--accent-green);">
-          <div style="text-align: left; padding-left: 10px;">
-            <p class="font-russo text-white" style="font-size: 16px;">Guigo <span style="font-size: 12px; color: var(--accent-green);">✔️ Amigo</span></p>
-            <p style="color: var(--text-gray); font-size: 12px;">Flamengo</p>
-          </div>
-          <button class="btn btn-cancelar font-russo" style="padding: 8px 15px; font-size: 12px;" title="Remover Amigo">X</button>
-        </div>
-
-        <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px;">
-          <img src="https://via.placeholder.com/50" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px; border-color: var(--accent-green);">
-          <div style="text-align: left; padding-left: 10px;">
-            <p class="font-russo text-white" style="font-size: 16px;">Emanuel <span style="font-size: 12px; color: var(--accent-green);">✔️ Amigo</span></p>
-            <p style="color: var(--text-gray); font-size: 12px;">Fluminense</p>
-          </div>
-          <button class="btn btn-cancelar font-russo" style="padding: 8px 15px; font-size: 12px;" title="Remover Amigo">X</button>
-        </div>
+        <p class="text-center text-gray-500 font-salsa">Carregando seus amigos... 🔄</p>
       </div>
       
     </section>
@@ -103,31 +67,126 @@
   </main>
 
   <script>
-    // Checagem de segurança básica: Se não estiver logado, não pode ver a página social
-    const idLogado = localStorage.getItem('craqueId');
-    if (!idLogado) {
-      // window.location.href = 'login.html'; // Descomente quando quiser ativar a trava
+    // Puxa o ID do usuário logado
+    const idLogado = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+
+    // 1. FUNÇÃO PARA BUSCAR USUÁRIOS NO SERVIDOR
+    async function buscarUsuarios() {
+        const termo = document.getElementById('inputBusca').value.trim();
+        if (!termo) return alert("Digite um nome para buscar!");
+
+        try {
+            const resposta = await fetch(`http://localhost:3000/buscar-usuarios?nome=${termo}`);
+            const usuarios = await resposta.json();
+            
+            const listaBusca = document.getElementById('lista-busca');
+            listaBusca.innerHTML = '';
+
+            if (usuarios.length === 0) {
+                listaBusca.innerHTML = '<p class="text-center text-gray-500">Nenhum craque encontrado com esse nome. 🦆</p>';
+                return;
+            }
+
+            usuarios.forEach(u => {
+                // Não mostra você mesmo na lista de busca
+                if (u.id == idLogado) return;
+
+                listaBusca.innerHTML += `
+                    <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px; margin-bottom: 15px;">
+                        <img src="${u.foto_perfil || 'https://via.placeholder.com/50'}" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                        <div style="text-align: left; padding-left: 15px;">
+                            <p class="font-russo text-white" style="font-size: 16px;">${u.nome}</p>
+                            <p style="color: var(--text-gray); font-size: 12px;">${u.time_favorito || 'Sem Time'}</p>
+                        </div>
+                        <button class="btn btn-salvar font-russo" onclick="adicionarAmigo(${u.id})" style="padding: 8px 15px; font-size: 12px; background-color: var(--accent-cyan);">+ Add</button>
+                    </div>
+                `;
+            });
+        } catch (erro) {
+            console.error("Erro na busca:", erro);
+        }
     }
 
-    // Função "fake" (por enquanto) para simular a busca de usuários
-    function buscarUsuarios() {
-      const termo = document.getElementById('inputBusca').value;
-      if (!termo) {
-        alert("Digite um nome para buscar!");
-        return;
-      }
-      
-      // Aqui, futuramente, faremos um fetch('http://localhost:3000/buscar-usuarios?nome=...')
-      console.log("Buscando no banco por:", termo);
-      alert("Procurando por " + termo + " no banco de dados...");
+    // 2. FUNÇÃO PARA ADICIONAR UM AMIGO
+    async function adicionarAmigo(idAmigo) {
+        try {
+            const resposta = await fetch('http://localhost:3000/adicionar-amigo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    usuario_id: idLogado, 
+                    amigo_id: idAmigo 
+                })
+            });
+
+            if (resposta.ok) {
+                alert("✅ Craque convocado para sua tropa!");
+                carregarAmigos(); // Atualiza a lista de amigos na hora
+            } else {
+                alert("❌ Você já é amigo deste jogador!");
+            }
+        } catch (erro) {
+            console.error("Erro ao adicionar amigo:", erro);
+        }
     }
 
-    // Função "fake" (por enquanto) para simular adição de amigo
-    function adicionarAmigo(idAmigo) {
-      // Aqui faremos o POST para salvar a relação na tabela de amigos
-      console.log("Adicionando amigo ID:", idAmigo);
-      alert("Convite enviado para o craque!");
+    // 3. FUNÇÃO PARA CARREGAR A LISTA DE AMIGOS DO USUÁRIO
+    async function carregarAmigos() {
+        if (!idLogado) return;
+
+        try {
+            const resposta = await fetch(`http://localhost:3000/meus-amigos/${idLogado}`);
+            const amigos = await resposta.json();
+            
+            const listaAmigos = document.getElementById('lista-amigos');
+            listaAmigos.innerHTML = '';
+
+            if (amigos.length === 0) {
+                listaAmigos.innerHTML = '<p class="text-center text-gray-500 font-salsa">Você ainda não tem amigos. Busque novos craques ao lado! 🦆</p>';
+                return;
+            }
+
+            amigos.forEach(a => {
+                listaAmigos.innerHTML += `
+                    <div class="linha-jogo" style="grid-template-columns: auto 1fr auto; justify-content: start; border-bottom: 1px dashed var(--borda-divisoria); padding-bottom: 15px; margin-bottom: 15px;">
+                        <img src="${a.foto_perfil || 'https://via.placeholder.com/50'}" alt="Foto" class="foto-perfil" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border-color: var(--accent-green);">
+                        <div style="text-align: left; padding-left: 15px;">
+                            <p class="font-russo text-white" style="font-size: 16px;">${a.nome} <span style="font-size: 12px; color: var(--accent-green);">✔️ Seguidor</span></p>
+                            <p style="color: var(--text-gray); font-size: 12px;">${a.time_favorito || 'Sem Time'}</p>
+                        </div>
+                        <button class="btn btn-cancelar font-russo" onclick="removerAmigo(${a.id})" style="padding: 8px 15px; font-size: 12px;" title="Remover Amigo">X</button>
+                    </div>
+                `;
+            });
+        } catch (erro) {
+            console.error("Erro ao carregar amigos:", erro);
+        }
     }
+
+    // 4. FUNÇÃO PARA REMOVER UM AMIGO
+    async function removerAmigo(idAmigo) {
+        if (!confirm("Deseja mesmo remover este craque da sua lista?")) return;
+
+        try {
+            const resposta = await fetch('http://localhost:3000/remover-amigo', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    usuario_id: idLogado, 
+                    amigo_id: idAmigo 
+                })
+            });
+
+            if (resposta.ok) {
+                carregarAmigos(); // Atualiza a lista na tela
+            }
+        } catch (erro) {
+            console.error("Erro ao remover amigo:", erro);
+        }
+    }
+
+    // Inicia a lista de amigos assim que a página abre
+    carregarAmigos();
   </script>
 
 </body>
