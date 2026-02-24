@@ -329,7 +329,7 @@
   async function calcularDesempenho() {
     if (!idLogado) return;
     try {
-      const resposta = await fetch(`http://localhost:3000/meus-palpites/${idLogado}`);
+      const resposta = await fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`);
       const palpites = await resposta.json();
 
       let cravadas = 0, acertos = 0, erros = 0, finalizados = 0;
@@ -366,7 +366,7 @@
   // ── RANKING GLOBAL ────────────────────────────────────────
   async function carregarRankingGlobal() {
     try {
-      const res      = await fetch('http://localhost:3000/ranking');
+      const res      = await fetch('https://palpitoo-api.onrender.com/ranking');
       const jogadores = await res.json();
       const ul       = document.getElementById('lista-global');
       ul.innerHTML   = '';
@@ -406,7 +406,7 @@
   async function carregarRankingMinhaLiga() {
     if (!idLogado) return;
     try {
-      const resLigas = await fetch(`http://localhost:3000/minhas-ligas/${idLogado}`);
+      const resLigas = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`);
       const ligas    = await resLigas.json();
       const ul       = document.getElementById('lista-minha-liga');
 
@@ -422,7 +422,7 @@
       }
 
       const idLiga    = ligas[0].id_liga;
-      const resRanking = await fetch(`http://localhost:3000/ranking-liga/${idLiga}`);
+      const resRanking = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`);
       const dadosLiga  = await resRanking.json();
 
       document.getElementById('titulo-minha-liga').innerText = `⚜️ ${dadosLiga.nomeLiga.toUpperCase()} ⚜️`;

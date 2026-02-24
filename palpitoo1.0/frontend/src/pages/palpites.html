@@ -282,7 +282,7 @@
   // 1. CARREGAR E DESENHAR OS JOGOS POR RODADA ──────────────
   async function carregarJogos() {
     try {
-      const resposta    = await fetch('http://localhost:3000/jogos');
+      const resposta    = await fetch('https://palpitoo-api.onrender.com/jogos');
       jogosCarregados   = await resposta.json();
       const container   = document.getElementById('container-jogos');
       container.innerHTML = '';
@@ -365,7 +365,7 @@
     }
 
     try {
-      const resposta = await fetch('http://localhost:3000/palpites', {
+      const resposta = await fetch('https://palpitoo-api.onrender.com/palpites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ palpites: palpitesParaSalvar })
@@ -396,7 +396,7 @@
     if (!idUsuario) return;
 
     try {
-      const resposta    = await fetch(`http://localhost:3000/meus-palpites/${idUsuario}`);
+      const resposta    = await fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idUsuario}`);
       const meusPalpites = await resposta.json();
       const containerResumo = document.getElementById('resumo-palpites');
       containerResumo.innerHTML = '';

@@ -488,9 +488,9 @@
     try {
       // Busca dados em paralelo
       const [resJogos, resPalpites, resRanking] = await Promise.all([
-        fetch('http://localhost:3000/jogos'),
-        idLogado ? fetch(`http://localhost:3000/meus-palpites/${idLogado}`) : Promise.resolve({ json: () => [] }),
-        fetch('http://localhost:3000/ranking')
+        fetch('https://palpitoo-api.onrender.com/jogos'),
+        idLogado ? fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`) : Promise.resolve({ json: () => [] }),
+        fetch('https://palpitoo-api.onrender.com/ranking')
       ]);
 
       const jogos    = await resJogos.json();
@@ -501,7 +501,7 @@
       let ligaAtual = null;
       if (idLogado) {
         try {
-          const resLiga = await fetch(`http://localhost:3000/minha-liga/${idLogado}`);
+          const resLiga = await fetch(`https://palpitoo-api.onrender.com/minha-liga/${idLogado}`);
           const dadosLiga = await resLiga.json();
           if (dadosLiga.liga) ligaAtual = dadosLiga.liga.nome;
         } catch (e) {}

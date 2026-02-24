@@ -231,8 +231,8 @@
 
     try {
       const [resBusca, resSeguindo] = await Promise.all([
-        fetch(`http://localhost:3000/buscar-usuarios?nome=${encodeURIComponent(termo)}`),
-        idLogado ? fetch(`http://localhost:3000/seguindo/${idLogado}`) : Promise.resolve({ json: () => [] })
+        fetch(`https://palpitoo-api.onrender.com/buscar-usuarios?nome=${encodeURIComponent(termo)}`),
+        idLogado ? fetch(`https://palpitoo-api.onrender.com/seguindo/${idLogado}`) : Promise.resolve({ json: () => [] })
       ]);
 
       const usuarios     = await resBusca.json();
@@ -260,7 +260,7 @@
       return;
     }
     try {
-      const res      = await fetch(`http://localhost:3000/seguindo/${idLogado}`);
+      const res      = await fetch(`https://palpitoo-api.onrender.com/seguindo/${idLogado}`);
       const seguindo = await res.json();
 
       document.getElementById('contador-seguindo').innerText =
@@ -283,7 +283,7 @@
     btn.disabled = true;
 
     try {
-      const url    = estaSeguindo ? 'http://localhost:3000/deixar-seguir' : 'http://localhost:3000/seguir';
+      const url    = estaSeguindo ? 'https://palpitoo-api.onrender.com/deixar-seguir' : 'hhttps://palpitoo-api.onrender.com/seguir';
       const method = estaSeguindo ? 'DELETE' : 'POST';
       const res = await fetch(url, {
         method,

@@ -89,7 +89,7 @@
       if (!idUsuario) return;
 
       try {
-        const resposta = await fetch(`http://localhost:3000/minhas-ligas/${idUsuario}`);
+        const resposta = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idUsuario}`);
         const ligas = await resposta.json();
         
         const ul = document.getElementById('lista-ligas-ativas');
@@ -144,7 +144,7 @@
       }
       
       try {
-        const resposta = await fetch('http://localhost:3000/entrar-liga', {
+        const resposta = await fetch('https://palpitoo-api.onrender.com/entrar-liga', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -176,7 +176,7 @@
       if (!nomeLiga || nomeLiga.trim() === "") return; // Se o cara cancelar, não faz nada
 
       try {
-        const resposta = await fetch('http://localhost:3000/criar-liga', {
+        const resposta = await fetch('https://palpitoo-api.onrender.com/criar-liga', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

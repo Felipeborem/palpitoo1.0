@@ -437,7 +437,7 @@
       if (!nome) { mostrarAviso('Digite um nome para a liga!', 'erro'); return; }
 
       try {
-        const res = await fetch('http://localhost:3000/criar-liga', {
+        const res = await fetch('https://palpitoo-api.onrender.com/criar-liga', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nome_liga: nome, id_dono: idLogado })
@@ -461,7 +461,7 @@
       if (codigo.length < 4) { mostrarAviso('Digite o código completo!', 'erro'); return; }
 
       try {
-        const res = await fetch('http://localhost:3000/entrar-liga', {
+        const res = await fetch('https://palpitoo-api.onrender.com/entrar-liga', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ codigo_convite: codigo, id_usuario: idLogado })
@@ -482,7 +482,7 @@
     async function sairDaLiga() {
       if (!confirm('Tem certeza que deseja sair da liga?')) return;
       try {
-        const res = await fetch('http://localhost:3000/sair-liga', {
+        const res = await fetch('https://palpitoo-api.onrender.com/sair-liga', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id_usuario: idLogado })
@@ -510,7 +510,7 @@
     // NOTA: A rota /ranking-liga/:id retorna { nomeLiga, ranking: [] }
     async function carregarRanking(idLiga) {
       try {
-        const res    = await fetch(`http://localhost:3000/ranking-liga/${idLiga}`);
+        const res    = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`);
         const dados  = await res.json();
 
         // A rota retorna { nomeLiga, ranking: [] } — extraímos o array correto
@@ -571,7 +571,7 @@
     // ─── CARREGAR MEMBROS ─────────────────────────────────────
     async function carregarMembros(idLiga, donoDaLiga) {
       try {
-        const res    = await fetch(`http://localhost:3000/liga-membros/${idLiga}`);
+        const res    = await fetch(`https://palpitoo-api.onrender.com/liga-membros/${idLiga}`);
         const membros = await res.json();
         const lista  = document.getElementById('lista-membros');
         lista.innerHTML = '';
@@ -616,7 +616,7 @@
     // ─── CARREGAR PALPITES DA GALERA ──────────────────────────
     async function carregarPalpitesGalera(idLiga) {
       try {
-        const res   = await fetch(`http://localhost:3000/palpites-liga/${idLiga}`);
+        const res   = await fetch(`https://palpitoo-api.onrender.com/palpites-liga/${idLiga}`);
         const dados = await res.json();
         const lista = document.getElementById('lista-palpites-galera');
         lista.innerHTML = '';
@@ -783,11 +783,11 @@
         let liga = null;
 
         if (idLigaUrl) {
-          const res  = await fetch(`http://localhost:3000/liga/${idLigaUrl}`);
+          const res  = await fetch(`https://palpitoo-api.onrender.com/liga/${idLigaUrl}`);
           const data = await res.json();
           if (res.ok && data.liga) liga = data.liga;
         } else {
-          const res  = await fetch(`http://localhost:3000/minha-liga/${idLogado}`);
+          const res  = await fetch(`https://palpitoo-api.onrender.com/minha-liga/${idLogado}`);
           const data = await res.json();
           if (res.ok && data.liga) liga = data.liga;
         }

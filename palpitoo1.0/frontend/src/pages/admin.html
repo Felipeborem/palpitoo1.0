@@ -147,7 +147,7 @@
     // ================= FUNÇÕES DE JOGOS =================
     async function carregarListaDeJogos() {
       try {
-        const resposta = await fetch('http://localhost:3000/jogos');
+        const resposta = await fetch('https://palpitoo-api.onrender.com/jogos');
         const jogos = await resposta.json();
         const tbody = document.getElementById('tabelaJogosBody');
         tbody.innerHTML = ''; 
@@ -181,7 +181,7 @@
       }
 
       try {
-        const resposta = await fetch('http://localhost:3000/criar-jogo', {
+        const resposta = await fetch('https://palpitoo-api.onrender.com/criar-jogo', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -220,7 +220,7 @@
       if (!confirm(`Confirmar fim de jogo: ID ${idJogo}?`)) return;
 
       try {
-        const resposta = await fetch('http://localhost:3000/encerrar-jogo', {
+        const resposta = await fetch('https://palpitoo-api.onrender.com/encerrar-jogo', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id_jogo: parseInt(idJogo), gols_casa_real: parseInt(golsCasa), gols_fora_real: parseInt(golsFora) })
@@ -237,7 +237,7 @@
     // ================= FUNÇÕES DE LIGAS =================
     async function carregarTodasLigas() {
       try {
-        const resposta = await fetch('http://localhost:3000/todas-ligas');
+        const resposta = await fetch('https://palpitoo-api.onrender.com/todas-ligas');
         const ligas = await resposta.json();
         const tbody = document.getElementById('tabelaLigasBody');
         tbody.innerHTML = ''; 
@@ -266,7 +266,7 @@
       tbody.innerHTML = '<tr><td colspan="3" class="text-center py-6 text-yellow-500">Buscando craques...</td></tr>';
 
       try {
-        const resposta = await fetch(`http://localhost:3000/liga-membros/${idLiga}`);
+        const resposta = await fetch(`https://palpitoo-api.onrender.com/liga-membros/${idLiga}`);
         const membros = await resposta.json();
         tbody.innerHTML = ''; 
 

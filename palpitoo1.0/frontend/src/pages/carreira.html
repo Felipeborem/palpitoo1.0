@@ -404,7 +404,7 @@
     if (!idLogado) return carregarPreviewTemporada();
 
     try {
-      const res  = await fetch(`http://localhost:3000/meus-palpites/${idLogado}`);
+      const res  = await fetch(`https://palpitoo-api.onrender.com/${idLogado}`);
       const palpites = await res.json();
 
       const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
@@ -429,12 +429,12 @@
       }, 100);
 
       // Posição na liga
-      const resLigas = await fetch(`http://localhost:3000/minhas-ligas/${idLogado}`);
+      const resLigas = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`);
       const ligas    = await resLigas.json();
 
       if (ligas.length > 0) {
         const idLiga   = ligas[0].id_liga;
-        const resRank  = await fetch(`http://localhost:3000/ranking-liga/${idLiga}`);
+        const resRank  = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`);
         const dadosLiga = await resRank.json();
 
         document.getElementById('t-nome-liga').innerText = dadosLiga.nomeLiga;
@@ -452,7 +452,7 @@
       }
 
       // Últimos palpites
-      const resJogos = await fetch('http://localhost:3000/jogos');
+      const resJogos = await fetch('https://palpitoo-api.onrender.com/jogos');
       const jogos    = await resJogos.json();
       const lista    = document.getElementById('lista-ultimos');
       lista.innerHTML = '';
@@ -534,7 +534,7 @@
 
     try {
       // Stats totais via palpites
-      const resPalpites = await fetch(`http://localhost:3000/meus-palpites/${idLogado}`);
+      const resPalpites = await fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`);
       const palpites    = await resPalpites.json();
 
       const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
@@ -555,7 +555,7 @@
       setTimeout(() => { document.getElementById('c-barra').style.width = `${taxa}%`; }, 200);
 
       // Ligas jogadas
-      const resLigas = await fetch(`http://localhost:3000/minhas-ligas/${idLogado}`);
+      const resLigas = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`);
       const ligas    = await resLigas.json();
       document.getElementById('c-ligas').innerText = ligas.length;
 
@@ -571,7 +571,7 @@
         histLigas.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;">Você ainda não participou de nenhuma liga.</p>';
       } else {
         for (const liga of ligas) {
-          const resRank   = await fetch(`http://localhost:3000/ranking-liga/${liga.id_liga}`);
+          const resRank   = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${liga.id_liga}`);
           const dadosLiga = await resRank.json();
           const pos       = dadosLiga.ranking.findIndex(r => String(r.id) === String(idLogado));
           const meuPts    = pos !== -1 ? dadosLiga.ranking[pos].total_pontos : 0;

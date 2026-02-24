@@ -426,7 +426,7 @@
 
     try {
       if (estaSeguindo) {
-        const res = await fetch('http://localhost:3000/deixar-seguir', {
+        const res = await fetch('https://palpitoo-api.onrender.com/deixar-seguir', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ seguidor_id: idLogado, seguido_id: idPerfil })
@@ -438,7 +438,7 @@
           atualizarContadores();
         }
       } else {
-        const res = await fetch('http://localhost:3000/seguir', {
+        const res = await fetch('https://palpitoo-api.onrender.com/seguir', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ seguidor_id: idLogado, seguido_id: idPerfil })
@@ -458,7 +458,7 @@
     if (!idPerfil) { window.location.href = 'social.html'; return; }
 
     try {
-      const res  = await fetch(`http://localhost:3000/usuario/${idPerfil}`);
+      const res  = await fetch(`https://palpitoo-api.onrender.com/usuario/${idPerfil}`);
       const data = await res.json();
 
       document.title = `Palpitoo - ${data.nome}`;
@@ -482,7 +482,7 @@
 
   async function atualizarContadores() {
     try {
-      const res  = await fetch(`http://localhost:3000/contadores/${idPerfil}`);
+      const res  = await fetch(`https://palpitoo-api.onrender.com/contadores/${idPerfil}`);
       const data = await res.json();
       document.getElementById('contSeguidores').innerText = data.seguidores ?? '—';
       document.getElementById('contSeguindo').innerText   = data.seguindo   ?? '—';
@@ -492,7 +492,7 @@
   async function verificarSeSeguindo() {
     if (!idLogado || String(idLogado) === String(idPerfil)) return;
     try {
-      const res  = await fetch(`http://localhost:3000/esta-seguindo?seguidor=${idLogado}&seguido=${idPerfil}`);
+      const res  = await fetch(`https://palpitoo-api.onrender.com/esta-seguindo?seguidor=${idLogado}&seguido=${idPerfil}`);
       const data = await res.json();
       const btn  = document.getElementById('btnSeguir');
       if (data.seguindo) {
@@ -505,7 +505,7 @@
   // ── TEMPORADA ATUAL ───────────────────────────────────────
   async function carregarTemporada() {
     try {
-      const res  = await fetch(`http://localhost:3000/desempenho/${idPerfil}`);
+      const res  = await fetch(`https://palpitoo-api.onrender.com/desempenho/${idPerfil}`);
       const data = await res.json();
 
       document.getElementById('t-pontos').innerText       = data.pontos        ?? 0;
@@ -541,7 +541,7 @@
 
     // Últimos palpites
     try {
-      const res     = await fetch(`http://localhost:3000/ultimos-palpites/${idPerfil}`);
+      const res     = await fetch(`https://palpitoo-api.onrender.com/ultimos-palpites/${idPerfil}`);
       const palpites = await res.json();
       const lista    = document.getElementById('lista-ultimos-palpites');
       lista.innerHTML = '';
@@ -574,7 +574,7 @@
   // ── CARREIRA HISTÓRICA ────────────────────────────────────
   async function carregarCarreira() {
     try {
-      const res  = await fetch(`http://localhost:3000/carreira/${idPerfil}`);
+      const res  = await fetch(`https://palpitoo-api.onrender.com/carreira/${idPerfil}`);
       const data = await res.json();
 
       document.getElementById('c-pontos').innerText       = data.pontos_total    ?? 0;
