@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palpitoo - Palpites</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/style.css">
 
   <style>
@@ -136,6 +139,64 @@
       white-space: nowrap;
     }
 
+    /* ── BANNER DE ESTADO DA RODADA ── */
+    .banner-rodada {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-radius: 14px;
+      padding: 14px 20px;
+      margin-bottom: 16px;
+    }
+    .banner-rodada.aberta {
+      background: rgba(122, 30, 58, 0.1);
+      border: 1px solid var(--accent-cyan);
+    }
+    .banner-rodada.ao-vivo {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid #ef4444;
+      animation: pulso-vivo 2s infinite ease-in-out;
+    }
+    .banner-rodada.encerrada {
+      background: rgba(100,100,100,0.06);
+      border: 1px solid #374151;
+    }
+    @keyframes pulso-vivo {
+      0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+      50%      { box-shadow: 0 0 0 6px rgba(239,68,68,0.12); }
+    }
+    .banner-label {
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .banner-rodada.aberta  .banner-label  { color: var(--text-gray); }
+    .banner-rodada.ao-vivo .banner-label  { color: #ef4444; }
+    .banner-rodada.encerrada .banner-label{ color: #6b7280; }
+    .banner-sub {
+      font-size: 11px;
+      color: var(--text-gray);
+      margin-top: 3px;
+    }
+    .banner-timer {
+      font-family: 'Russo One', sans-serif;
+      font-size: 22px;
+      letter-spacing: 2px;
+    }
+    .banner-rodada.aberta   .banner-timer { color: var(--accent-cyan); }
+    .banner-rodada.ao-vivo  .banner-timer { color: #ef4444; }
+    .banner-rodada.encerrada .banner-timer{ color: #6b7280; }
+    .dot-vivo {
+      display: inline-block; width: 8px; height: 8px;
+      background: #ef4444; border-radius: 50%;
+      margin-right: 5px; vertical-align: middle;
+      animation: pisca 1s infinite;
+    }
+    @keyframes pisca { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
     /* ── STATUS BADGE ── */
     .status-badge {
       font-family: 'Russo One', sans-serif;
@@ -197,8 +258,6 @@
       .botoes-acao .btn { max-width: 100%; }
     }
   </style>
-  <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
-  <link rel="icon" href="./img/pato.png" type="image/png">
 </head>
 <body>
 
@@ -216,10 +275,6 @@
         <li><a href="carreira.html">Carreira</a></li>
       </ul>
     </nav>
-    <button class="hamburger" id="hamburger-btn" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-    <div class="navbar-user" id="navbar-user-area"></div>
   </header>
 
   <main class="container-principal container-palpites">
@@ -282,40 +337,183 @@
     return `<span class="status-badge aberto">🟢 Aberto</span>`;
   }
 
-  // 1. CARREGAR E DESENHAR OS JOGOS POR RODADA ──────────────
+  // ── HELPERS ──────────────────────────────────────────────
+  function formatarDataHora(iso) {
+    if (!iso) return null;
+    const d = new Date(iso);
+    return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+  }
+  function formatarCountdown(ms) {
+    if (ms <= 0) return '00:00:00';
+    const s    = Math.floor(ms / 1000);
+    const dias  = Math.floor(s / 86400);
+    const horas = Math.floor((s % 86400) / 3600);
+    const min   = Math.floor((s % 3600) / 60);
+    const seg   = s % 60;
+    if (dias > 0) return `${dias}d ${String(horas).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+    return `${String(horas).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
+  }
+
+  // Busca o prazo de uma rodada:
+  // 1. Do campo prazo_rodada retornado pela API (ideal)
+  // 2. Fallback: localStorage (salvo pelo admin)
+  function getPrazoRodada(numeroRodada, jogosRodada) {
+    // Tenta pegar do primeiro jogo que tenha prazo_rodada
+    const comPrazo = jogosRodada.find(j => j.prazo_rodada);
+    if (comPrazo) return new Date(comPrazo.prazo_rodada).getTime();
+    // Fallback: localStorage (definido pelo painel admin)
+    const prazos = JSON.parse(localStorage.getItem('prazos_rodadas') || '{}');
+    const prazoStr = prazos[String(numeroRodada)];
+    return prazoStr ? new Date(prazoStr).getTime() : null;
+  }
+
+  // Retorna o estado atual da rodada: 'aberta' | 'ao_vivo' | 'encerrada'
+  function estadoRodada(numeroRodada, jogosRodada) {
+    const statuses = jogosRodada.map(j => j.status.toLowerCase());
+
+    // Todos finalizados → encerrada
+    if (statuses.every(s => s === 'finalizado')) return 'encerrada';
+
+    // Qualquer jogo em andamento ou finalizado → ao vivo
+    if (statuses.some(s => s === 'em andamento' || s === 'finalizado')) return 'ao_vivo';
+
+    // Prazo expirou → ao vivo
+    const prazo = getPrazoRodada(numeroRodada, jogosRodada);
+    if (prazo && Date.now() >= prazo) return 'ao_vivo';
+
+    return 'aberta';
+  }
+
+  function rodadaBloqueada(numeroRodada, jogosRodada) {
+    return estadoRodada(numeroRodada, jogosRodada) !== 'aberta';
+  }
+
+  // ── BANNER DE ESTADO DA RODADA ────────────────────────────
+  const _timers = {};
+  function renderBannerRodada(containerId, numeroRodada, jogosRodada) {
+    const bannerId  = `banner-${containerId}`;
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (_timers[bannerId]) { clearInterval(_timers[bannerId]); delete _timers[bannerId]; }
+    const antigo = document.getElementById(bannerId);
+    if (antigo) antigo.remove();
+
+    const banner = document.createElement('div');
+    banner.id = bannerId;
+
+    function bloquearInputs() {
+      jogosRodada.forEach(j => {
+        const iC = document.getElementById(`casa_${j.id_jogo}`);
+        const iF = document.getElementById(`fora_${j.id_jogo}`);
+        if (iC) iC.disabled = true;
+        if (iF) iF.disabled = true;
+      });
+    }
+
+    function atualizar() {
+      const estado = estadoRodada(numeroRodada, jogosRodada);
+      const prazo  = getPrazoRodada(numeroRodada, jogosRodada);
+
+      if (estado === 'encerrada') {
+        banner.className = 'banner-rodada encerrada';
+        banner.innerHTML = `<div><p class="banner-label">🏁 Rodada Encerrada</p><p class="banner-sub">Todos os jogos foram finalizados.</p></div><span class="banner-timer">FIM</span>`;
+        bloquearInputs();
+        clearInterval(_timers[bannerId]);
+
+      } else if (estado === 'ao_vivo') {
+        banner.className = 'banner-rodada ao-vivo';
+        const vivos = jogosRodada.filter(j => j.status.toLowerCase() === 'em andamento').length;
+        banner.innerHTML = `<div><p class="banner-label"><span class="dot-vivo"></span>Rodada ao Vivo</p><p class="banner-sub">Palpites encerrados${vivos ? ` · ${vivos} jogo(s) rolando` : ''}</p></div><span class="banner-timer">AO VIVO</span>`;
+        bloquearInputs();
+        clearInterval(_timers[bannerId]);
+
+      } else if (prazo) {
+        // aberta com prazo definido → countdown
+        const restante = prazo - Date.now();
+        if (restante <= 0) { atualizar(); return; }
+        banner.className = 'banner-rodada aberta';
+        banner.innerHTML = `<div><p class="banner-label">⏰ Mercado fecha em</p><p class="banner-sub">Após este tempo, nenhum palpite é aceito</p></div><span class="banner-timer">${formatarCountdown(restante)}</span>`;
+
+      } else {
+        // aberta sem prazo → não mostra banner
+        banner.remove();
+        return;
+      }
+    }
+
+    atualizar();
+    if (!document.getElementById(bannerId)) {
+      container.insertBefore(banner, container.firstChild);
+    }
+
+    const estado = estadoRodada(numeroRodada, jogosRodada);
+    if (estado === 'aberta') {
+      _timers[bannerId] = setInterval(atualizar, 1000);
+    }
+  }
+
   // ── HELPER: MONTA HTML DE UM JOGO ────────────────────────
-  function htmlJogo(jogo) {
-    const finalizado = jogo.status.toLowerCase() === 'finalizado';
+  function htmlJogo(jogo, bloqueado = false) {
+    const s = jogo.status.toLowerCase();
+    const finalizado   = s === 'finalizado';
+    const emAndamento  = s === 'em andamento';
+    const desabilitado = finalizado || emAndamento || bloqueado;
+
+    // Centro: se finalizado mostra placar real; senão mostra inputs
+    let centro;
+    if (finalizado) {
+      centro = `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span class="status-badge finalizado">🔒 Finalizado</span>
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(107,114,128,.15);border:1px solid #374151;border-radius:10px;padding:6px 12px;">
+            <span style="font-family:'Russo One',sans-serif;font-size:20px;color:#9ca3af;">${jogo.gols_casa_real ?? '?'}</span>
+            <span style="font-size:13px;color:#4b5563;">x</span>
+            <span style="font-family:'Russo One',sans-serif;font-size:20px;color:#9ca3af;">${jogo.gols_fora_real ?? '?'}</span>
+          </div>
+        </div>`;
+    } else if (emAndamento) {
+      centro = `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span class="status-badge andamento">🟡 Ao Vivo</span>
+          <div class="area-placar">
+            <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" disabled>
+            <span class="versus">x</span>
+            <input type="number" id="fora_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" disabled>
+          </div>
+        </div>`;
+    } else {
+      centro = `
+        <div class="area-placar">
+          <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
+          <span class="versus">x</span>
+          <input type="number" id="fora_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
+        </div>`;
+    }
+
     return `
       <div class="linha-jogo ${finalizado ? 'finalizado' : ''}">
         <span class="nome-time time-casa">${jogo.time_casa}</span>
-        <div class="area-placar">
-          <input type="number" id="casa_${jogo.id_jogo}"
-                 class="input-placar font-russo"
-                 placeholder="0" min="0"
-                 ${finalizado ? 'disabled' : ''}>
-          <span class="versus">x</span>
-          <input type="number" id="fora_${jogo.id_jogo}"
-                 class="input-placar font-russo"
-                 placeholder="0" min="0"
-                 ${finalizado ? 'disabled' : ''}>
-        </div>
+        ${centro}
         <span class="nome-time time-fora">${jogo.time_fora}</span>
-      </div>
-      ${finalizado ? '<p class="aviso-encerrado">🔒 Palpites encerrados para este jogo</p>' : ''}`;
+      </div>`;
   }
 
   // ── DETECTA RODADA ATUAL ──────────────────────────────────
+  // Prioridade: ao vivo > aberta > mais recente
   function detectarRodadaAtual(porRodada) {
-    const todasRodadas = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
-    let rodadaAtual = todasRodadas[todasRodadas.length - 1];
-    for (const r of [...todasRodadas].reverse()) {
-      if (porRodada[r].some(j => j.status.toLowerCase() !== 'finalizado')) {
-        rodadaAtual = r;
-        break;
-      }
+    const todas = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
+
+    // 1. Alguma rodada ao vivo (tem jogo em andamento)?
+    for (const r of todas) {
+      if (porRodada[r].some(j => j.status.toLowerCase() === 'em andamento')) return r;
     }
-    return rodadaAtual;
+    // 2. Primeira rodada com jogos não finalizados
+    for (const r of todas) {
+      if (porRodada[r].some(j => j.status.toLowerCase() !== 'finalizado')) return r;
+    }
+    // 3. Fallback: última rodada
+    return todas[todas.length - 1];
   }
 
   // 1. CARREGAR E DESENHAR OS JOGOS POR RODADA ──────────────
@@ -344,11 +542,17 @@
       const rodadasAntes   = todasRodadas.filter(r => r < rodadaAtual);
 
       // ── RODADA ATUAL ──────────────────────────────────────
+      const bloqueadaAtual = rodadaBloqueada(rodadaAtual, porRodada[rodadaAtual]);
       container.innerHTML += `
-        <div class="titulo-rodada">
-          <span>🏆 Rodada ${rodadaAtual} — Atual</span>
-        </div>`;
-      porRodada[rodadaAtual].forEach(jogo => { container.innerHTML += htmlJogo(jogo); });
+        <div class="titulo-rodada"><span>🏆 Rodada ${rodadaAtual} — Atual</span></div>
+        <div id="jogos-rodada-${rodadaAtual}"></div>`;
+
+      let htmlJogosAtual = '';
+      porRodada[rodadaAtual].forEach(j => { htmlJogosAtual += htmlJogo(j, bloqueadaAtual); });
+      document.getElementById(`jogos-rodada-${rodadaAtual}`).innerHTML = htmlJogosAtual;
+
+      // Banner de estado (countdown / ao vivo / encerrada)
+      renderBannerRodada(`jogos-rodada-${rodadaAtual}`, rodadaAtual, porRodada[rodadaAtual]);
 
       // ── BOTÃO + PAINEL RODADAS ANTERIORES ─────────────────
       if (rodadasAntes.length > 0) {
@@ -546,44 +750,5 @@
   carregarJogos();
 </script>
 <script src="main.js"></script>
-
-  <script>
-    // Navbar: avatar + logout para páginas autenticadas
-    (function() {
-      const nome = localStorage.getItem('nome_craque') || '';
-      const foto = localStorage.getItem('foto_craque');
-      const userArea = document.getElementById('navbar-user-area');
-      if (!userArea) return;
-      if (nome) {
-        const initials = encodeURIComponent(nome.split(' ')[0]);
-        const src = (foto && foto !== 'null' && foto !== 'undefined')
-          ? foto
-          : `https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36`;
-        userArea.innerHTML = `
-          <a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36'"></a>
-          <button class="btn-logout" onclick="fazerLogout()">Sair</button>
-        `;
-      } else {
-        userArea.innerHTML = '<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>';
-      }
-    })();
-
-    function fazerLogout() {
-      localStorage.clear();
-      window.location.href = 'inicio.html';
-    }
-
-    // Hamburger menu
-    document.addEventListener('DOMContentLoaded', function() {
-      const btn = document.getElementById('hamburger-btn');
-      const nav = document.querySelector('.nav-links');
-      if (!btn || !nav) return;
-      btn.addEventListener('click', function() {
-        btn.classList.toggle('aberto');
-        nav.classList.toggle('aberto');
-      });
-    });
-  </script>
-
 </body>
 </html>

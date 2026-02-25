@@ -4,506 +4,366 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palpitoo - Página Inicial</title>
-  <link rel="stylesheet" href="./css/style.css">
-
-  <style>
-    /* ── Cards de Liga ── */
-    .card-liga {
-      width: 100%;
-      max-width: 600px;
-      background: var(--card-dark);
-      border: 1px solid var(--borda-divisoria);
-      border-radius: 20px;
-      overflow: hidden;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .card-liga:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 8px 30px rgba(122, 30, 58, 0.15);
-    }
-
-    /* Cabeçalho clicável do card */
-    .card-liga-header {
-      padding: 20px 24px;
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .card-liga-titulo {
-      font-family: 'Russo One', sans-serif;
-      color: var(--accent-cyan);
-      font-size: 17px;
-      letter-spacing: 1px;
-      text-shadow: 0 0 12px rgba(122, 30, 58, 0.4);
-    }
-
-    .card-liga-subtitulo {
-      font-family: 'Russo One', sans-serif;
-      color: var(--text-white);
-      font-size: 13px;
-      margin-top: 4px;
-      opacity: 0.7;
-    }
-
-    .card-liga-divisor {
-      width: 100%;
-      height: 1px;
-      background-image: linear-gradient(to right, var(--borda-divisoria) 50%, transparent 50%);
-      background-size: 15px 1px;
-      background-repeat: repeat-x;
-    }
-
-    .card-liga-status {
-      display: inline-block;
-      background: var(--bg-dark);
-      border: 1px solid var(--borda-divisoria);
-      border-radius: 20px;
-      padding: 8px 22px;
-      font-family: 'Russo One', sans-serif;
-      font-size: 13px;
-      color: var(--text-white);
-      margin: 14px 0;
-    }
-
-    /* Botão de expandir */
-    .btn-tabelona {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 12px 24px;
-      background: none;
-      border: none;
-      border-top: 1px dashed var(--borda-divisoria);
-      font-family: 'Russo One', sans-serif;
-      font-size: 13px;
-      color: var(--text-gray);
-      cursor: pointer;
-      transition: color 0.2s ease, background 0.2s ease;
-    }
-    .btn-tabelona:hover {
-      color: var(--text-white);
-      background: rgba(255,255,255,0.03);
-    }
-    .btn-tabelona .seta {
-      transition: transform 0.3s ease;
-      display: inline-block;
-    }
-    .btn-tabelona.aberto .seta {
-      transform: rotate(180deg);
-    }
-
-    /* Tabela expansível */
-    .tabelona-expansivel {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease;
-      border-top: 0px solid var(--borda-divisoria);
-    }
-    .tabelona-expansivel.aberto {
-      max-height: 600px;
-      border-top: 1px dashed var(--borda-divisoria);
-    }
-    .tabelona-expansivel-inner {
-      padding: 16px 20px 20px;
-    }
-
-    /* Link "ver página completa" */
-    .link-pagina-completa {
-      display: block;
-      text-align: center;
-      margin-top: 14px;
-      font-family: 'Russo One', sans-serif;
-      font-size: 12px;
-      color: var(--accent-cyan);
-      text-decoration: none;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid var(--accent-cyan);
-      transition: background 0.2s ease;
-    }
-    .link-pagina-completa:hover {
-      background: rgba(122, 30, 58, 0.15);
-    }
-
-    /* Item do ranking dentro da tabelona */
-    .rank-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 6px;
-      border-radius: 8px;
-      transition: background 0.15s ease;
-      font-family: 'Russo One', sans-serif;
-      font-size: 13px;
-    }
-    .rank-item:hover { background: var(--bg-dark); }
-    .rank-item.rank-eu { background: rgba(122,30,58,0.1); border: 1px solid var(--accent-cyan); }
-    .quadrado { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-    .verde   { background: var(--accent-green); }
-    .amarelo { background: #eab308; }
-    .laranja { background: #f97316; }
-    .vermelho{ background: var(--vermelho); }
-  </style>
-  <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
+  <meta name="description" content="Palpitoo — A Resenha Virou Campeonato.">
   <link rel="icon" href="./img/pato.png" type="image/png">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    .card-liga { width:100%; background:var(--card-dark); border:1px solid var(--borda-divisoria); border-radius:20px; overflow:hidden; transition:border-color .3s,box-shadow .3s; }
+    .card-liga:hover { border-color:var(--accent-cyan); box-shadow:0 8px 30px rgba(122,30,58,.15); }
+    .card-liga-header { padding:20px 24px; cursor:pointer; text-align:center; }
+    .card-liga-titulo { font-family:'Russo One',sans-serif; color:var(--accent-cyan); font-size:17px; letter-spacing:1px; text-shadow:0 0 12px rgba(122,30,58,.4); }
+    .card-liga-subtitulo { font-family:'Russo One',sans-serif; color:var(--text-white); font-size:13px; margin-top:4px; opacity:.7; }
+    .card-liga-divisor { width:100%; height:1px; background-image:linear-gradient(to right,var(--borda-divisoria) 50%,transparent 50%); background-size:15px 1px; background-repeat:repeat-x; }
+    .card-liga-status { display:inline-block; background:var(--bg-dark); border:1px solid var(--borda-divisoria); border-radius:20px; padding:8px 22px; font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-white); margin:14px 0; }
+    .btn-tabelona { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:12px 24px; background:none; border:none; border-top:1px dashed var(--borda-divisoria); font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-gray); cursor:pointer; transition:color .2s,background .2s; }
+    .btn-tabelona:hover { color:var(--text-white); background:rgba(255,255,255,.03); }
+    .btn-tabelona .seta { transition:transform .3s; display:inline-block; }
+    .btn-tabelona.aberto .seta { transform:rotate(180deg); }
+    .tabelona-expansivel { max-height:0; overflow:hidden; transition:max-height .4s; }
+    .tabelona-expansivel.aberto { max-height:600px; border-top:1px dashed var(--borda-divisoria); }
+    .tabelona-expansivel-inner { padding:16px 20px 20px; }
+    .link-pagina-completa { display:block; text-align:center; margin-top:14px; font-family:'Russo One',sans-serif; font-size:12px; color:var(--accent-cyan); text-decoration:none; padding:8px; border-radius:8px; border:1px solid var(--accent-cyan); transition:background .2s; }
+    .link-pagina-completa:hover { background:rgba(122,30,58,.15); }
+    .rank-item { display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:8px; transition:background .15s; font-family:'Russo One',sans-serif; font-size:13px; }
+    .rank-item:hover { background:var(--bg-dark); }
+    .rank-item.rank-eu { background:rgba(122,30,58,.1); border:1px solid var(--accent-cyan); }
+    .quadrado { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
+    .verde{background:var(--accent-green);} .amarelo{background:#eab308;} .laranja{background:#f97316;} .vermelho{background:var(--vermelho);}
+
+    /* FEED */
+    .coluna-feed { display:flex; flex-direction:column; gap:14px; min-width:0; }
+    .feed-filtros { display:flex; gap:6px; flex-wrap:wrap; }
+    .filtro-btn { padding:5px 12px; border-radius:20px; font-family:'Russo One',sans-serif; font-size:10px; text-transform:uppercase; border:1px solid var(--borda-divisoria); background:var(--bg-dark); color:var(--text-gray); cursor:pointer; transition:all .2s; white-space:nowrap; }
+    .filtro-btn:hover { border-color:var(--accent-cyan); color:var(--text-white); }
+    .filtro-btn.ativo { background:var(--accent-cyan); color:#fff; border-color:var(--accent-cyan); }
+    .feed-lista { display:flex; flex-direction:column; gap:8px; max-height:480px; overflow-y:auto; padding-right:4px; }
+    .feed-lista::-webkit-scrollbar { width:4px; }
+    .feed-lista::-webkit-scrollbar-thumb { background:var(--borda-divisoria); border-radius:2px; }
+    .feed-item { display:flex; gap:12px; padding:13px 14px; background:var(--bg-dark); border-radius:12px; border:1px solid var(--borda-divisoria); transition:border-color .2s; animation:fadeSlide .35s ease forwards; opacity:0; }
+    .feed-item:hover { border-color:var(--accent-cyan); }
+    @keyframes fadeSlide { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .feed-item.tipo-pessoal{border-left:3px solid var(--accent-cyan);}
+    .feed-item.tipo-liga{border-left:3px solid var(--accent-green);}
+    .feed-item.tipo-sistema{border-left:3px solid #eab308;}
+    .feed-item.tipo-pato{border-left:3px solid var(--accent-cyan);background:rgba(122,30,58,.06);}
+    .feed-icone { font-size:18px; width:36px; height:36px; flex-shrink:0; background:var(--bg-header); border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--borda-divisoria); }
+    .feed-corpo { flex-grow:1; min-width:0; }
+    .feed-titulo { font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-white); margin-bottom:3px; }
+    .feed-descricao { font-size:11px; color:var(--text-gray); line-height:1.45; }
+    .feed-tempo { font-size:9px; color:var(--text-gray); margin-top:5px; text-transform:uppercase; font-weight:700; letter-spacing:1px; }
+    .badge-tipo { font-family:'Russo One',sans-serif; font-size:8px; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:1px; display:inline-block; margin-bottom:3px; }
+    .badge-pessoal{background:rgba(122,30,58,.2);color:var(--accent-cyan);border:1px solid var(--accent-cyan);}
+    .badge-liga{background:rgba(46,125,50,.2);color:#4ade80;border:1px solid #4ade80;}
+    .badge-sistema{background:rgba(234,179,8,.15);color:#eab308;border:1px solid #eab308;}
+    .badge-pato{background:rgba(122,30,58,.2);color:var(--accent-cyan);border:1px solid var(--accent-cyan);}
+    .regra-linha { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed var(--borda-divisoria); }
+    .regra-linha:last-child { border-bottom:none; }
+
+    @media(max-width:1100px){ .dashboard-layout{grid-template-columns:260px 1fr!important;} .coluna-feed{display:none;} }
+    @media(max-width:768px){ .dashboard-layout{grid-template-columns:1fr!important;} }
+  </style>
 </head>
 <body>
 
   <header class="navbar">
-    <a href="inicio.html" class="logo-link">
-      <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
-    </a>
+    <a href="inicio.html" class="logo-link"><img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem"></a>
     <nav>
       <ul class="nav-links">
         <li><a href="index.html" class="ativo">Início</a></li>
         <li><a href="ligas.html">Ligas</a></li>
         <li><a href="palpites.html">Palpites</a></li>
-        <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
         <li><a href="carreira.html">Carreira</a></li>
       </ul>
     </nav>
-    <button class="hamburger" id="hamburger-btn" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="hamburger" id="hamburger-btn" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="navbar-user" id="navbar-user-area"></div>
   </header>
 
-  <main class="container-principal dashboard-layout">
+  <main class="container-principal dashboard-layout" style="grid-template-columns:270px 1fr 300px;gap:24px;">
 
-    <!-- ══════════════ SIDEBAR ESQUERDA ══════════════ -->
+    <!-- SIDEBAR ESQUERDA -->
     <aside class="cartao bg-claro cartao-perfil animacao-suave">
-
       <div class="perfil-topo" style="display:flex;flex-direction:column;align-items:center;">
-        <img src="https://ui-avatars.com/api/?name=?https://via.placeholder.com/80background=7A1E3Ahttps://via.placeholder.com/80color=fffhttps://via.placeholder.com/80size=80" alt="Foto" id="fotoPerfil"
-             class="foto-perfil" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
-        <h2 class="font-russo titulo-azul" id="textoNome">Carregando...</h2>
-        <p class="font-russo text-gray-600 mt-5" style="font-size:0.9em;">
-          Time: <span id="textoTime" style="color:var(--accent-cyan);">Nenhum</span>
-        </p>
+        <img src="https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=80" alt="Foto" id="fotoPerfil" class="foto-perfil" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
+        <h2 class="font-russo titulo-azul mt-10" id="textoNome">Carregando...</h2>
+        <p class="font-russo mt-5" style="font-size:.85em;color:var(--text-gray);">⚽ <span id="textoTime" style="color:var(--accent-cyan);">Nenhum</span></p>
       </div>
-
       <hr class="linha-divisoria mt-15 mb-15">
-
       <h3 class="font-russo titulo-azul">Desempenho na temporada</h3>
       <ul class="lista-desempenho mt-10">
-        <li>
-          <span class="icone">🎯</span>
-          <strong id="stat-cravadas">0</strong>
-          <span style="font-size:0.7em;color:gray;margin-left:5px;">Cravações (3pts)</span>
-        </li>
-        <li>
-          <span class="icone">✔️</span>
-          <strong id="stat-acertos">0</strong>
-          <span style="font-size:0.7em;color:gray;margin-left:5px;">Acertos (1pt)</span>
-        </li>
-        <li>
-          <span class="icone">✖️</span>
-          <strong id="stat-erros">0</strong>
-          <span style="font-size:0.7em;color:gray;margin-left:5px;">Erros (0pt)</span>
-        </li>
+        <li><span class="icone">🎯</span><strong id="stat-cravadas">0</strong><span style="font-size:.7em;color:gray;margin-left:5px;">Cravações (3pts)</span></li>
+        <li><span class="icone">✔️</span><strong id="stat-acertos">0</strong><span style="font-size:.7em;color:gray;margin-left:5px;">Acertos (1pt)</span></li>
+        <li><span class="icone">✖️</span><strong id="stat-erros">0</strong><span style="font-size:.7em;color:gray;margin-left:5px;">Erros (0pt)</span></li>
       </ul>
-
       <h3 class="font-russo titulo-azul mt-20">Aproveitamento</h3>
       <div class="aproveitamento-box mt-10">
         <span class="icone-grande" id="icone-aproveitamento">⏳</span>
         <p><strong id="texto-aproveitamento">Calculando...<br>--% de acerto</strong></p>
       </div>
-
       <hr class="linha-divisoria final-linha">
-
       <a href="carreira.html" class="perfil-rodape font-russo" style="text-decoration:none;display:flex;">
-        <span class="icone">⚙️</span>
-        <span class="texto-hover">Alterar Perfil</span>
+        <span class="icone">⚙️</span><span class="texto-hover">Alterar Perfil</span>
       </a>
-
     </aside>
 
-    <!-- ══════════════ COLUNA CENTRAL ══════════════ -->
-    <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:20px;">
+    <!-- COLUNA CENTRAL -->
+    <div style="display:flex;flex-direction:column;gap:20px;min-width:0;">
 
-      <!-- ── CARD: GLOBAL LEAGUE ── -->
+      <!-- LIGA GLOBAL -->
       <div class="card-liga">
-
         <div class="card-liga-header">
           <div class="card-liga-divisor" style="margin-bottom:14px;"></div>
-          <p class="card-liga-titulo">⚜️ GLOBAL - LEAGUE ⚜️</p>
-          <p class="card-liga-subtitulo">- (RANKING GERAL) -</p>
+          <p class="card-liga-titulo">🌐 LIGA GLOBAL</p>
+          <p class="card-liga-subtitulo">- TODO MUNDO PARTICIPA -</p>
           <div class="card-liga-divisor" style="margin-top:14px;margin-bottom:10px;"></div>
-          <span class="card-liga-status" id="status-global">👑 Status: TOP 8 CRAQUES</span>
+          <span class="card-liga-status" id="status-global">👑 Carregando posição...</span>
           <div class="card-liga-divisor" style="margin-top:10px;"></div>
         </div>
-
         <button class="btn-tabelona" id="btn-global" onclick="toggleTabelona('global')">
-          <span class="seta">⬇️</span> Tabelona <span class="seta">⬇️</span>
+          <span class="seta">⬇️</span> Ver Ranking Global <span class="seta">⬇️</span>
         </button>
-
         <div class="tabelona-expansivel" id="tabela-global">
           <div class="tabelona-expansivel-inner">
-            <ul id="lista-global" style="list-style:none;padding:0;">
-              <li class="rank-item" style="justify-content:center;color:var(--text-gray);">
-                Carregando... 🔄
-              </li>
-            </ul>
-            <a href="ligas.html" class="link-pagina-completa">
-              Ver Tabela Completa →
-            </a>
+            <ul id="lista-global" style="list-style:none;padding:0;"><li class="rank-item" style="justify-content:center;color:var(--text-gray);">Carregando... 🔄</li></ul>
+            <a href="ligas.html" class="link-pagina-completa">Ver Tabela Completa →</a>
           </div>
         </div>
-
       </div>
 
-      <!-- ── CARD: MINHA LIGA ── -->
+      <!-- MINHA LIGA PRIVADA -->
       <div class="card-liga">
-
         <div class="card-liga-header">
           <div class="card-liga-divisor" style="margin-bottom:14px;"></div>
           <p class="card-liga-titulo" id="titulo-minha-liga">⚜️ MINHA LIGA ⚜️</p>
           <p class="card-liga-subtitulo">- (RANKING PRIVADO) -</p>
           <div class="card-liga-divisor" style="margin-top:14px;margin-bottom:10px;"></div>
-          <span class="card-liga-status" id="status-minha-liga">🔥 Status: TOP 8 DA LIGA</span>
+          <span class="card-liga-status" id="status-minha-liga">🔥 Carregando...</span>
           <div class="card-liga-divisor" style="margin-top:10px;"></div>
         </div>
-
         <button class="btn-tabelona" id="btn-minha-liga" onclick="toggleTabelona('minha-liga')">
           <span class="seta">⬇️</span> Tabelona da Liga <span class="seta">⬇️</span>
         </button>
-
         <div class="tabelona-expansivel" id="tabela-minha-liga">
           <div class="tabelona-expansivel-inner">
-            <ul id="lista-minha-liga" style="list-style:none;padding:0;">
-              <li class="rank-item" style="justify-content:center;color:var(--text-gray);">
-                Procurando sua liga secreta... 🕵️‍♂️
-              </li>
-            </ul>
-            <a href="minhaliga.html" class="link-pagina-completa" id="link-minha-liga">
-              Ver Página da Liga →
-            </a>
+            <ul id="lista-minha-liga" style="list-style:none;padding:0;"><li class="rank-item" style="justify-content:center;color:var(--text-gray);">Procurando sua liga... 🕵️‍♂️</li></ul>
+            <a href="minhaliga.html" class="link-pagina-completa" id="link-minha-liga">Ver Página da Liga →</a>
           </div>
         </div>
-
       </div>
 
     </div>
-    <!-- fim coluna central -->
 
-    <aside class="coluna-destaques"></aside>
+    <!-- COLUNA DIREITA: FEED -->
+    <aside class="coluna-feed">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <h3 class="font-russo" style="font-size:15px;color:var(--text-white);">📰 Novidades</h3>
+        <div class="feed-filtros">
+          <button class="filtro-btn ativo" onclick="filtrar('todos',this)">Todos</button>
+          <button class="filtro-btn" onclick="filtrar('pessoal',this)">👤</button>
+          <button class="filtro-btn" onclick="filtrar('liga',this)">⚔️</button>
+          <button class="filtro-btn" onclick="filtrar('pato',this)">🦆</button>
+        </div>
+      </div>
+
+      <div class="feed-lista" id="feed-container">
+        <p class="font-russo" style="color:var(--text-gray);font-size:12px;text-align:center;padding:20px 0;">Carregando... 🔄</p>
+      </div>
+
+      <div class="cartao bg-escuro" style="padding:18px;border-top:2px solid var(--accent-cyan);">
+        <h4 class="font-russo mb-10" style="font-size:14px;color:var(--text-white);">⚖️ Pontuação</h4>
+        <div class="regra-linha"><span style="font-size:12px;color:var(--text-white);">🎯 Placar exato</span><span class="font-russo" style="color:var(--accent-cyan);font-size:13px;">+3 PTS</span></div>
+        <div class="regra-linha"><span style="font-size:12px;color:var(--text-white);">✅ Acertar vencedor</span><span class="font-russo" style="color:var(--accent-green);font-size:13px;">+1 PT</span></div>
+        <div class="regra-linha"><span style="font-size:12px;color:var(--text-gray);">❌ Errar tudo</span><span class="font-russo" style="color:var(--vermelho);font-size:13px;">0 PTS</span></div>
+      </div>
+
+    </aside>
 
   </main>
 
   <div id="container-avisos"></div>
 
 <script>
-  // ── DADOS DO USUÁRIO ──────────────────────────────────────
-  const nomeLogado = localStorage.getItem('nome_craque');
+  const nomeLogado = localStorage.getItem('nome_craque') || 'Craque';
   const timeLogado = localStorage.getItem('time_craque');
   const fotoLogada = localStorage.getItem('foto_craque');
   const idLogado   = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
 
-  if (nomeLogado) {
+  if (nomeLogado && nomeLogado !== 'Craque') {
     document.getElementById('textoNome').innerText = nomeLogado;
-    if (timeLogado && timeLogado !== 'undefined') {
-      document.getElementById('textoTime').innerText = timeLogado;
-    }
+    if (timeLogado && timeLogado !== 'undefined') document.getElementById('textoTime').innerText = timeLogado;
   }
-  if (fotoLogada && fotoLogada !== 'undefined' && fotoLogada !== 'null') {
-    document.getElementById('fotoPerfil').src = fotoLogada;
-  }
+  if (fotoLogada && fotoLogada !== 'undefined' && fotoLogada !== 'null') document.getElementById('fotoPerfil').src = fotoLogada;
 
-  // ── TOGGLE TABELONA ──────────────────────────────────────
   function toggleTabelona(qual) {
-    const tabela = document.getElementById(`tabela-${qual}`);
-    const btn    = document.getElementById(`btn-${qual}`);
-    const aberto = tabela.classList.contains('aberto');
-
-    tabela.classList.toggle('aberto', !aberto);
-    btn.classList.toggle('aberto', !aberto);
-
-    // Muda o emoji da seta quando aberto
-    const setas = btn.querySelectorAll('.seta');
-    setas.forEach(s => s.innerText = aberto ? '⬇️' : '⬆️');
+    const tabela=document.getElementById(`tabela-${qual}`), btn=document.getElementById(`btn-${qual}`);
+    const aberto=tabela.classList.contains('aberto');
+    tabela.classList.toggle('aberto',!aberto); btn.classList.toggle('aberto',!aberto);
+    btn.querySelectorAll('.seta').forEach(s=>s.innerText=aberto?'⬇️':'⬆️');
   }
 
-  // ── DESEMPENHO ────────────────────────────────────────────
   async function calcularDesempenho() {
     if (!idLogado) return;
     try {
-      const resposta = await fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`);
-      const palpites = await resposta.json();
-
-      let cravadas = 0, acertos = 0, erros = 0, finalizados = 0;
-
-      palpites.forEach(p => {
-        if (p.pontos_obtidos !== null) {
-          finalizados++;
-          if (p.pontos_obtidos === 3) cravadas++;
-          else if (p.pontos_obtidos === 1) acertos++;
-          else erros++;
-        }
-      });
-
-      document.getElementById('stat-cravadas').innerText = cravadas;
-      document.getElementById('stat-acertos').innerText  = acertos;
-      document.getElementById('stat-erros').innerText    = erros;
-
-      if (finalizados > 0) {
-        const taxa = Math.round(((cravadas + acertos) / finalizados) * 100);
-        let icone = '👍', frase = 'Bom jogador,';
-        if (taxa >= 70) { icone = '🔥'; frase = 'Tá voando!,'; }
-        else if (taxa < 40) { icone = '🦆'; frase = 'Pato master,'; }
-        document.getElementById('icone-aproveitamento').innerText = icone;
-        document.getElementById('texto-aproveitamento').innerHTML = `${frase}<br>${taxa}% de acerto`;
+      const palpites=await fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`).then(r=>r.json());
+      let cravadas=0,acertos=0,erros=0,fin=0;
+      palpites.forEach(p=>{if(p.pontos_obtidos!==null){fin++;if(p.pontos_obtidos===3)cravadas++;else if(p.pontos_obtidos===1)acertos++;else erros++;}});
+      document.getElementById('stat-cravadas').innerText=cravadas;
+      document.getElementById('stat-acertos').innerText=acertos;
+      document.getElementById('stat-erros').innerText=erros;
+      if(fin>0){
+        const taxa=Math.round(((cravadas+acertos)/fin)*100);
+        let icone='👍',frase='Bom jogador,';
+        if(taxa>=70){icone='🔥';frase='Tá voando!,';}else if(taxa<40){icone='🦆';frase='Pato master,';}
+        document.getElementById('icone-aproveitamento').innerText=icone;
+        document.getElementById('texto-aproveitamento').innerHTML=`${frase}<br>${taxa}% de acerto`;
       } else {
-        document.getElementById('icone-aproveitamento').innerText = '⚽';
-        document.getElementById('texto-aproveitamento').innerHTML = 'Sem jogos<br>encerrados ainda';
+        document.getElementById('icone-aproveitamento').innerText='⚽';
+        document.getElementById('texto-aproveitamento').innerHTML='Sem jogos<br>encerrados ainda';
       }
-    } catch (e) {
-      document.getElementById('texto-aproveitamento').innerHTML = 'Erro de conexão';
-    }
+    } catch(e){document.getElementById('texto-aproveitamento').innerHTML='Erro de conexão';}
   }
 
-  // ── RANKING GLOBAL ────────────────────────────────────────
   async function carregarRankingGlobal() {
     try {
-      const res      = await fetch('https://palpitoo-api.onrender.com/ranking');
-      const jogadores = await res.json();
-      const ul       = document.getElementById('lista-global');
-      ul.innerHTML   = '';
-
-      if (!jogadores.length) {
-        ul.innerHTML = '<li class="rank-item" style="justify-content:center;color:var(--text-gray);">Nenhum palpite computado ainda. 🦆</li>';
-        return;
-      }
-
-      const cores = ['verde','verde','verde','amarelo','amarelo','laranja','vermelho','vermelho'];
-      jogadores.slice(0, 8).forEach((j, i) => {
-        const ehEu = String(j.id) === String(idLogado);
-        const nome = j.nome.split(' ')[0].toUpperCase();
-        ul.innerHTML += `
-          <li class="rank-item ${ehEu ? 'rank-eu' : ''}">
-            <span class="quadrado ${cores[i] || 'vermelho'}"></span>
-            <span style="color:var(--text-gray);min-width:24px;">${i+1}º</span>
-            <span style="flex-grow:1;color:${ehEu ? 'var(--accent-cyan)' : 'var(--text-white)'};">${nome} ${ehEu ? '(você)' : ''}</span>
-            <span style="color:var(--accent-cyan);">${j.total_pontos} pts</span>
-          </li>`;
+      const jogadores=await fetch('https://palpitoo-api.onrender.com/ranking').then(r=>r.json());
+      const ul=document.getElementById('lista-global'); ul.innerHTML='';
+      if(!jogadores.length){ul.innerHTML='<li class="rank-item" style="justify-content:center;color:var(--text-gray);">Nenhum palpite ainda. 🦆</li>';return;}
+      const cores=['verde','verde','verde','amarelo','amarelo','laranja','vermelho','vermelho'];
+      jogadores.slice(0,8).forEach((j,i)=>{
+        const ehEu=String(j.id)===String(idLogado), nome=j.nome.split(' ')[0].toUpperCase();
+        ul.innerHTML+=`<li class="rank-item ${ehEu?'rank-eu':''}"><span class="quadrado ${cores[i]||'vermelho'}"></span><span style="color:var(--text-gray);min-width:22px;">${i+1}º</span><span style="flex-grow:1;color:${ehEu?'var(--accent-cyan)':'var(--text-white)'};">${nome}${ehEu?' (você)':''}</span><span style="color:var(--accent-cyan);">${j.total_pontos}pts</span></li>`;
       });
-
-      // Atualiza o status com a posição do usuário
-      if (idLogado) {
-        const pos = jogadores.findIndex(j => String(j.id) === String(idLogado));
-        if (pos !== -1) {
-          document.getElementById('status-global').innerText = `👑 Status: ${pos + 1}º LUGAR GERAL`;
-        }
-      }
-    } catch (e) {
-      document.getElementById('lista-global').innerHTML =
-        '<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao conectar com a CBF.</li>';
-    }
+      if(idLogado){const pos=jogadores.findIndex(j=>String(j.id)===String(idLogado));document.getElementById('status-global').innerText=pos!==-1?`👑 Você está em ${pos+1}º lugar`:'👑 Status: Global League';}
+    } catch(e){document.getElementById('lista-global').innerHTML='<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao conectar.</li>';}
   }
 
-  // ── RANKING MINHA LIGA ────────────────────────────────────
   async function carregarRankingMinhaLiga() {
-    if (!idLogado) return;
+    if(!idLogado){document.getElementById('titulo-minha-liga').innerText='⚜️ SEM LIGA ⚜️';document.getElementById('status-minha-liga').innerText='🦆 Faça login';return;}
     try {
-      const resLigas = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`);
-      const ligas    = await resLigas.json();
-      const ul       = document.getElementById('lista-minha-liga');
-
-      if (!ligas.length) {
-        ul.innerHTML = `
-          <li class="rank-item" style="justify-content:center;flex-direction:column;gap:8px;text-align:center;color:var(--text-gray);">
-            Você não está em nenhuma liga ainda. 🦆
-            <a href="minhaliga.html" style="color:var(--accent-cyan);font-size:12px;text-decoration:underline;">Criar ou entrar em uma</a>
-          </li>`;
-        document.getElementById('titulo-minha-liga').innerText = '⚜️ SEM LIGA ⚜️';
-        document.getElementById('status-minha-liga').innerText = '🦆 Sem Liga';
+      const ligas=await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`).then(r=>r.json());
+      const ul=document.getElementById('lista-minha-liga');
+      if(!ligas.length){
+        ul.innerHTML=`<li class="rank-item" style="justify-content:center;flex-direction:column;gap:8px;text-align:center;color:var(--text-gray);">Você não está em nenhuma liga ainda. 🦆<a href="ligas.html" style="color:var(--accent-cyan);font-size:12px;text-decoration:underline;">Criar ou entrar em uma</a></li>`;
+        document.getElementById('titulo-minha-liga').innerText='⚜️ SEM LIGA ⚜️';
+        document.getElementById('status-minha-liga').innerText='🦆 Sem Liga Privada';
         return;
       }
-
-      const idLiga    = ligas[0].id_liga;
-      const resRanking = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`);
-      const dadosLiga  = await resRanking.json();
-
-      document.getElementById('titulo-minha-liga').innerText = `⚜️ ${dadosLiga.nomeLiga.toUpperCase()} ⚜️`;
-      document.getElementById('link-minha-liga').href = `minhaliga.html?id=${idLiga}`;
-      ul.innerHTML = '';
-
-      if (!dadosLiga.ranking.length) {
-        ul.innerHTML = '<li class="rank-item" style="justify-content:center;color:var(--text-gray);">Ninguém pontuou ainda.</li>';
-        return;
-      }
-
-      const cores = ['verde','verde','verde','amarelo','amarelo','laranja','vermelho','vermelho'];
-      dadosLiga.ranking.slice(0, 8).forEach((j, i) => {
-        const ehEu = String(j.id) === String(idLogado);
-        const nome = j.nome.split(' ')[0].toUpperCase();
-        ul.innerHTML += `
-          <li class="rank-item ${ehEu ? 'rank-eu' : ''}">
-            <span class="quadrado ${cores[i] || 'vermelho'}"></span>
-            <span style="color:var(--text-gray);min-width:24px;">${i+1}º</span>
-            <span style="flex-grow:1;color:${ehEu ? 'var(--accent-cyan)' : 'var(--text-white)'};">${nome} ${ehEu ? '(você)' : ''}</span>
-            <span style="color:var(--accent-cyan);">${j.total_pontos} pts</span>
-          </li>`;
+      const idLiga=ligas[0].id_liga;
+      const dados=await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`).then(r=>r.json());
+      document.getElementById('titulo-minha-liga').innerText=`⚜️ ${dados.nomeLiga.toUpperCase()} ⚜️`;
+      document.getElementById('link-minha-liga').href=`minhaliga.html?id=${idLiga}`;
+      ul.innerHTML='';
+      if(!dados.ranking.length){ul.innerHTML='<li class="rank-item" style="justify-content:center;color:var(--text-gray);">Ninguém pontuou ainda.</li>';return;}
+      const cores=['verde','verde','verde','amarelo','amarelo','laranja','vermelho','vermelho'];
+      dados.ranking.slice(0,8).forEach((j,i)=>{
+        const ehEu=String(j.id)===String(idLogado), nome=j.nome.split(' ')[0].toUpperCase();
+        ul.innerHTML+=`<li class="rank-item ${ehEu?'rank-eu':''}"><span class="quadrado ${cores[i]||'vermelho'}"></span><span style="color:var(--text-gray);min-width:22px;">${i+1}º</span><span style="flex-grow:1;color:${ehEu?'var(--accent-cyan)':'var(--text-white)'};">${nome}${ehEu?' (você)':''}</span><span style="color:var(--accent-cyan);">${j.total_pontos}pts</span></li>`;
       });
+      const pos=dados.ranking.findIndex(j=>String(j.id)===String(idLogado));
+      document.getElementById('status-minha-liga').innerText=pos!==-1?`🔥 Você está em ${pos+1}º da liga`:'🔥 Liga Privada';
+    } catch(e){document.getElementById('lista-minha-liga').innerHTML='<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao buscar liga.</li>';}
+  }
 
-      // Atualiza status com posição na liga
-      const pos = dadosLiga.ranking.findIndex(j => String(j.id) === String(idLogado));
-      if (pos !== -1) {
-        document.getElementById('status-minha-liga').innerText = `🔥 Status: ${pos + 1}º DA LIGA`;
-      }
+  // FEED
+  let filtroAtivo='todos', todosFeedItens=[];
+  const nome1=nomeLogado.split(' ')[0];
 
-    } catch (e) {
-      document.getElementById('lista-minha-liga').innerHTML =
-        '<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao buscar sua liga.</li>';
+  function gerarDecretosPato(palpites,ranking){
+    const decretos=[], fin=palpites.filter(p=>p.pontos_obtidos!==null);
+    if(fin.length>0){
+      const cr=fin.filter(p=>p.pontos_obtidos===3).length, taxa=Math.round((cr/fin.length)*100);
+      if(taxa>=50) decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato aprova!',descricao:`"${nome1}, ${taxa}% de cravações?! Quase me envergonhando na frente da galera!"`,tempo:'Agora'});
+      else if(taxa===0) decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato está desapontado',descricao:`"${nome1}... zero cravações. ZERO. Bagre confirmado."`,tempo:'Agora'});
+      else decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato observa...',descricao:`"Olho em você, ${nome1}. Apenas ${taxa}% de cravações. Mais esforço!"`,tempo:'Agora'});
+    } else {
+      decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato convoca!',descricao:`"${nome1}! Nenhum jogo encerrado. Vai logo palpitar!"`,tempo:'Agora'});
+    }
+    if(ranking&&ranking.length){
+      const pos=ranking.findIndex(r=>String(r.id)===String(idLogado));
+      if(pos===0) decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'Decreto de Liderança!',descricao:`"ATENÇÃO: ${nome1} lidera o ranking. Tá bom... por agora."`,tempo:'Agora'});
+      else if(pos>=0&&pos<=2) decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'Você está no pódio!',descricao:`"${nome1} no top 3! Falta pouco pra chegar onde o Pato manda."`,tempo:'Agora'});
+    }
+    return decretos;
+  }
+
+  function gerarFeedPessoal(palpites,ranking){
+    const itens=[], fin=palpites.filter(p=>p.pontos_obtidos!==null);
+    if(fin.length>0){
+      const total=fin.reduce((s,p)=>s+p.pontos_obtidos,0), cr=fin.filter(p=>p.pontos_obtidos===3).length, er=fin.filter(p=>p.pontos_obtidos===0).length;
+      if(cr>0) itens.push({tipo:'pessoal',icone:'🎯',badge:'Pessoal',titulo:`${cr} cravação${cr>1?'ões':''}!`,descricao:`Placar exato em ${cr} jogo${cr>1?'s':''}. Cada um vale 3 pts!`,tempo:'Esta temporada'});
+      itens.push({tipo:'pessoal',icone:'📊',badge:'Pessoal',titulo:`${total} pontos acumulados`,descricao:`${fin.length} jogo${fin.length>1?'s':''} encerrado${fin.length>1?'s':''}. ${er>0?`${er} erro${er>1?'s':''} 🤫`:'Sem erros!'}`,tempo:'Esta temporada'});
+      if(ranking&&ranking.length){const pos=ranking.findIndex(r=>String(r.id)===String(idLogado));if(pos!==-1)itens.push({tipo:'pessoal',icone:pos<3?['🥇','🥈','🥉'][pos]:'📍',badge:'Pessoal',titulo:`Você está em ${pos+1}º lugar`,descricao:pos===0?'Lidera o ranking! Não relaxe.':pos<=2?'Você está no pódio!':'Hora de pressionar!',tempo:'Agora'});}
+    } else {
+      itens.push({tipo:'pessoal',icone:'⚽',badge:'Pessoal',titulo:'Nenhum jogo encerrado ainda',descricao:'Seus palpites aguardam resultados. Assim que fecharem, sua pontuação aparece aqui.',tempo:'Agora'});
+    }
+    return itens;
+  }
+
+  function gerarFeedLiga(jogos,ligaAtual){
+    const itens=[], fin=jogos.filter(j=>j.status==='finalizado'), ao=jogos.filter(j=>j.status==='em andamento');
+    const rod={}; fin.forEach(j=>{const r=j.rodada||1;if(!rod[r])rod[r]=[];rod[r].push(j);});
+    Object.keys(rod).sort((a,b)=>b-a).forEach(r=>{const jr=rod[r];itens.push({tipo:'liga',icone:'🏁',badge:'Liga',titulo:`Rodada ${r} encerrada!`,descricao:`${jr.map(j=>`${j.time_casa} ${j.gols_casa_real}x${j.gols_fora_real} ${j.time_fora}`).join(' • ')}`,tempo:`Rodada ${r}`});});
+    if(ao.length) itens.push({tipo:'liga',icone:'⚡',badge:'Liga',titulo:`Rodada ${ao[0].rodada||'?'} ao vivo`,descricao:`${ao.map(j=>`${j.time_casa} x ${j.time_fora}`).join(' • ')}`,tempo:'Agora'});
+    if(ligaAtual) itens.push({tipo:'liga',icone:'⚔️',badge:'Liga',titulo:`Sua liga: ${ligaAtual}`,descricao:'Acesse a página da sua liga para ver o ranking e os palpites da galera.',tempo:'Esta temporada'});
+    return itens;
+  }
+
+  function gerarFeedSistema(){
+    return [
+      {tipo:'sistema',icone:'🆕',badge:'Sistema',titulo:'Perfil Público disponível!',descricao:'Visite o perfil de qualquer palpiteiro pelo Social.',tempo:'Novidade'},
+      {tipo:'sistema',icone:'⏰',badge:'Sistema',titulo:'Prazos automáticos de rodada',descricao:'O mercado fecha sozinho quando o prazo do admin chega. Sem choro!',tempo:'Novidade'},
+      {tipo:'sistema',icone:'🔒',badge:'Sistema',titulo:'Rodada ao Vivo',descricao:'Quando qualquer jogo começa, todos os palpites da rodada são bloqueados.',tempo:'Disponível'}
+    ];
+  }
+
+  function renderizarFeed(itens){
+    const c=document.getElementById('feed-container');
+    const f=filtroAtivo==='todos'?itens:itens.filter(i=>i.tipo===filtroAtivo);
+    if(!f.length){c.innerHTML=`<p class="font-russo" style="color:var(--text-gray);font-size:12px;text-align:center;padding:20px 0;">Nenhuma novidade aqui. 🦆</p>`;return;}
+    c.innerHTML='';
+    f.forEach((item,idx)=>{c.innerHTML+=`<div class="feed-item tipo-${item.tipo}" style="animation-delay:${idx*.05}s;"><div class="feed-icone">${item.icone}</div><div class="feed-corpo"><span class="badge-tipo badge-${item.tipo}">${item.badge}</span><p class="feed-titulo">${item.titulo}</p><p class="feed-descricao">${item.descricao}</p><p class="feed-tempo">🕐 ${item.tempo}</p></div></div>`;});
+  }
+
+  function filtrar(tipo,btn){filtroAtivo=tipo;document.querySelectorAll('.filtro-btn').forEach(b=>b.classList.remove('ativo'));btn.classList.add('ativo');renderizarFeed(todosFeedItens);}
+
+  async function carregarFeed(){
+    try {
+      const [jogos,palpites,ranking]=await Promise.all([
+        fetch('https://palpitoo-api.onrender.com/jogos').then(r=>r.json()),
+        idLogado?fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`).then(r=>r.json()):[],
+        fetch('https://palpitoo-api.onrender.com/ranking').then(r=>r.json())
+      ]);
+      let ligaAtual=null;
+      if(idLogado){try{const dl=await fetch(`https://palpitoo-api.onrender.com/minha-liga/${idLogado}`).then(r=>r.json());if(dl.liga)ligaAtual=dl.liga.nome;}catch(e){}}
+      todosFeedItens=[...(idLogado?gerarDecretosPato(palpites,ranking):[]),...(idLogado?gerarFeedPessoal(palpites,ranking):[]),...gerarFeedLiga(jogos,ligaAtual),...gerarFeedSistema()];
+      renderizarFeed(todosFeedItens);
+    } catch(e){
+      todosFeedItens=[{tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato está dormindo...',descricao:`"Servidor offline. Volta mais tarde!"`,tempo:'Agora'},...gerarFeedSistema()];
+      renderizarFeed(todosFeedItens);
     }
   }
 
-  // ── INICIAR ───────────────────────────────────────────────
+  // NAVBAR
+  (function(){
+    const nome=localStorage.getItem('nome_craque')||'', foto=localStorage.getItem('foto_craque');
+    const ua=document.getElementById('navbar-user-area'); if(!ua) return;
+    if(nome){
+      const init=encodeURIComponent(nome.split(' ')[0]);
+      const src=(foto&&foto!=='null'&&foto!=='undefined')?foto:`https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36`;
+      ua.innerHTML=`<a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36'"></a><button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
+    } else {
+      ua.innerHTML='<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>';
+    }
+  })();
+  function fazerLogout(){localStorage.clear();window.location.href='inicio.html';}
+  document.addEventListener('DOMContentLoaded',function(){const btn=document.getElementById('hamburger-btn'),nav=document.querySelector('.nav-links');if(btn&&nav)btn.addEventListener('click',()=>{btn.classList.toggle('aberto');nav.classList.toggle('aberto');});});
+
   calcularDesempenho();
   carregarRankingGlobal();
   carregarRankingMinhaLiga();
+  carregarFeed();
 </script>
-
-
-  <script>
-    // Navbar: avatar + logout para páginas autenticadas
-    (function() {
-      const nome = localStorage.getItem('nome_craque') || '';
-      const foto = localStorage.getItem('foto_craque');
-      const userArea = document.getElementById('navbar-user-area');
-      if (!userArea) return;
-      if (nome) {
-        const initials = encodeURIComponent(nome.split(' ')[0]);
-        const src = (foto && foto !== 'null' && foto !== 'undefined')
-          ? foto
-          : `https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36`;
-        userArea.innerHTML = `
-          <a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36'"></a>
-          <button class="btn-logout" onclick="fazerLogout()">Sair</button>
-        `;
-      } else {
-        userArea.innerHTML = '<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>';
-      }
-    })();
-
-    function fazerLogout() {
-      localStorage.clear();
-      window.location.href = 'inicio.html';
-    }
-
-    // Hamburger menu
-    document.addEventListener('DOMContentLoaded', function() {
-      const btn = document.getElementById('hamburger-btn');
-      const nav = document.querySelector('.nav-links');
-      if (!btn || !nav) return;
-      btn.addEventListener('click', function() {
-        btn.classList.toggle('aberto');
-        nav.classList.toggle('aberto');
-      });
-    });
-  </script>
-
 </body>
 </html>
