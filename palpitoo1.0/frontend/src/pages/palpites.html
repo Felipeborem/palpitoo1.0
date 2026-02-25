@@ -280,11 +280,47 @@
   }
 
   // 1. CARREGAR E DESENHAR OS JOGOS POR RODADA ──────────────
+  // ── HELPER: MONTA HTML DE UM JOGO ────────────────────────
+  function htmlJogo(jogo) {
+    const finalizado = jogo.status.toLowerCase() === 'finalizado';
+    return `
+      <div class="linha-jogo ${finalizado ? 'finalizado' : ''}">
+        <span class="nome-time time-casa">${jogo.time_casa}</span>
+        <div class="area-placar">
+          <input type="number" id="casa_${jogo.id_jogo}"
+                 class="input-placar font-russo"
+                 placeholder="0" min="0"
+                 ${finalizado ? 'disabled' : ''}>
+          <span class="versus">x</span>
+          <input type="number" id="fora_${jogo.id_jogo}"
+                 class="input-placar font-russo"
+                 placeholder="0" min="0"
+                 ${finalizado ? 'disabled' : ''}>
+        </div>
+        <span class="nome-time time-fora">${jogo.time_fora}</span>
+      </div>
+      ${finalizado ? '<p class="aviso-encerrado">🔒 Palpites encerrados para este jogo</p>' : ''}`;
+  }
+
+  // ── DETECTA RODADA ATUAL ──────────────────────────────────
+  function detectarRodadaAtual(porRodada) {
+    const todasRodadas = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
+    let rodadaAtual = todasRodadas[todasRodadas.length - 1];
+    for (const r of [...todasRodadas].reverse()) {
+      if (porRodada[r].some(j => j.status.toLowerCase() !== 'finalizado')) {
+        rodadaAtual = r;
+        break;
+      }
+    }
+    return rodadaAtual;
+  }
+
+  // 1. CARREGAR E DESENHAR OS JOGOS POR RODADA ──────────────
   async function carregarJogos() {
     try {
-      const resposta    = await fetch('https://palpitoo-api.onrender.com/jogos');
-      jogosCarregados   = await resposta.json();
-      const container   = document.getElementById('container-jogos');
+      const resposta  = await fetch('https://palpitoo-api.onrender.com/jogos');
+      jogosCarregados = await resposta.json();
+      const container = document.getElementById('container-jogos');
       container.innerHTML = '';
 
       if (!jogosCarregados.length) {
@@ -300,36 +336,30 @@
         porRodada[r].push(j);
       });
 
-      for (const rodada in porRodada) {
-        // Título da rodada
+      const todasRodadas   = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
+      const rodadaAtual    = detectarRodadaAtual(porRodada);
+      const rodadasAntes   = todasRodadas.filter(r => r < rodadaAtual);
+
+      // ── RODADA ATUAL ──────────────────────────────────────
+      container.innerHTML += `
+        <div class="titulo-rodada">
+          <span>🏆 Rodada ${rodadaAtual} — Atual</span>
+        </div>`;
+      porRodada[rodadaAtual].forEach(jogo => { container.innerHTML += htmlJogo(jogo); });
+
+      // ── BOTÃO + PAINEL RODADAS ANTERIORES ─────────────────
+      if (rodadasAntes.length > 0) {
         container.innerHTML += `
-          <div class="titulo-rodada">
-            <span>🏆 Rodada ${rodada}</span>
-          </div>`;
-
-        porRodada[rodada].forEach(jogo => {
-          const finalizado = jogo.status.toLowerCase() === 'finalizado';
-
-          container.innerHTML += `
-            <div class="linha-jogo ${finalizado ? 'finalizado' : ''}">
-              <span class="nome-time time-casa">${jogo.time_casa}</span>
-
-              <div class="area-placar">
-                <input type="number" id="casa_${jogo.id_jogo}"
-                       class="input-placar font-russo"
-                       placeholder="0" min="0"
-                       ${finalizado ? 'disabled' : ''}>
-                <span class="versus">x</span>
-                <input type="number" id="fora_${jogo.id_jogo}"
-                       class="input-placar font-russo"
-                       placeholder="0" min="0"
-                       ${finalizado ? 'disabled' : ''}>
-              </div>
-
-              <span class="nome-time time-fora">${jogo.time_fora}</span>
-            </div>
-            ${finalizado ? '<p class="aviso-encerrado">🔒 Palpites encerrados para este jogo</p>' : ''}`;
-        });
+          <div style="text-align:center; margin-top:24px;">
+            <button
+              id="btn-anteriores"
+              onclick="toggleRodadasAnteriores()"
+              class="btn btn-cancelar font-russo"
+              style="font-size:12px; padding:10px 24px; width:100%; border-style:dashed; opacity:0.7;">
+              ⏪ Ver Rodadas Anteriores (${rodadasAntes.length})
+            </button>
+          </div>
+          <div id="rodadas-anteriores" style="display:none; margin-top:8px;"></div>`;
       }
 
       puxarPalpitesSalvos();
@@ -338,6 +368,50 @@
       document.getElementById('container-jogos').innerHTML =
         '<p class="text-center font-russo mt-10" style="color:#f87171;">Erro ao conectar com o servidor.</p>';
     }
+  }
+
+  // ── TOGGLE RODADAS ANTERIORES ─────────────────────────────
+  let anterioresCarregadas = false;
+  function toggleRodadasAnteriores() {
+    const painel = document.getElementById('rodadas-anteriores');
+    const btn    = document.getElementById('btn-anteriores');
+    const aberto = painel.style.display !== 'none';
+
+    if (aberto) {
+      painel.style.display = 'none';
+      const porRodada = {};
+      jogosCarregados.forEach(j => { const r = j.rodada||1; if(!porRodada[r]) porRodada[r]=[]; porRodada[r].push(j); });
+      const total = Object.keys(porRodada).map(Number).filter(r => r < detectarRodadaAtual(porRodada)).length;
+      btn.innerHTML = `⏪ Ver Rodadas Anteriores (${total})`;
+      return;
+    }
+
+    painel.style.display = 'block';
+    btn.innerHTML = '🔼 Ocultar Rodadas Anteriores';
+
+    if (anterioresCarregadas) return;
+    anterioresCarregadas = true;
+
+    const porRodada = {};
+    jogosCarregados.forEach(j => {
+      const r = j.rodada || 1;
+      if (!porRodada[r]) porRodada[r] = [];
+      porRodada[r].push(j);
+    });
+
+    const todasRodadas   = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
+    const rodadaAtual    = detectarRodadaAtual(porRodada);
+    const rodadasAntes   = todasRodadas.filter(r => r < rodadaAtual).reverse(); // mais recente primeiro
+
+    let html = '';
+    rodadasAntes.forEach(rodada => {
+      html += `<div class="titulo-rodada" style="margin-top:20px;"><span>Rodada ${rodada}</span></div>`;
+      porRodada[rodada].forEach(jogo => { html += htmlJogo(jogo); });
+    });
+    painel.innerHTML = html;
+
+    // Repreenche palpites salvos nos novos inputs
+    puxarPalpitesSalvos();
   }
 
   // 2. ENVIAR PALPITES ───────────────────────────────────────

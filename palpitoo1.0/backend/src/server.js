@@ -838,7 +838,47 @@ app.get('/ultimos-palpites/:id', async (req, res) => {
   }
 });
 
-// LIGA O MOTOR! (Sempre deve ficar no final do arquivo)
+// -----------------------------------------------------------------------------
+/// =========================================================================
+// ROTA: ATUALIZAR PERFIL (TIME DO CORAÇÃO)
+// =========================================================================
+app.put('/atualizar-perfil', async (req, res) => {
+  try {
+    const { id, time_favorito } = req.body;
+
+    // 1. Validação básica de segurança
+    if (!id || !time_favorito) {
+      return res.status(400).json({ erro: 'ID do usuário e time favorito são obrigatórios.' });
+    }
+
+    // 2. Comando SQL para atualizar apenas a coluna 'time_favorito' do usuário logado
+    // O "RETURNING *" faz o banco devolver os dados atualizados para confirmarmos
+    const resultado = await pool.query(
+      `UPDATE usuarios 
+       SET time_favorito = $1 
+       WHERE id = $2 
+       RETURNING *`,
+      [time_favorito, id]
+    );
+
+    // 3. Verifica se o usuário realmente existe no banco
+    if (resultado.rowCount === 0) {
+      return res.status(404).json({ erro: 'Usuário não encontrado no banco de dados.' });
+    }
+
+    // 4. Responde de volta para o seu perfil.html
+    res.json({ 
+      mensagem: 'Perfil atualizado com sucesso no banco de dados!', 
+      usuario: resultado.rows[0] 
+    });
+
+  } catch (err) {
+    console.error("Erro ao atualizar perfil:", err);
+    res.status(500).json({ erro: 'Erro interno no servidor ao tentar salvar o time.' });
+  }
+});
+
+//--------------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando bem demais na porta ${PORT}`);

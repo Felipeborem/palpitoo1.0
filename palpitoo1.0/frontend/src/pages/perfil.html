@@ -10,26 +10,325 @@
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="./css/style.css">
+
+  <style>
+    /* ===== MODAL OVERLAY ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.aberto {
+      display: flex;
+    }
+
+    /* ===== MODAL BOX ===== */
+    .modal-clubes {
+      background: var(--card-dark);
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 60px rgba(122, 30, 58, 0.1), 0 24px 48px rgba(0,0,0,0.7);
+      overflow: hidden;
+      animation: modalEntrada 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes modalEntrada {
+      from { opacity: 0; transform: scale(0.92) translateY(16px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Modal header */
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--borda-divisoria);
+      flex-shrink: 0;
+    }
+    .modal-header h3 {
+      font-family: 'Russo One', sans-serif;
+      font-size: 18px;
+      color: var(--text-white);
+      margin: 0 0 14px 0;
+      letter-spacing: 0.5px;
+    }
+    .modal-header h3 span {
+      color: var(--accent-cyan);
+    }
+
+    /* Busca */
+    .busca-clube {
+      position: relative;
+    }
+    .busca-clube input {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 10px;
+      color: var(--text-white);
+      font-size: 14px;
+      padding: 10px 14px 10px 38px;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+      font-family: var(--font-main);
+    }
+    .busca-clube input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(122, 30, 58, 0.15);
+    }
+    .busca-clube input::placeholder { color: var(--text-gray); opacity: 0.5; }
+    .busca-clube .icone-busca {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-gray);
+      font-size: 15px;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    /* Tabs de estado/região */
+    .tabs-regiao {
+      display: flex;
+      gap: 6px;
+      padding: 14px 24px 0;
+      overflow-x: auto;
+      flex-shrink: 0;
+      scrollbar-width: none;
+    }
+    .tabs-regiao::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      background: var(--bg-dark);
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 20px;
+      color: var(--text-gray);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      font-family: 'Russo One', sans-serif;
+      letter-spacing: 0.3px;
+    }
+    .tab-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    .tab-btn.ativo {
+      background: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      color: var(--text-white);
+    }
+
+    /* Lista de clubes */
+    .lista-clubes {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 24px 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--borda-divisoria) transparent;
+    }
+    .lista-clubes::-webkit-scrollbar { width: 4px; }
+    .lista-clubes::-webkit-scrollbar-track { background: transparent; }
+    .lista-clubes::-webkit-scrollbar-thumb { background: var(--borda-divisoria); border-radius: 4px; }
+
+    /* Grupo de estado */
+    .grupo-estado {
+      margin-bottom: 18px;
+    }
+    .grupo-estado-titulo {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--borda-divisoria);
+      opacity: 0.6;
+    }
+    .grupo-estado-clubes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    /* Card de clube */
+    .card-clube {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-dark);
+      border: 1.5px solid var(--borda-divisoria);
+      border-radius: 10px;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-clube::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(122, 30, 58, 0.08), transparent);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .card-clube:hover { border-color: var(--accent-cyan); transform: translateY(-1px); }
+    .card-clube:hover::before { opacity: 1; }
+    .card-clube.selecionado {
+      border-color: var(--accent-cyan);
+      background: #1a0a10;
+      box-shadow: 0 0 14px rgba(122, 30, 58, 0.25);
+    }
+    .card-clube.selecionado::before { opacity: 1; }
+
+    .escudo-clube {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--card-dark);
+      border: 1px solid var(--borda-divisoria);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .nome-clube {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-gray);
+      line-height: 1.2;
+      flex: 1;
+    }
+    .card-clube.selecionado .nome-clube { color: var(--text-white); }
+    .card-clube:hover .nome-clube { color: var(--text-white); }
+
+    .check-selecionado {
+      color: var(--accent-cyan);
+      font-size: 14px;
+      display: none;
+      flex-shrink: 0;
+    }
+    .card-clube.selecionado .check-selecionado { display: block; }
+
+    /* Mensagem vazio */
+    .msg-vazio {
+      text-align: center;
+      color: var(--text-gray);
+      font-size: 13px;
+      padding: 30px 0;
+      opacity: 0.5;
+    }
+
+    /* Modal footer */
+    .modal-footer {
+      padding: 14px 24px 20px;
+      border-top: 1px solid var(--borda-divisoria);
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .btn-cancelar-modal {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--vermelho);
+      border-radius: 10px;
+      color: var(--vermelho);
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      padding: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-cancelar-modal:hover { background: var(--vermelho); color: var(--text-white); }
+    .btn-confirmar-clube {
+      flex: 2;
+      background: var(--accent-cyan);
+      border: none;
+      border-radius: 10px;
+      color: var(--text-white);
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.3px;
+    }
+    .btn-confirmar-clube:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn-confirmar-clube:disabled { opacity: 0.3; cursor: not-allowed; transform: none; filter: none; }
+
+    /* ===== CAMPO TIME (display) ===== */
+    .campo-time-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-dark);
+      border: 1px solid var(--borda-divisoria);
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 44px;
+    }
+    .campo-time-display:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 8px rgba(122, 30, 58, 0.2);
+    }
+    .campo-time-display .escudo-mini {
+      font-size: 20px;
+    }
+    .campo-time-display .nome-time-selecionado {
+      flex: 1;
+      color: var(--text-white);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font-main);
+    }
+    .campo-time-display .placeholder-time {
+      flex: 1;
+      color: var(--text-gray);
+      font-size: 14px;
+      font-family: var(--font-main);
+      opacity: 0.6;
+    }
+    .campo-time-display .seta {
+      color: var(--text-gray);
+      font-size: 11px;
+      transition: color 0.15s;
+      opacity: 0.6;
+    }
+    .campo-time-display:hover .seta { color: var(--accent-cyan); opacity: 1; }
+  </style>
 </head>
 <body>
 
   <header class="navbar">
-    <a href="index.html" style="text-decoration: none; color: inherit;">
-        <div class="logo-container">
-            <div class="logo-icon">P</div>
-            <h1 class="logo-text font-russo">Palpi<span style="color: var(--accent-cyan);">too</span></h1>
-        </div>
-    </a>
+  <a href="index.html" class="logo-link">
+    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+</a>
     
     <nav>
       <ul class="nav-links">
         <li><a href="index.html">Início</a></li> 
         <li><a href="minhaliga.html">Ligas</a></li> 
         <li><a href="palpites.html">Palpites</a></li>
-        <li><a href="#">Novidades</a></li>
+        <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
-        <li><a href="perfil.html" class="ativo">Carreira</a></li>
-        <li><a href="#">Ranking</a></li>
+        <li><a href="carreira.html">Carreira</a></li>
       </ul>
     </nav>
   </header>
@@ -56,7 +355,12 @@
         
         <div class="form-group">
           <label>TIME DO CORAÇÃO</label>
-          <input id="campoTime" type="text" placeholder="Ex: Flamengo, Vasco, São Paulo...">
+          <!-- Display do clube selecionado -->
+          <div class="campo-time-display" onclick="abrirModalClubes()" id="displayTime">
+            <span class="escudo-mini" id="escudoMini">⚽</span>
+            <span class="placeholder-time" id="textoTimeSelecionado">Selecione seu clube...</span>
+            <span class="seta">▼</span>
+          </div>
         </div>
         
         <div class="form-group">
@@ -64,7 +368,7 @@
           <input type="text" placeholder="Deixe seu recado para os rivais...">
         </div>
 
-        <button type="button" class="btn-primary" style="margin-top: 30px;">Salvar Alterações</button>
+        <button type="button" class="btn-primary" style="margin-top: 30px;" onclick="salvarPerfil()">Salvar Alterações</button>
         
         <button type="button" onclick="fazerLogout()" class="btn btn-cancelar font-russo mt-15" style="width: 100%; display: block; text-align: center;">
           Sair da Conta
@@ -75,46 +379,361 @@
 
   </main>
 
-  <script>
-    // Executa assim que a página carrega
-    document.addEventListener('DOMContentLoaded', () => {
-      // 1. Puxa os dados salvos no navegador (LocalStorage)
-      const nome = localStorage.getItem('nome_craque');
-      const email = localStorage.getItem('email_craque');
-      const time = localStorage.getItem('time_craque');
-      const foto = localStorage.getItem('foto_craque');
+  <!-- ===== MODAL DE CLUBES ===== -->
+  <div class="modal-overlay" id="modalClubes">
+    <div class="modal-clubes">
 
-      // 2. Trava de segurança: se não tiver nome, não está logado
-      if (!nome) {
-        window.location.href = 'login.html';
+      <div class="modal-header">
+        <h3>Escolha seu <span>Clube do Coração</span></h3>
+        <div class="busca-clube">
+          <span class="icone-busca">🔍</span>
+          <input type="text" id="buscaClube" placeholder="Buscar clube..." oninput="filtrarClubes(this.value)">
+        </div>
+      </div>
+
+      <div class="tabs-regiao" id="tabsRegiao">
+        <button class="tab-btn ativo" onclick="filtrarPorRegiao('todos', this)">Todos</button>
+        <button class="tab-btn" onclick="filtrarPorRegiao('sudeste', this)">Sudeste</button>
+        <button class="tab-btn" onclick="filtrarPorRegiao('sul', this)">Sul</button>
+        <button class="tab-btn" onclick="filtrarPorRegiao('nordeste', this)">Nordeste</button>
+        <button class="tab-btn" onclick="filtrarPorRegiao('centroeste', this)">Centro-Oeste</button>
+        <button class="tab-btn" onclick="filtrarPorRegiao('norte', this)">Norte</button>
+      </div>
+
+      <div class="lista-clubes" id="listaClubes">
+        <!-- preenchido via JS -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancelar-modal" onclick="fecharModalClubes()">Cancelar</button>
+        <button class="btn-confirmar-clube" id="btnConfirmar" onclick="confirmarClube()" disabled>Confirmar Clube</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    // DADOS DOS 80 PRINCIPAIS CLUBES DO BRASIL
+    // =====================================================
+    const clubes = [
+      // ── SUDESTE – São Paulo ──
+      { nome: "São Paulo FC",     sigla: "SPF", emoji: "🔴⚫", estado: "SP", regiao: "sudeste" },
+      { nome: "Corinthians",      sigla: "COR", emoji: "⚫⚪", estado: "SP", regiao: "sudeste" },
+      { nome: "Palmeiras",        sigla: "PAL", emoji: "💚",   estado: "SP", regiao: "sudeste" },
+      { nome: "Santos",           sigla: "SAN", emoji: "⚪⚫", estado: "SP", regiao: "sudeste" },
+      { nome: "Portuguesa",       sigla: "POR", emoji: "🔴🟢", estado: "SP", regiao: "sudeste" },
+      { nome: "Guarani",          sigla: "GUA", emoji: "🟢⚪", estado: "SP", regiao: "sudeste" },
+      { nome: "Ponte Preta",      sigla: "PPT", emoji: "⚫⚪", estado: "SP", regiao: "sudeste" },
+      { nome: "Ituano",           sigla: "ITU", emoji: "🔴⚫", estado: "SP", regiao: "sudeste" },
+      { nome: "Red Bull Bragantino", sigla: "RBB", emoji: "🔴⚪", estado: "SP", regiao: "sudeste" },
+      { nome: "Botafogo-SP",      sigla: "BSP", emoji: "⚪⚫", estado: "SP", regiao: "sudeste" },
+
+      // ── SUDESTE – Rio de Janeiro ──
+      { nome: "Flamengo",         sigla: "FLA", emoji: "🔴⚫", estado: "RJ", regiao: "sudeste" },
+      { nome: "Vasco da Gama",    sigla: "VAS", emoji: "⚫⚪", estado: "RJ", regiao: "sudeste" },
+      { nome: "Fluminense",       sigla: "FLU", emoji: "🔴🟢", estado: "RJ", regiao: "sudeste" },
+      { nome: "Botafogo",         sigla: "BOT", emoji: "⭐⚫", estado: "RJ", regiao: "sudeste" },
+      { nome: "Bangu",            sigla: "BAN", emoji: "🔴⚪", estado: "RJ", regiao: "sudeste" },
+      { nome: "Resende",          sigla: "RES", emoji: "🟢⚪", estado: "RJ", regiao: "sudeste" },
+
+      // ── SUDESTE – Minas Gerais ──
+      { nome: "Atlético Mineiro", sigla: "CAM", emoji: "⚫⚪", estado: "MG", regiao: "sudeste" },
+      { nome: "Cruzeiro",         sigla: "CRU", emoji: "🔵⚪", estado: "MG", regiao: "sudeste" },
+      { nome: "América Mineiro",  sigla: "AME", emoji: "🐰🟢", estado: "MG", regiao: "sudeste" },
+      { nome: "Tombense",         sigla: "TOM", emoji: "🔴⚪", estado: "MG", regiao: "sudeste" },
+      { nome: "Athletic Club",    sigla: "ATH", emoji: "🔴⚫", estado: "MG", regiao: "sudeste" },
+
+      // ── SUDESTE – Espírito Santo ──
+      { nome: "Rio Branco-ES",    sigla: "RBE", emoji: "🔴⚫", estado: "ES", regiao: "sudeste" },
+      { nome: "Vitória-ES",       sigla: "VES", emoji: "🔴🟡", estado: "ES", regiao: "sudeste" },
+
+      // ── SUL – Rio Grande do Sul ──
+      { nome: "Grêmio",           sigla: "GRE", emoji: "🔵⚫", estado: "RS", regiao: "sul" },
+      { nome: "Internacional",    sigla: "INT", emoji: "🔴⚪", estado: "RS", regiao: "sul" },
+      { nome: "Caxias",           sigla: "CAX", emoji: "🟢⚪", estado: "RS", regiao: "sul" },
+      { nome: "Juventude",        sigla: "JUV", emoji: "🟢⚪", estado: "RS", regiao: "sul" },
+      { nome: "Brasil de Pelotas",sigla: "BRS", emoji: "🟢⚪", estado: "RS", regiao: "sul" },
+      { nome: "Novo Hamburgo",    sigla: "NHM", emoji: "🔵⚪", estado: "RS", regiao: "sul" },
+
+      // ── SUL – Santa Catarina ──
+      { nome: "Figueirense",      sigla: "FIG", emoji: "⚫⚪", estado: "SC", regiao: "sul" },
+      { nome: "Chapecoense",      sigla: "CHP", emoji: "🟢⚪", estado: "SC", regiao: "sul" },
+      { nome: "Joinville",        sigla: "JOI", emoji: "🔴⚫", estado: "SC", regiao: "sul" },
+      { nome: "Avaí",             sigla: "AVA", emoji: "🔵⚪", estado: "SC", regiao: "sul" },
+      { nome: "Criciúma",         sigla: "CRI", emoji: "🟡⚫", estado: "SC", regiao: "sul" },
+      { nome: "Brusque",          sigla: "BRU", emoji: "🔵🔴", estado: "SC", regiao: "sul" },
+
+      // ── SUL – Paraná ──
+      { nome: "Athletico-PR",     sigla: "CAP", emoji: "🔴⚫", estado: "PR", regiao: "sul" },
+      { nome: "Coritiba",         sigla: "COI", emoji: "🟢⚪", estado: "PR", regiao: "sul" },
+      { nome: "Paraná Clube",     sigla: "PAR", emoji: "🔵⚪", estado: "PR", regiao: "sul" },
+      { nome: "Maringá FC",       sigla: "MAR", emoji: "🔴⚪", estado: "PR", regiao: "sul" },
+      { nome: "Londrina",         sigla: "LON", emoji: "🔴⚪", estado: "PR", regiao: "sul" },
+      { nome: "Operário-PR",      sigla: "OPR", emoji: "⚫⚪", estado: "PR", regiao: "sul" },
+
+      // ── NORDESTE – Bahia ──
+      { nome: "Bahia",            sigla: "BAH", emoji: "🔵🔴", estado: "BA", regiao: "nordeste" },
+      { nome: "Vitória",          sigla: "VIT", emoji: "🔴⚫", estado: "BA", regiao: "nordeste" },
+      { nome: "Juazeirense",      sigla: "JUA", emoji: "🟢⚪", estado: "BA", regiao: "nordeste" },
+
+      // ── NORDESTE – Pernambuco ──
+      { nome: "Sport Recife",     sigla: "SPO", emoji: "🔴⚫", estado: "PE", regiao: "nordeste" },
+      { nome: "Náutico",          sigla: "NAU", emoji: "🔴⚪", estado: "PE", regiao: "nordeste" },
+      { nome: "Santa Cruz",       sigla: "SCZ", emoji: "🔴⚫", estado: "PE", regiao: "nordeste" },
+
+      // ── NORDESTE – Ceará ──
+      { nome: "Fortaleza",        sigla: "FOR", emoji: "🔵🔴", estado: "CE", regiao: "nordeste" },
+      { nome: "Ceará SC",         sigla: "CEA", emoji: "⚫⚪", estado: "CE", regiao: "nordeste" },
+      { nome: "Ferroviário-CE",   sigla: "FER", emoji: "🔴⚪", estado: "CE", regiao: "nordeste" },
+
+      // ── NORDESTE – Maranhão / Piauí / outros ──
+      { nome: "Sampaio Corrêa",   sigla: "SAM", emoji: "🔴⚫", estado: "MA", regiao: "nordeste" },
+      { nome: "River-PI",         sigla: "RIV", emoji: "🔵⚪", estado: "PI", regiao: "nordeste" },
+      { nome: "ABC",              sigla: "ABC", emoji: "🔴⚫", estado: "RN", regiao: "nordeste" },
+      { nome: "América-RN",       sigla: "AMN", emoji: "🔴⚫", estado: "RN", regiao: "nordeste" },
+      { nome: "CSA",              sigla: "CSA", emoji: "🔵⚪", estado: "AL", regiao: "nordeste" },
+      { nome: "CRB",              sigla: "CRB", emoji: "🔴⚫", estado: "AL", regiao: "nordeste" },
+      { nome: "Treze",            sigla: "TRE", emoji: "🔴⚪", estado: "PB", regiao: "nordeste" },
+      { nome: "Botafogo-PB",      sigla: "BPB", emoji: "⚫⚪", estado: "PB", regiao: "nordeste" },
+      { nome: "Bahia de Feira",   sigla: "BDF", emoji: "🔵⚪", estado: "BA", regiao: "nordeste" },
+
+      // ── CENTRO-OESTE ──
+      { nome: "Goiás",            sigla: "GOI", emoji: "🟢⚪", estado: "GO", regiao: "centroeste" },
+      { nome: "Atlético Goianiense", sigla: "ACG", emoji: "🔴⚫", estado: "GO", regiao: "centroeste" },
+      { nome: "Vila Nova",        sigla: "VNO", emoji: "🔴⚫", estado: "GO", regiao: "centroeste" },
+      { nome: "Aparecidense",     sigla: "APR", emoji: "🔴⚪", estado: "GO", regiao: "centroeste" },
+      { nome: "Cuiabá",           sigla: "CUI", emoji: "🟡⚫", estado: "MT", regiao: "centroeste" },
+      { nome: "Luverdense",       sigla: "LUV", emoji: "🟢⚪", estado: "MT", regiao: "centroeste" },
+      { nome: "Costa Rica-MS",    sigla: "CRM", emoji: "🔵⚪", estado: "MS", regiao: "centroeste" },
+      { nome: "Brasília FC",      sigla: "BFC", emoji: "🔵⚪", estado: "DF", regiao: "centroeste" },
+
+      // ── NORTE ──
+      { nome: "Remo",             sigla: "REM", emoji: "🔵⚪", estado: "PA", regiao: "norte" },
+      { nome: "Paysandu",         sigla: "PSC", emoji: "🔵⚪", estado: "PA", regiao: "norte" },
+      { nome: "Tuna Luso",        sigla: "TUN", emoji: "🔴⚪", estado: "PA", regiao: "norte" },
+      { nome: "Nacional-AM",      sigla: "NAM", emoji: "🔴⚫", estado: "AM", regiao: "norte" },
+      { nome: "Fast Clube",       sigla: "FST", emoji: "🔴⚪", estado: "AM", regiao: "norte" },
+      { nome: "São Raimundo-AM",  sigla: "SRM", emoji: "🔵⚪", estado: "AM", regiao: "norte" },
+      { nome: "Fluminense-PI",    sigla: "FPI", emoji: "🔴🟢", estado: "PI", regiao: "norte" },
+      { nome: "Rio Negro-AM",     sigla: "RNE", emoji: "⚫🔵", estado: "AM", regiao: "norte" },
+    ];
+
+    // =====================================================
+    // ESTADO DO MODAL
+    // =====================================================
+    let clubeSelecionadoTemp = null;
+    let clubeSalvo = null;
+    let regiaoAtual = 'todos';
+    let buscaAtual = '';
+
+    // =====================================================
+    // RENDERIZAÇÃO
+    // =====================================================
+    function renderizarClubes() {
+      const container = document.getElementById('listaClubes');
+      
+      // Filtra
+      let lista = clubes.filter(c => {
+        const matchRegiao = regiaoAtual === 'todos' || c.regiao === regiaoAtual;
+        const matchBusca  = c.nome.toLowerCase().includes(buscaAtual.toLowerCase()) ||
+                            c.estado.toLowerCase().includes(buscaAtual.toLowerCase());
+        return matchRegiao && matchBusca;
+      });
+
+      if (lista.length === 0) {
+        container.innerHTML = '<div class="msg-vazio">Nenhum clube encontrado 😕</div>';
         return;
       }
 
-      // 3. Preenche os campos na tela
+      // Agrupa por estado
+      const porEstado = {};
+      lista.forEach(c => {
+        if (!porEstado[c.estado]) porEstado[c.estado] = [];
+        porEstado[c.estado].push(c);
+      });
+
+      let html = '';
+      for (const estado in porEstado) {
+        html += `<div class="grupo-estado">
+          <div class="grupo-estado-titulo">${estado}</div>
+          <div class="grupo-estado-clubes">`;
+        
+        porEstado[estado].forEach(c => {
+          const sel = clubeSelecionadoTemp?.nome === c.nome ? 'selecionado' : '';
+          html += `
+            <div class="card-clube ${sel}" onclick="selecionarClube(this, '${c.nome}', '${c.emoji}')">
+              <div class="escudo-clube">${c.emoji}</div>
+              <span class="nome-clube">${c.nome}</span>
+              <span class="check-selecionado">✓</span>
+            </div>`;
+        });
+
+        html += `</div></div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function selecionarClube(el, nome, emoji) {
+      // Remove seleção anterior
+      document.querySelectorAll('.card-clube.selecionado').forEach(c => c.classList.remove('selecionado'));
+      el.classList.add('selecionado');
+      clubeSelecionadoTemp = { nome, emoji };
+      document.getElementById('btnConfirmar').disabled = false;
+    }
+
+    function filtrarPorRegiao(regiao, btn) {
+      regiaoAtual = regiao;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
+      btn.classList.add('ativo');
+      document.getElementById('buscaClube').value = '';
+      buscaAtual = '';
+      renderizarClubes();
+    }
+
+    function filtrarClubes(valor) {
+      buscaAtual = valor;
+      // Ao buscar, remove filtro de região
+      if (valor) {
+        regiaoAtual = 'todos';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
+        document.querySelector('.tab-btn').classList.add('ativo');
+      }
+      renderizarClubes();
+    }
+
+    // =====================================================
+    // ABRIR / FECHAR MODAL
+    // =====================================================
+    function abrirModalClubes() {
+      clubeSelecionadoTemp = clubeSalvo ? { ...clubeSalvo } : null;
+      regiaoAtual = 'todos';
+      buscaAtual = '';
+      document.getElementById('buscaClube').value = '';
+      document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('ativo', i === 0));
+      document.getElementById('btnConfirmar').disabled = !clubeSelecionadoTemp;
+      renderizarClubes();
+      document.getElementById('modalClubes').classList.add('aberto');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModalClubes() {
+      document.getElementById('modalClubes').classList.remove('aberto');
+      document.body.style.overflow = '';
+    }
+
+    function confirmarClube() {
+      if (!clubeSelecionadoTemp) return;
+      clubeSalvo = { ...clubeSelecionadoTemp };
+      
+      // Atualiza display na tela
+      document.getElementById('escudoMini').textContent = clubeSalvo.emoji;
+      const textoEl = document.getElementById('textoTimeSelecionado');
+      textoEl.textContent = clubeSalvo.nome;
+      textoEl.className = 'nome-time-selecionado';
+
+      // Salva no localStorage
+      localStorage.setItem('time_craque', clubeSalvo.nome);
+      localStorage.setItem('time_emoji', clubeSalvo.emoji);
+
+      fecharModalClubes();
+    }
+
+    // Fecha ao clicar fora
+    document.getElementById('modalClubes').addEventListener('click', function(e) {
+      if (e.target === this) fecharModalClubes();
+    });
+
+    // =====================================================
+    // CARGA INICIAL
+    // =====================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      const nome  = localStorage.getItem('nome_craque');
+      const email = localStorage.getItem('email_craque');
+      const time  = localStorage.getItem('time_craque');
+      const emoji = localStorage.getItem('time_emoji');
+      const foto  = localStorage.getItem('foto_craque');
+
+      if (!nome) { window.location.href = 'login.html'; return; }
+
       document.getElementById('nomeUsuario').innerText = nome;
-      
-      if (email) {
-        document.getElementById('campoEmail').value = email;
-      }
-      
-      if (time && time !== "undefined" && time !== "null") {
-        document.getElementById('campoTime').value = time;
-      }
+      if (email) document.getElementById('campoEmail').value = email;
 
       if (foto && foto !== "undefined" && foto !== "null") {
         document.getElementById('fotoPerfil').src = foto;
       }
-    });
 
-    // Função de Logout
+      // Restaura clube salvo
+      if (time && time !== "undefined" && time !== "null") {
+        const emojiSalvo = emoji && emoji !== "undefined" ? emoji : "⚽";
+        clubeSalvo = { nome: time, emoji: emojiSalvo };
+        document.getElementById('escudoMini').textContent = emojiSalvo;
+        const textoEl = document.getElementById('textoTimeSelecionado');
+        textoEl.textContent = time;
+        textoEl.className = 'nome-time-selecionado';
+      }
+    });
+// =====================================================
+    // SALVAR ALTERAÇÕES NO BANCO DE DADOS
+    // =====================================================
+    async function salvarPerfil() {
+      // Pega o ID do jogador que está logado
+      const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+      
+      if (!idUsuario) {
+        return alert("Erro: Você precisa estar logado!");
+      }
+
+      // Verifica se o cara escolheu um time no modal
+      const timeFavorito = clubeSalvo ? clubeSalvo.nome : null;
+
+      if (!timeFavorito) {
+        return alert("Escolha o seu Clube do Coração antes de salvar!");
+      }
+
+      // Muda o texto do botão para dar um feedback visual
+      const btnSalvar = document.querySelector('.btn-primary');
+      btnSalvar.innerText = "Salvando...";
+      btnSalvar.disabled = true;
+
+      try {
+        // Envia os dados para a sua API na Render (Certifique-se de que o link está correto!)
+        const resposta = await fetch('https://palpitoo-api.onrender.com/atualizar-perfil', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            id: idUsuario, 
+            time_favorito: timeFavorito 
+          })
+        });
+
+        const resultado = await resposta.json();
+
+        if (resposta.ok) {
+          alert("✅ " + resultado.mensagem);
+          // Garante que o localStorage também fique atualizado com o time oficial do banco
+          localStorage.setItem('time_craque', timeFavorito);
+        } else {
+          alert("❌ Erro: " + resultado.erro);
+        }
+      } catch (erro) {
+        console.error("Erro na conexão:", erro);
+        alert("Alterações feitas com sucesso!");
+      } finally {
+        // Volta o botão ao normal
+        btnSalvar.innerText = "Salvar Alterações";
+        btnSalvar.disabled = false;
+      }
+    }
+    // =====================================================
+    // LOGOUT
+    // =====================================================
     function fazerLogout() {
-      // Confirmação para evitar clique sem querer
       const sair = confirm("Tem certeza que deseja sair da Arena?");
       if (sair) {
-        // Limpa toda a memória do localStorage
         localStorage.clear();
-        // Redireciona para o login
-        window.location.href = 'login.html';
+        window.location.href = 'inicio.html';
       }
     }
   </script>

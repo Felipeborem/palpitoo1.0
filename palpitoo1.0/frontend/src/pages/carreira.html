@@ -8,95 +8,51 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="./css/style.css">
 
   <style>
     /* ── Abas ── */
-    .abas-carreira {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 28px;
-    }
+    .abas-carreira { display: flex; gap: 8px; margin-bottom: 28px; }
     .aba-btn {
-      flex: 1;
-      padding: 13px;
-      font-family: 'Russo One', sans-serif;
-      font-size: 13px;
+      flex: 1; padding: 13px;
+      font-family: 'Russo One', sans-serif; font-size: 13px;
       text-transform: uppercase;
-      border: 1px solid var(--borda-divisoria);
-      border-radius: 12px;
-      cursor: pointer;
-      background: var(--bg-dark);
-      color: var(--text-gray);
+      border: 1px solid var(--borda-divisoria); border-radius: 12px;
+      cursor: pointer; background: var(--bg-dark); color: var(--text-gray);
       transition: all 0.2s ease;
     }
-    .aba-btn.ativa {
-      background: var(--accent-cyan);
-      color: var(--text-white);
-      border-color: var(--accent-cyan);
-    }
-    .painel-aba { display: none; }
-    .painel-aba.ativo { display: block; }
+    .aba-btn.ativa { background: var(--accent-cyan); color: var(--text-white); border-color: var(--accent-cyan); }
+    .painel-aba         { display: none; }
+    .painel-aba.ativo   { display: block; }
 
     /* ── Stat boxes ── */
     .stat-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 12px; margin-bottom: 20px;
     }
     .stat-box {
-      background: var(--bg-dark);
-      border: 1px solid var(--borda-divisoria);
-      border-radius: 14px;
-      padding: 16px 10px;
-      text-align: center;
+      background: var(--bg-dark); border: 1px solid var(--borda-divisoria);
+      border-radius: 14px; padding: 16px 10px; text-align: center;
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
-    .stat-box:hover {
-      border-color: var(--accent-cyan);
-      transform: translateY(-2px);
-    }
-    .stat-valor {
-      font-family: 'Russo One', sans-serif;
-      font-size: 28px;
-      color: var(--accent-cyan);
-    }
-    .stat-label {
-      font-size: 10px;
-      color: var(--text-gray);
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-top: 4px;
-      line-height: 1.3;
-    }
+    .stat-box:hover { border-color: var(--accent-cyan); transform: translateY(-2px); }
+    .stat-valor { font-family: 'Russo One', sans-serif; font-size: 28px; color: var(--accent-cyan); }
+    .stat-label { font-size: 10px; color: var(--text-gray); text-transform: uppercase; font-weight: 700; margin-top: 4px; line-height: 1.3; }
 
     /* ── Barra de aproveitamento ── */
-    .barra-container {
-      background: var(--bg-dark);
-      border-radius: 20px;
-      height: 10px;
-      overflow: hidden;
-    }
+    .barra-container { background: var(--bg-dark); border-radius: 20px; height: 10px; overflow: hidden; }
     .barra-fill {
-      height: 100%;
-      border-radius: 20px;
+      height: 100%; border-radius: 20px;
       background: linear-gradient(to right, var(--accent-green), var(--accent-cyan));
-      width: 0%;
-      transition: width 1s ease;
+      width: 0%; transition: width 1s ease;
     }
 
     /* ── Palpite item ── */
     .palpite-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 11px 14px;
-      background: var(--bg-dark);
-      border-radius: 10px;
-      margin-bottom: 8px;
-      border: 1px solid var(--borda-divisoria);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; background: var(--bg-dark); border-radius: 10px;
+      margin-bottom: 8px; border: 1px solid var(--borda-divisoria);
       transition: border-color 0.2s ease;
     }
     .palpite-item:hover { border-color: var(--accent-cyan); }
@@ -110,40 +66,37 @@
 
     /* ── Posição badge ── */
     .posicao-destaque {
-      display: inline-block;
-      padding: 8px 22px;
-      border-radius: 20px;
-      font-family: 'Russo One', sans-serif;
-      font-size: 14px;
-      background: rgba(122,30,58,0.15);
-      border: 1px solid var(--accent-cyan);
-      color: var(--accent-cyan);
+      display: inline-block; padding: 8px 22px; border-radius: 20px;
+      font-family: 'Russo One', sans-serif; font-size: 14px;
+      background: rgba(122,30,58,0.15); border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
     }
 
     /* ── Troféu card ── */
     .trofeu-card {
-      background: var(--bg-dark);
-      border-radius: 14px;
-      padding: 18px 12px;
-      text-align: center;
-      transition: all 0.2s ease;
-      border: 1px solid var(--borda-divisoria);
+      background: var(--bg-dark); border-radius: 14px; padding: 18px 12px;
+      text-align: center; transition: all 0.2s ease; border: 1px solid var(--borda-divisoria);
     }
     .trofeu-card:hover { transform: translateY(-3px); }
-    .trofeu-card.ouro   { border-color: #eab308; box-shadow: 0 0 15px rgba(234,179,8,0.1); }
-    .trofeu-card.prata  { border-color: #d1d5db; }
-    .trofeu-card.bronze { border-color: #b45309; }
-    .trofeu-card.especial { border-color: var(--accent-cyan); }
+    .trofeu-card.ouro    { border-color: #eab308; box-shadow: 0 0 15px rgba(234,179,8,0.1); }
+    .trofeu-card.prata   { border-color: #d1d5db; }
+    .trofeu-card.bronze  { border-color: #b45309; }
+    .trofeu-card.especial{ border-color: var(--accent-cyan); }
 
     /* ── Liga histórico ── */
     .liga-hist-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      border-bottom: 1px dashed var(--borda-divisoria);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; border-bottom: 1px dashed var(--borda-divisoria);
     }
     .liga-hist-item:last-child { border-bottom: none; }
+
+    /* ── Loading skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-dark) 25%, rgba(255,255,255,0.04) 50%, var(--bg-dark) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: 8px; height: 28px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   </style>
 </head>
 <body>
@@ -168,14 +121,16 @@
 
     <!-- ══ TOPO: IDENTIDADE ══ -->
     <section class="cartao bg-escuro animacao-suave text-center mb-20"
-             style="position: relative; overflow: hidden; border: 1px solid var(--accent-cyan);">
+             style="position:relative;overflow:hidden;border:1px solid var(--accent-cyan);">
       <div style="position:absolute;top:-50px;right:-50px;font-size:150px;opacity:0.03;pointer-events:none;">👑</div>
 
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-        <img id="fotoPerfil" src="https://via.placeholder.com/100" alt="Foto"
-             class="foto-perfil" style="width:100px;height:100px;border-color:var(--accent-cyan);border-width:3px;">
+        <img id="fotoPerfil"
+             src="https://ui-avatars.com/api/?name=?&background=random&size=100"
+             alt="Foto" class="foto-perfil"
+             style="width:100px;height:100px;border-color:var(--accent-cyan);border-width:3px;border-radius:50%;object-fit:cover;">
         <h2 id="nomeUsuario" class="font-russo titulo-branco" style="font-size:28px;margin:0;">Carregando...</h2>
-        <p id="timeUsuario" style="color:var(--text-gray);font-size:14px;margin:0;text-transform:uppercase;">Membro Oficial Brah.Bet</p>
+        <p id="timeUsuario" style="color:var(--text-gray);font-size:14px;margin:0;text-transform:uppercase;">—</p>
 
         <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
           <div style="background:var(--bg-dark);padding:8px 20px;border-radius:20px;border:1px solid var(--borda-divisoria);">
@@ -198,62 +153,35 @@
 
     <!-- ══ ABAS ══ -->
     <div class="abas-carreira">
-      <button class="aba-btn ativa" id="aba-btn-temporada" onclick="trocarAba('temporada')">
-        ⚡ Temporada Atual
-      </button>
-      <button class="aba-btn" id="aba-btn-carreira" onclick="trocarAba('carreira')">
-        📜 Carreira Completa
-      </button>
+      <button class="aba-btn ativa" id="aba-btn-temporada" onclick="trocarAba('temporada')">⚡ Temporada Atual</button>
+      <button class="aba-btn"       id="aba-btn-carreira"  onclick="trocarAba('carreira')">📜 Carreira Completa</button>
     </div>
 
     <!-- ══ ABA: TEMPORADA ATUAL ══ -->
     <div id="painel-temporada" class="painel-aba ativo">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;">
 
-        <!-- Briefing da temporada -->
+        <!-- Desempenho -->
         <section class="cartao bg-escuro animacao-suave">
           <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">📊 Desempenho Atual</h3>
           <div class="divisor-tracejado mb-20"></div>
 
           <div class="stat-grid">
-            <div class="stat-box">
-              <div class="stat-valor" id="t-pontos">—</div>
-              <div class="stat-label">Pontos</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="t-cravadas">—</div>
-              <div class="stat-label">Cravações 🎯</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="t-acertos">—</div>
-              <div class="stat-label">Acertos ✅</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="t-erros">—</div>
-              <div class="stat-label">Erros ❌</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="t-palpites">—</div>
-              <div class="stat-label">Palpites feitos</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="t-aproveitamento">—%</div>
-              <div class="stat-label">Aproveitamento</div>
-            </div>
+            <div class="stat-box"><div class="stat-valor" id="t-pontos">—</div><div class="stat-label">Pontos</div></div>
+            <div class="stat-box"><div class="stat-valor" id="t-cravadas">—</div><div class="stat-label">Cravações 🎯</div></div>
+            <div class="stat-box"><div class="stat-valor" id="t-acertos">—</div><div class="stat-label">Acertos ✅</div></div>
+            <div class="stat-box"><div class="stat-valor" id="t-erros">—</div><div class="stat-label">Erros ❌</div></div>
+            <div class="stat-box"><div class="stat-valor" id="t-palpites">—</div><div class="stat-label">Palpites feitos</div></div>
+            <div class="stat-box"><div class="stat-valor" id="t-aproveitamento">—%</div><div class="stat-label">Aproveitamento</div></div>
           </div>
 
-          <!-- Barra de aproveitamento -->
           <div style="background:var(--bg-dark);border:1px solid var(--borda-divisoria);border-radius:12px;padding:14px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
               <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--text-gray);">Taxa de acerto</span>
               <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--accent-cyan);" id="t-taxa-label">—%</span>
             </div>
-            <div class="barra-container">
-              <div class="barra-fill" id="t-barra"></div>
-            </div>
-            <p id="t-frase" style="font-size:12px;color:var(--text-gray);margin-top:8px;text-align:center;font-family:'Russo One',sans-serif;">
-              Calculando...
-            </p>
+            <div class="barra-container"><div class="barra-fill" id="t-barra"></div></div>
+            <p id="t-frase" style="font-size:12px;color:var(--text-gray);margin-top:8px;text-align:center;font-family:'Russo One',sans-serif;">Calculando...</p>
           </div>
         </section>
 
@@ -263,7 +191,6 @@
           <section class="cartao bg-escuro animacao-suave">
             <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">🏆 Posição na Liga</h3>
             <div class="divisor-tracejado mb-20"></div>
-
             <div style="text-align:center;padding:10px 0;">
               <div style="font-size:52px;margin-bottom:10px;" id="t-posicao-icone">—</div>
               <span class="posicao-destaque" id="t-posicao-texto">Carregando...</span>
@@ -275,7 +202,6 @@
           <section class="cartao bg-escuro animacao-suave">
             <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">🕐 Últimos Palpites</h3>
             <div class="divisor-tracejado mb-20"></div>
-
             <div id="lista-ultimos">
               <p class="text-center" style="color:var(--text-gray);font-size:13px;">Carregando...</p>
             </div>
@@ -295,44 +221,21 @@
           <div class="divisor-tracejado mb-20"></div>
 
           <div class="stat-grid">
-            <div class="stat-box">
-              <div class="stat-valor" id="c-pontos">—</div>
-              <div class="stat-label">Pontos Totais</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="c-palpites">—</div>
-              <div class="stat-label">Total Palpites</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="c-ligas">—</div>
-              <div class="stat-label">Ligas Jogadas</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="c-cravadas">—</div>
-              <div class="stat-label">Cravações 🎯</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="c-acertos">—</div>
-              <div class="stat-label">Acertos ✅</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-valor" id="c-aproveitamento">—%</div>
-              <div class="stat-label">Aproveitamento</div>
-            </div>
+            <div class="stat-box"><div class="stat-valor" id="c-pontos">—</div><div class="stat-label">Pontos Totais</div></div>
+            <div class="stat-box"><div class="stat-valor" id="c-palpites">—</div><div class="stat-label">Total Palpites</div></div>
+            <div class="stat-box"><div class="stat-valor" id="c-ligas">—</div><div class="stat-label">Ligas Jogadas</div></div>
+            <div class="stat-box"><div class="stat-valor" id="c-cravadas">—</div><div class="stat-label">Cravações 🎯</div></div>
+            <div class="stat-box"><div class="stat-valor" id="c-acertos">—</div><div class="stat-label">Acertos ✅</div></div>
+            <div class="stat-box"><div class="stat-valor" id="c-aproveitamento">—%</div><div class="stat-label">Aproveitamento</div></div>
           </div>
 
-          <!-- Barra carreira -->
           <div style="background:var(--bg-dark);border:1px solid var(--borda-divisoria);border-radius:12px;padding:14px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
               <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--text-gray);">Aproveitamento histórico</span>
               <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--accent-cyan);" id="c-taxa-label">—%</span>
             </div>
-            <div class="barra-container">
-              <div class="barra-fill" id="c-barra"></div>
-            </div>
-            <p id="c-frase" style="font-size:12px;color:var(--text-gray);margin-top:8px;text-align:center;font-family:'Russo One',sans-serif;">
-              Calculando...
-            </p>
+            <div class="barra-container"><div class="barra-fill" id="c-barra"></div></div>
+            <p id="c-frase" style="font-size:12px;color:var(--text-gray);margin-top:8px;text-align:center;font-family:'Russo One',sans-serif;">Calculando...</p>
           </div>
         </section>
 
@@ -342,7 +245,6 @@
           <section class="cartao bg-escuro animacao-suave">
             <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">🏅 Sala de Troféus</h3>
             <div class="divisor-tracejado mb-20"></div>
-
             <div id="sala-trofeus" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Carregando...</p>
             </div>
@@ -352,7 +254,6 @@
           <section class="cartao bg-escuro animacao-suave">
             <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">📜 Histórico de Ligas</h3>
             <div class="divisor-tracejado mb-20"></div>
-
             <div id="historico-ligas">
               <p class="text-center" style="color:var(--text-gray);font-size:13px;">Carregando...</p>
             </div>
@@ -367,19 +268,40 @@
   <div id="container-avisos"></div>
 
 <script>
+  const API     = 'https://palpitoo-api.onrender.com';
   const idLogado   = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
   const nomeLogado = localStorage.getItem('nome_craque');
   const timeLogado = localStorage.getItem('time_craque');
   const fotoLogada = localStorage.getItem('foto_craque');
 
-  // ── PREENCHE TOPO ─────────────────────────────────────────
+  // ── TOAST ─────────────────────────────────────────────────
+  function mostrarAviso(msg, tipo = 'info') {
+    const cont  = document.getElementById('container-avisos');
+    const toast = document.createElement('div');
+    const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+    toast.className = `aviso-toast aviso-${tipo}`;
+    toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
+    cont.appendChild(toast);
+    setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
+
+  // ── PREENCHE TOPO COM DADOS DO LOCALSTORAGE ───────────────
   document.addEventListener('DOMContentLoaded', () => {
-    if (nomeLogado) document.getElementById('nomeUsuario').innerText = nomeLogado;
+    if (nomeLogado) {
+      document.getElementById('nomeUsuario').innerText = nomeLogado;
+      document.getElementById('fotoPerfil').src =
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(nomeLogado)}&background=random&size=100`;
+    }
     if (timeLogado && timeLogado !== 'undefined' && timeLogado !== 'null') {
-      document.getElementById('timeUsuario').innerText = timeLogado;
+      document.getElementById('timeUsuario').innerText = `⚽ ${timeLogado}`;
     }
     if (fotoLogada && fotoLogada !== 'undefined' && fotoLogada !== 'null') {
       document.getElementById('fotoPerfil').src = fotoLogada;
+    }
+    if (!idLogado) {
+      mostrarAviso('Você não está logado — exibindo prévia.', 'info');
+      carregarPreviewTemporada();
+      carregarPreviewCarreira();
     }
   });
 
@@ -401,49 +323,57 @@
 
   // ── TEMPORADA ATUAL ───────────────────────────────────────
   async function carregarTemporada() {
-    if (!idLogado) return carregarPreviewTemporada();
+    if (!idLogado) return;
 
     try {
-      const res  = await fetch(`https://palpitoo-api.onrender.com/${idLogado}`);
-      const palpites = await res.json();
+      // 1. Palpites do usuário
+      const [resPalpites, resJogos] = await Promise.all([
+        fetch(`${API}/meus-palpites/${idLogado}`),
+        fetch(`${API}/jogos`)
+      ]);
+      const palpites = await resPalpites.json();
+      const jogos    = await resJogos.json();
 
-      const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
-      const pontos      = finalizados.reduce((s, p) => s + p.pontos_obtidos, 0);
-      const cravadas    = finalizados.filter(p => p.pontos_obtidos === 3).length;
-      const acertos     = finalizados.filter(p => p.pontos_obtidos === 1).length;
-      const erros       = finalizados.filter(p => p.pontos_obtidos === 0).length;
-      const taxa        = finalizados.length > 0 ? Math.round(((cravadas + acertos) / finalizados.length) * 100) : 0;
+      // Calcula stats sobre palpites finalizados
+      const finalizados  = palpites.filter(p => p.pontos_obtidos !== null);
+      const pontos       = finalizados.reduce((s, p) => s + Number(p.pontos_obtidos), 0);
+      const cravadas     = finalizados.filter(p => Number(p.pontos_obtidos) === 3).length;
+      const acertos      = finalizados.filter(p => Number(p.pontos_obtidos) === 1).length;
+      const erros        = finalizados.filter(p => Number(p.pontos_obtidos) === 0).length;
+      const taxa         = finalizados.length > 0
+        ? Math.round(((cravadas + acertos) / finalizados.length) * 100) : 0;
 
-      document.getElementById('t-pontos').innerText       = pontos;
-      document.getElementById('t-cravadas').innerText     = cravadas;
-      document.getElementById('t-acertos').innerText      = acertos;
-      document.getElementById('t-erros').innerText        = erros;
-      document.getElementById('t-palpites').innerText     = finalizados.length;
+      document.getElementById('t-pontos').innerText         = pontos;
+      document.getElementById('t-cravadas').innerText       = cravadas;
+      document.getElementById('t-acertos').innerText        = acertos;
+      document.getElementById('t-erros').innerText          = erros;
+      document.getElementById('t-palpites').innerText       = palpites.length;
       document.getElementById('t-aproveitamento').innerText = `${taxa}%`;
-      document.getElementById('t-taxa-label').innerText   = `${taxa}%`;
-      document.getElementById('t-frase').innerText        = fraseAproveitamento(taxa);
-      document.getElementById('totalTemporada').innerText = `${pontos} pts`;
+      document.getElementById('t-taxa-label').innerText     = `${taxa}%`;
+      document.getElementById('t-frase').innerText          = fraseAproveitamento(taxa);
+      document.getElementById('totalTemporada').innerText   = `${pontos} pts`;
+      setTimeout(() => { document.getElementById('t-barra').style.width = `${taxa}%`; }, 100);
 
-      setTimeout(() => {
-        document.getElementById('t-barra').style.width = `${taxa}%`;
-      }, 100);
-
-      // Posição na liga
-      const resLigas = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`);
+      // 2. Posição na liga
+      const resLigas = await fetch(`${API}/minhas-ligas/${idLogado}`);
       const ligas    = await resLigas.json();
 
-      if (ligas.length > 0) {
-        const idLiga   = ligas[0].id_liga;
-        const resRank  = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`);
+      if (Array.isArray(ligas) && ligas.length > 0) {
+        const liga     = ligas[0];
+        const resRank  = await fetch(`${API}/ranking-liga/${liga.id_liga}`);
         const dadosLiga = await resRank.json();
+        const ranking  = dadosLiga.ranking || [];
 
-        document.getElementById('t-nome-liga').innerText = dadosLiga.nomeLiga;
+        document.getElementById('t-nome-liga').innerText = dadosLiga.nomeLiga || liga.nome;
 
-        const pos = dadosLiga.ranking.findIndex(r => String(r.id) === String(idLogado));
+        const pos = ranking.findIndex(r => String(r.id) === String(idLogado));
         if (pos !== -1) {
-          const medalhas = { 0:'🥇', 1:'🥈', 2:'🥉' };
+          const medalhas = { 0: '🥇', 1: '🥈', 2: '🥉' };
           document.getElementById('t-posicao-icone').innerText = medalhas[pos] || '🏅';
           document.getElementById('t-posicao-texto').innerText = `${pos + 1}º lugar`;
+        } else {
+          document.getElementById('t-posicao-icone').innerText = '🏅';
+          document.getElementById('t-posicao-texto').innerText = 'Sem pontos ainda';
         }
       } else {
         document.getElementById('t-posicao-icone').innerText = '🦆';
@@ -451,10 +381,8 @@
         document.getElementById('t-nome-liga').innerText     = 'Entre em uma liga!';
       }
 
-      // Últimos palpites
-      const resJogos = await fetch('https://palpitoo-api.onrender.com/jogos');
-      const jogos    = await resJogos.json();
-      const lista    = document.getElementById('lista-ultimos');
+      // 3. Últimos 6 palpites
+      const lista = document.getElementById('lista-ultimos');
       lista.innerHTML = '';
 
       const palpitesComJogo = palpites
@@ -467,17 +395,18 @@
         lista.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;">Nenhum palpite feito ainda.</p>';
       } else {
         palpitesComJogo.forEach(p => {
-          const ptsCls   = p.pontos_obtidos === 3 ? 'pts-3' : p.pontos_obtidos === 1 ? 'pts-1' : p.pontos_obtidos === 0 ? 'pts-0' : '';
-          const ptsLabel = p.pontos_obtidos === 3 ? '🎯 +3' : p.pontos_obtidos === 1 ? '✅ +1' : p.pontos_obtidos === 0 ? '❌ 0' : '⏳ —';
-          const resultado = p.jogo.status === 'finalizado'
+          const pts      = p.pontos_obtidos !== null ? Number(p.pontos_obtidos) : null;
+          const ptsCls   = pts === 3 ? 'pts-3' : pts === 1 ? 'pts-1' : pts === 0 ? 'pts-0' : '';
+          const ptsLabel = pts === 3 ? '🎯 +3' : pts === 1 ? '✅ +1' : pts === 0 ? '❌ 0' : '⏳ —';
+          const resultado = p.jogo.status === 'finalizado' && p.jogo.gols_casa_real !== null
             ? `<span style="font-size:10px;color:var(--text-gray);">Real: ${p.jogo.gols_casa_real}x${p.jogo.gols_fora_real}</span>`
-            : `<span style="font-size:10px;color:var(--accent-cyan);">Em andamento</span>`;
+            : `<span style="font-size:10px;color:var(--accent-cyan);">${p.jogo.status === 'em andamento' ? '🟡 Em andamento' : '🟢 Aberto'}</span>`;
 
           lista.innerHTML += `
             <div class="palpite-item">
               <div>
                 <p class="palpite-jogo">${p.jogo.time_casa} x ${p.jogo.time_fora}</p>
-                <p class="palpite-info">Rod. ${p.jogo.rodada || 1} • ${resultado}</p>
+                <p class="palpite-info">Rod. ${p.jogo.rodada || 1} · ${resultado}</p>
               </div>
               <span class="palpite-placar">${p.gols_casa_palpite} x ${p.gols_fora_palpite}</span>
               <span class="palpite-pts ${ptsCls}">${ptsLabel}</span>
@@ -486,178 +415,171 @@
       }
 
     } catch (e) {
+      console.error('Erro ao carregar temporada:', e);
+      mostrarAviso('Erro ao carregar dados da temporada.', 'erro');
       carregarPreviewTemporada();
     }
   }
 
-  // ── PREVIEW (servidor offline) ────────────────────────────
+  // ── CARREIRA COMPLETA ─────────────────────────────────────
+  async function carregarCarreira() {
+    if (!idLogado) return;
+
+    try {
+      // Stats totais
+      const resPalpites = await fetch(`${API}/meus-palpites/${idLogado}`);
+      const palpites    = await resPalpites.json();
+
+      const finalizados  = palpites.filter(p => p.pontos_obtidos !== null);
+      const pontos       = finalizados.reduce((s, p) => s + Number(p.pontos_obtidos), 0);
+      const cravadas     = finalizados.filter(p => Number(p.pontos_obtidos) === 3).length;
+      const acertos      = finalizados.filter(p => Number(p.pontos_obtidos) === 1).length;
+      const taxa         = finalizados.length > 0
+        ? Math.round(((cravadas + acertos) / finalizados.length) * 100) : 0;
+
+      document.getElementById('c-pontos').innerText         = pontos;
+      document.getElementById('c-palpites').innerText       = finalizados.length;
+      document.getElementById('c-cravadas').innerText       = cravadas;
+      document.getElementById('c-acertos').innerText        = acertos;
+      document.getElementById('c-aproveitamento').innerText = `${taxa}%`;
+      document.getElementById('c-taxa-label').innerText     = `${taxa}%`;
+      document.getElementById('c-frase').innerText          = fraseAproveitamento(taxa);
+      document.getElementById('totalCarreira').innerText    = `${pontos} pts`;
+      setTimeout(() => { document.getElementById('c-barra').style.width = `${taxa}%`; }, 200);
+
+      // Ligas jogadas
+      const resLigas = await fetch(`${API}/minhas-ligas/${idLogado}`);
+      const ligas    = await resLigas.json();
+      document.getElementById('c-ligas').innerText = Array.isArray(ligas) ? ligas.length : 0;
+
+      const trofeus   = document.getElementById('sala-trofeus');
+      const histLigas = document.getElementById('historico-ligas');
+      trofeus.innerHTML   = '';
+      histLigas.innerHTML = '';
+
+      if (!Array.isArray(ligas) || !ligas.length) {
+        trofeus.innerHTML   = '<p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Nenhum troféu ainda. 🦆</p>';
+        histLigas.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;">Você ainda não participou de nenhuma liga.</p>';
+        return;
+      }
+
+      const trofeusList = [];
+
+      for (const liga of ligas) {
+        const resRank   = await fetch(`${API}/ranking-liga/${liga.id_liga}`);
+        const dadosLiga = await resRank.json();
+        const ranking   = dadosLiga.ranking || [];
+        const pos       = ranking.findIndex(r => String(r.id) === String(idLogado));
+        const meuPts    = pos !== -1 ? ranking[pos].total_pontos : 0;
+        const posicao   = pos !== -1 ? pos + 1 : null;
+
+        const corPos   = posicao === 1 ? '#eab308' : posicao === 2 ? '#d1d5db' : posicao === 3 ? '#b45309' : 'var(--accent-cyan)';
+        const labelPos = posicao === 1 ? '🏆 Campeão' : posicao === 2 ? '🥈 Vice' : posicao === 3 ? '🥉 3º Lugar'
+          : posicao ? `${posicao}º Lugar` : '—';
+
+        histLigas.innerHTML += `
+          <div class="liga-hist-item">
+            <div>
+              <p class="font-russo" style="font-size:14px;color:var(--text-white);">${liga.nome}</p>
+              <p style="font-size:11px;color:var(--text-gray);">Liga Privada · Cód: ${liga.codigo_convite}</p>
+            </div>
+            <div style="text-align:right;">
+              <p class="font-russo" style="font-size:15px;color:${corPos};">${labelPos}</p>
+              <p style="font-size:12px;color:var(--accent-cyan);">${meuPts} pts</p>
+            </div>
+          </div>`;
+
+        if (posicao && posicao <= 3) trofeusList.push({ posicao, nome: liga.nome });
+      }
+
+      // Troféus
+      if (!trofeusList.length) {
+        trofeus.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Nenhum troféu ainda. Continue lutando! 🦆</p>';
+      } else {
+        const config = {
+          1: { icone: '🏆', cor: 'ouro',   label: 'CAMPEÃO'  },
+          2: { icone: '🥈', cor: 'prata',  label: 'VICE'     },
+          3: { icone: '🥉', cor: 'bronze', label: '3º LUGAR' }
+        };
+        trofeusList.forEach(t => {
+          const c = config[t.posicao];
+          trofeus.innerHTML += `
+            <div class="trofeu-card ${c.cor}">
+              <div style="font-size:40px;margin-bottom:10px;">${c.icone}</div>
+              <p class="font-russo" style="font-size:13px;color:var(--text-white);margin-bottom:4px;">${t.nome}</p>
+              <p style="color:var(--text-gray);font-size:10px;font-weight:bold;">${c.label}</p>
+            </div>`;
+        });
+      }
+
+      // Troféu especial: Rei das Cravações (5+)
+      if (cravadas >= 5) {
+        trofeus.innerHTML += `
+          <div class="trofeu-card especial" style="grid-column:span 2;">
+            <div style="font-size:36px;margin-bottom:8px;">🎯</div>
+            <p class="font-russo" style="font-size:13px;color:var(--accent-cyan);margin-bottom:4px;">Rei das Cravações</p>
+            <p style="color:var(--text-gray);font-size:10px;font-weight:bold;">${cravadas} PLACARES EXATOS NA CARREIRA</p>
+          </div>`;
+      }
+
+    } catch (e) {
+      console.error('Erro ao carregar carreira:', e);
+      mostrarAviso('Erro ao carregar dados da carreira.', 'erro');
+      carregarPreviewCarreira();
+    }
+  }
+
+  // ── PREVIEW TEMPORADA ─────────────────────────────────────
   function carregarPreviewTemporada() {
-    document.getElementById('t-pontos').innerText       = '24';
-    document.getElementById('t-cravadas').innerText     = '3';
-    document.getElementById('t-acertos').innerText      = '5';
-    document.getElementById('t-erros').innerText        = '4';
-    document.getElementById('t-palpites').innerText     = '12';
+    document.getElementById('t-pontos').innerText         = '24';
+    document.getElementById('t-cravadas').innerText       = '3';
+    document.getElementById('t-acertos').innerText        = '5';
+    document.getElementById('t-erros').innerText          = '4';
+    document.getElementById('t-palpites').innerText       = '12';
     document.getElementById('t-aproveitamento').innerText = '67%';
-    document.getElementById('t-taxa-label').innerText   = '67%';
-    document.getElementById('t-frase').innerText        = '🔥 Tá voando!';
-    document.getElementById('totalTemporada').innerText = '24 pts';
-    document.getElementById('t-posicao-icone').innerText = '🥈';
-    document.getElementById('t-posicao-texto').innerText = '2º lugar';
-    document.getElementById('t-nome-liga').innerText    = 'Liga dos Bagres';
+    document.getElementById('t-taxa-label').innerText     = '67%';
+    document.getElementById('t-frase').innerText          = '🔥 Tá voando!';
+    document.getElementById('totalTemporada').innerText   = '24 pts';
+    document.getElementById('t-posicao-icone').innerText  = '🥈';
+    document.getElementById('t-posicao-texto').innerText  = '2º lugar';
+    document.getElementById('t-nome-liga').innerText      = 'Liga dos Bagres';
     setTimeout(() => { document.getElementById('t-barra').style.width = '67%'; }, 100);
 
     const lista = document.getElementById('lista-ultimos');
-    const demo  = [
+    [
       { jogo: 'FLA x SAN', rod: 3, palpite: '2 x 1', real: '2 x 1', pts: 3 },
       { jogo: 'SPF x CRU', rod: 3, palpite: '1 x 0', real: '2 x 0', pts: 1 },
       { jogo: 'PAL x GRE', rod: 2, palpite: '0 x 1', real: '1 x 0', pts: 0 },
-    ];
-    lista.innerHTML = '';
-    demo.forEach(d => {
+    ].forEach(d => {
       const cls = d.pts === 3 ? 'pts-3' : d.pts === 1 ? 'pts-1' : 'pts-0';
       const lbl = d.pts === 3 ? '🎯 +3' : d.pts === 1 ? '✅ +1' : '❌ 0';
       lista.innerHTML += `
         <div class="palpite-item">
-          <div>
-            <p class="palpite-jogo">${d.jogo}</p>
-            <p class="palpite-info">Rod. ${d.rod} • Real: ${d.real}</p>
-          </div>
+          <div><p class="palpite-jogo">${d.jogo}</p><p class="palpite-info">Rod. ${d.rod} · Real: ${d.real}</p></div>
           <span class="palpite-placar">${d.palpite}</span>
           <span class="palpite-pts ${cls}">${lbl}</span>
         </div>`;
     });
   }
 
-  // ── CARREIRA COMPLETA ─────────────────────────────────────
-  async function carregarCarreira() {
-    if (!idLogado) return carregarPreviewCarreira();
-
-    try {
-      // Stats totais via palpites
-      const resPalpites = await fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`);
-      const palpites    = await resPalpites.json();
-
-      const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
-      const pontos      = finalizados.reduce((s, p) => s + p.pontos_obtidos, 0);
-      const cravadas    = finalizados.filter(p => p.pontos_obtidos === 3).length;
-      const acertos     = finalizados.filter(p => p.pontos_obtidos === 1).length;
-      const taxa        = finalizados.length > 0 ? Math.round(((cravadas + acertos) / finalizados.length) * 100) : 0;
-
-      document.getElementById('c-pontos').innerText       = pontos;
-      document.getElementById('c-palpites').innerText     = finalizados.length;
-      document.getElementById('c-cravadas').innerText     = cravadas;
-      document.getElementById('c-acertos').innerText      = acertos;
-      document.getElementById('c-aproveitamento').innerText = `${taxa}%`;
-      document.getElementById('c-taxa-label').innerText   = `${taxa}%`;
-      document.getElementById('c-frase').innerText        = fraseAproveitamento(taxa);
-      document.getElementById('totalCarreira').innerText  = `${pontos} pts`;
-
-      setTimeout(() => { document.getElementById('c-barra').style.width = `${taxa}%`; }, 200);
-
-      // Ligas jogadas
-      const resLigas = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`);
-      const ligas    = await resLigas.json();
-      document.getElementById('c-ligas').innerText = ligas.length;
-
-      // Troféus e histórico de ligas
-      const trofeus       = document.getElementById('sala-trofeus');
-      const histLigas     = document.getElementById('historico-ligas');
-      const trofeusList   = [];
-      histLigas.innerHTML = '';
-      trofeus.innerHTML   = '';
-
-      if (!ligas.length) {
-        trofeus.innerHTML   = '<p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Nenhum troféu ainda. 🦆</p>';
-        histLigas.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;">Você ainda não participou de nenhuma liga.</p>';
-      } else {
-        for (const liga of ligas) {
-          const resRank   = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${liga.id_liga}`);
-          const dadosLiga = await resRank.json();
-          const pos       = dadosLiga.ranking.findIndex(r => String(r.id) === String(idLogado));
-          const meuPts    = pos !== -1 ? dadosLiga.ranking[pos].total_pontos : 0;
-          const posicao   = pos !== -1 ? pos + 1 : null;
-
-          // Histórico
-          const corPos   = posicao === 1 ? '#eab308' : posicao === 2 ? '#d1d5db' : posicao === 3 ? '#b45309' : 'var(--accent-cyan)';
-          const labelPos = posicao === 1 ? '🏆 Campeão' : posicao === 2 ? '🥈 Vice' : posicao === 3 ? '🥉 3º Lugar' : posicao ? `${posicao}º Lugar` : '—';
-
-          histLigas.innerHTML += `
-            <div class="liga-hist-item">
-              <div>
-                <p class="font-russo" style="font-size:14px;color:var(--text-white);">${liga.nome}</p>
-                <p style="font-size:11px;color:var(--text-gray);">Liga Privada</p>
-              </div>
-              <div style="text-align:right;">
-                <p class="font-russo" style="font-size:15px;color:${corPos};">${labelPos}</p>
-                <p style="font-size:12px;color:var(--accent-cyan);">${meuPts} pts</p>
-              </div>
-            </div>`;
-
-          // Troféus
-          if (posicao && posicao <= 3) {
-            trofeusList.push({ posicao, nome: liga.nome });
-          }
-        }
-
-        // Renderiza troféus
-        if (!trofeusList.length) {
-          trofeus.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Nenhum troféu ainda. Continue lutando! 🦆</p>';
-        } else {
-          const config = {
-            1: { icone: '🏆', cor: 'ouro',   label: 'CAMPEÃO'    },
-            2: { icone: '🥈', cor: 'prata',  label: 'VICE'       },
-            3: { icone: '🥉', cor: 'bronze', label: '3º LUGAR'   }
-          };
-          trofeusList.forEach(t => {
-            const c = config[t.posicao];
-            trofeus.innerHTML += `
-              <div class="trofeu-card ${c.cor}">
-                <div style="font-size:40px;margin-bottom:10px;filter:drop-shadow(0 0 6px rgba(234,179,8,0.3));">${c.icone}</div>
-                <p class="font-russo" style="font-size:13px;color:var(--text-white);margin-bottom:4px;">${t.nome}</p>
-                <p style="color:var(--text-gray);font-size:10px;font-weight:bold;">${c.label}</p>
-              </div>`;
-          });
-
-          // Troféu especial de cravação
-          if (cravadas >= 5) {
-            trofeus.innerHTML += `
-              <div class="trofeu-card especial" style="grid-column: span 2;">
-                <div style="font-size:36px;margin-bottom:8px;">🎯</div>
-                <p class="font-russo" style="font-size:13px;color:var(--accent-cyan);margin-bottom:4px;">Rei das Cravações</p>
-                <p style="color:var(--text-gray);font-size:10px;font-weight:bold;">${cravadas} PLACARES EXATOS NA CARREIRA</p>
-              </div>`;
-          }
-        }
-      }
-
-    } catch (e) {
-      carregarPreviewCarreira();
-    }
-  }
-
-  // ── PREVIEW CARREIRA (servidor offline) ───────────────────
+  // ── PREVIEW CARREIRA ──────────────────────────────────────
   function carregarPreviewCarreira() {
-    document.getElementById('c-pontos').innerText       = '142';
-    document.getElementById('c-palpites').innerText     = '38';
-    document.getElementById('c-ligas').innerText        = '3';
-    document.getElementById('c-cravadas').innerText     = '12';
-    document.getElementById('c-acertos').innerText      = '15';
+    document.getElementById('c-pontos').innerText         = '142';
+    document.getElementById('c-palpites').innerText       = '38';
+    document.getElementById('c-ligas').innerText          = '3';
+    document.getElementById('c-cravadas').innerText       = '12';
+    document.getElementById('c-acertos').innerText        = '15';
     document.getElementById('c-aproveitamento').innerText = '71%';
-    document.getElementById('c-taxa-label').innerText   = '71%';
-    document.getElementById('c-frase').innerText        = '🔥 Tá voando!';
-    document.getElementById('totalCarreira').innerText  = '142 pts';
+    document.getElementById('c-taxa-label').innerText     = '71%';
+    document.getElementById('c-frase').innerText          = '🔥 Tá voando!';
+    document.getElementById('totalCarreira').innerText    = '142 pts';
     setTimeout(() => { document.getElementById('c-barra').style.width = '71%'; }, 200);
 
     document.getElementById('sala-trofeus').innerHTML = `
       <div class="trofeu-card ouro">
         <div style="font-size:40px;margin-bottom:10px;">🏆</div>
-        <p class="font-russo" style="font-size:13px;color:#eab308;margin-bottom:4px;">Série A</p>
-        <p style="color:var(--text-gray);font-size:10px;font-weight:bold;">CAMPEÃO TEMP. 4</p>
-      </div>
-      <div class="trofeu-card prata">
-        <div style="font-size:40px;margin-bottom:10px;">🥈</div>
-        <p class="font-russo" style="font-size:13px;color:#d1d5db;margin-bottom:4px;">Copa Brah.Bet</p>
-        <p style="color:var(--text-gray);font-size:10px;font-weight:bold;">VICE TEMP. 5</p>
+        <p class="font-russo" style="font-size:13px;color:#eab308;margin-bottom:4px;">Liga dos Bagres</p>
+        <p style="color:var(--text-gray);font-size:10px;font-weight:bold;">CAMPEÃO</p>
       </div>
       <div class="trofeu-card especial" style="grid-column:span 2;">
         <div style="font-size:36px;margin-bottom:8px;">🎯</div>
@@ -667,16 +589,8 @@
 
     document.getElementById('historico-ligas').innerHTML = `
       <div class="liga-hist-item">
-        <div><p class="font-russo" style="font-size:14px;color:var(--text-white);">Temporada 5</p><p style="font-size:11px;color:var(--text-gray);">Brah.League - Série A</p></div>
-        <div style="text-align:right;"><p class="font-russo" style="font-size:15px;color:var(--accent-cyan);">3º Lugar</p><p style="font-size:12px;color:var(--accent-cyan);">32 pts</p></div>
-      </div>
-      <div class="liga-hist-item">
-        <div><p class="font-russo" style="font-size:14px;color:var(--text-white);">Temporada 4</p><p style="font-size:11px;color:var(--text-gray);">Brah.League - Série A</p></div>
+        <div><p class="font-russo" style="font-size:14px;color:var(--text-white);">Liga dos Bagres</p><p style="font-size:11px;color:var(--text-gray);">Liga Privada</p></div>
         <div style="text-align:right;"><p class="font-russo" style="font-size:15px;color:#eab308;">🏆 Campeão</p><p style="font-size:12px;color:var(--accent-cyan);">45 pts</p></div>
-      </div>
-      <div class="liga-hist-item">
-        <div><p class="font-russo" style="font-size:14px;color:var(--text-white);">Temporada 3</p><p style="font-size:11px;color:var(--text-gray);">Brah.League - Série B</p></div>
-        <div style="text-align:right;"><p class="font-russo" style="font-size:15px;color:var(--accent-green);">⬆️ Acesso (2º)</p><p style="font-size:12px;color:var(--accent-cyan);">38 pts</p></div>
       </div>`;
   }
 
