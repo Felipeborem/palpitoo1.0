@@ -4,11 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palpitoo - Novidades</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="./css/style.css">
 
   <style>
@@ -111,13 +106,16 @@
     .badge-sistema { background: rgba(234,179,8,0.15); color: #eab308;             border: 1px solid #eab308; }
     .badge-pato    { background: rgba(122,30,58,0.2);  color: var(--accent-cyan);  border: 1px solid var(--accent-cyan); }
   </style>
+  <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
+  <link rel="icon" href="./img/pato.png" type="image/png">
 </head>
 <body>
 
   <header class="navbar">
-    <a href="index.html" class="logo-link">
-      <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+        <a href="inicio.html" class="logo-link">
+        <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
     </a>
+    
     <nav>
       <ul class="nav-links">
         <li><a href="index.html">Início</a></li>
@@ -128,6 +126,10 @@
         <li><a href="carreira.html">Carreira</a></li>
       </ul>
     </nav>
+    <button class="hamburger" id="hamburger-btn" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="navbar-user" id="navbar-user-area"></div>
   </header>
 
   <main class="container-principal" style="max-width: 960px; margin-top: 40px;">
@@ -540,6 +542,45 @@
 
   carregarFeed();
 </script>
+
+
+  <script>
+    // Navbar: avatar + logout para páginas autenticadas
+    (function() {
+      const nome = localStorage.getItem('nome_craque') || '';
+      const foto = localStorage.getItem('foto_craque');
+      const userArea = document.getElementById('navbar-user-area');
+      if (!userArea) return;
+      if (nome) {
+        const initials = encodeURIComponent(nome.split(' ')[0]);
+        const src = (foto && foto !== 'null' && foto !== 'undefined')
+          ? foto
+          : `https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36`;
+        userArea.innerHTML = `
+          <a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36'"></a>
+          <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+        `;
+      } else {
+        userArea.innerHTML = '<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>';
+      }
+    })();
+
+    function fazerLogout() {
+      localStorage.clear();
+      window.location.href = 'inicio.html';
+    }
+
+    // Hamburger menu
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('hamburger-btn');
+      const nav = document.querySelector('.nav-links');
+      if (!btn || !nav) return;
+      btn.addEventListener('click', function() {
+        btn.classList.toggle('aberto');
+        nav.classList.toggle('aberto');
+      });
+    });
+  </script>
 
 </body>
 </html>

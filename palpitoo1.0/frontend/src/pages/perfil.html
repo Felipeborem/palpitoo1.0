@@ -4,11 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palpitoo - Perfil e Sobre</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="./css/style.css">
 
   <style>
@@ -313,11 +308,13 @@
     }
     .campo-time-display:hover .seta { color: var(--accent-cyan); opacity: 1; }
   </style>
+  <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
+  <link rel="icon" href="./img/pato.png" type="image/png">
 </head>
 <body>
 
   <header class="navbar">
-  <a href="index.html" class="logo-link">
+  <a href="inicio.html" class="logo-link">
     <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
 </a>
     
@@ -331,6 +328,10 @@
         <li><a href="carreira.html">Carreira</a></li>
       </ul>
     </nav>
+    <button class="hamburger" id="hamburger-btn" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="navbar-user" id="navbar-user-area"></div>
   </header>
 
   <main class="container-principal" style="max-width: 600px; margin-top: 60px;">
@@ -737,6 +738,8 @@
       }
     }
   </script>
+
+  <div id="container-avisos"></div>
 
 </body>
 </html>

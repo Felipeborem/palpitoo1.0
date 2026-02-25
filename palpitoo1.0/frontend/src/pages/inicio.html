@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palpitoo - Arena VIP</title>
+  <title>Palpitoo - A Resenha Virou Campeonato</title>
   <link rel="stylesheet" href="./css/style.css">
+  <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
+  <link rel="icon" href="./img/pato.png" type="image/png">
 </head>
 <body>
 
   <header class="navbar">
-    <a href="index.html" class="logo-link">
-    <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
-</a>
-    
+    <a href="inicio.html" class="logo-link">
+        <img src="./img/pato.png" alt="Logo Pato Mestre" class="logo-imagem">
+    </a>
     <nav>
         <ul class="nav-links">
-            <li><a href="#regras">Regras</a></li>
             <li><a href="login.html">Entrar</a></li>
             <li><a href="cadastro.html" class="ativo">Criar Conta</a></li>
         </ul>
     </nav>
-</header>
+  </header>
 
   <main class="hero-section">
     <div class="glow-blue"></div>
@@ -28,36 +28,114 @@
     
     <div class="container hero-grid">
       <div class="hero-content">
-        <p class="subtitle">A Arena dos Especialistas</p>
-        <h2 class="main-title">Mostre seu <br><span class="text-gradient">Conhecimento.</span></h2>
-        <p class="description">Ligas privadas para quem leva o futebol a sério. Interface minimalista, foco total na competição.</p>
+        <p class="subtitle">A Resenha Virou Campeonato</p>
+        <h2 class="main-title">Separe os <br><span class="text-gradient">Especialistas</span> <br>dos <span style="color: var(--vermelho);">Patos.</span></h2>
+        <p class="description">Crie sua liga privada, convoque a rapaziada e mostre quem entende mais do futebol de verdade.</p>
         
-        <div class="feature-cards">
-          <div class="feature-card">
-            <span class="feature-icon green">🎯</span>
-            <p class="feature-title">Precisão</p>
-          </div>
-          <div class="feature-card">
-            <span class="feature-icon blue">🏆</span>
-            <p class="feature-title">Ranking</p>
-          </div>
+        <div class="botoes-hero mt-20" style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <a href="cadastro.html" class="btn btn-salvar" style="text-decoration: none; font-size: 1.1rem; padding: 15px 30px;">Criar Minha Conta</a>
+            <a href="#como-funciona" class="btn btn-cancelar" style="text-decoration: none; font-size: 1.1rem; padding: 15px 30px;">Entender o Jogo</a>
         </div>
       </div>
 
-      <div class="login-area" id="regras">
-        <div class="cartao bg-escuro text-center animacao-suave" style="width: 100%; max-width: 400px;">
-          <h3 class="font-russo mb-20" style="color: var(--accent-cyan);">Sistema de Pontos</h3>
+      <div class="login-area">
+        <div class="cartao bg-escuro text-center animacao-suave" style="width: 100%; max-width: 400px; border-color: var(--accent-cyan);">
+          <h3 class="font-russo mb-10" style="color: var(--text-white); font-size: 1.8rem;">O Que Vale é Ponto</h3>
+          <p style="color: var(--text-gray); font-size: 0.9rem; margin-bottom: 20px;">Esquece o achismo. O sistema é bruto:</p>
           <div class="divisor-tracejado mb-15"></div>
-          <p class="font-russo" style="font-size: 14px; margin-bottom: 10px;">🎯 Placar Exato: <span style="color: var(--accent-cyan);">3 PTS</span></p>
-          <p class="font-russo" style="font-size: 14px; margin-bottom: 10px;">✅ Vitória/Empate: <span style="color: var(--text-white);">1 PT</span></p>
-          <p class="font-russo" style="font-size: 14px;">❌ Erro Total: <span style="color: var(--vermelho);">0 PTS</span></p>
-          <div class="divisor-tracejado mt-15 mb-20"></div>
           
-          <a href="login.html" class="btn-primary" style="display: block; text-decoration: none;">Entrar na Arena</a>
+          <div style="display: flex; flex-direction: column; gap: 15px; text-align: left; padding: 0 10px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span class="font-russo" style="font-size: 16px;">🎯 Na Mosca (Placar Exato)</span>
+                  <span class="destaque-status" style="color: var(--accent-cyan); font-weight: 900;">3 PTS</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span class="font-russo" style="font-size: 16px;">✅ Na Trave (Acertou o Vencedor)</span>
+                  <span class="destaque-status" style="color: var(--accent-green); font-weight: 900;">1 PT</span>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span class="font-russo" style="font-size: 16px;">❌ Bagre (Errou Tudo)</span>
+                  <span class="destaque-status" style="color: var(--vermelho); font-weight: 900;">0 PTS</span>
+              </div>
+          </div>
+          
+          <div class="divisor-tracejado mt-20 mb-20"></div>
+          <a href="login.html" class="btn-link" style="font-size: 1rem; color: var(--accent-cyan);">Já tenho uma liga ></a>
         </div>
       </div>
     </div>
   </main>
+
+  <section id="como-funciona" class="container mt-20" style="padding: 40px 24px;">
+    <h2 class="text-center font-russo text-gradient mb-10" style="font-size: 2.5rem;">Como rola o jogo?</h2>
+    <p class="text-center description mx-auto mb-20" style="max-width: 600px; margin: 0 auto 40px auto;">Sem complicação. Você monta o esquema em 3 passos e deixa o sistema cuidar da matemática e das zoações.</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px;">
+        <div class="cartao bg-escuro animacao-suave text-center">
+            <div class="icone" style="font-size: 40px; margin-bottom: 15px;">🏆</div>
+            <h3 class="font-russo mb-10" style="color: var(--text-white);">1. Crie a Panela</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.5;">Monte sua liga privada e mande o link pro grupo. Só entra quem tem o convite do administrador.</p>
+        </div>
+        <div class="cartao bg-escuro animacao-suave text-center">
+            <div class="icone" style="font-size: 40px; margin-bottom: 15px;">⚽</div>
+            <h3 class="font-russo mb-10" style="color: var(--text-white);">2. Deixe o Palpite</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.5;">A rodada abriu? Preencha seus placares. O mercado fecha minutos antes da bola rolar. Sem choro.</p>
+        </div>
+        <div class="cartao bg-escuro animacao-suave text-center">
+            <div class="icone" style="font-size: 40px; margin-bottom: 15px;">🦆</div>
+            <h3 class="font-russo mb-10" style="color: var(--accent-cyan);">3. Fuja da Lanterna</h3>
+            <p style="color: var(--text-gray); font-size: 0.95rem; line-height: 1.5;">O líder tira onda no topo, o último colocado vira o Pato Mestre oficial da rodada no ranking ao vivo.</p>
+        </div>
+    </div>
+  </section>
+
+  <section class="container mt-20" style="padding: 40px 24px;">
+    <h2 class="text-center font-russo mb-10" style="font-size: 2.2rem; color: var(--text-white);">Chega de bagunça no Zap</h2>
+    <p class="text-center description mx-auto mb-20" style="max-width: 600px; margin: 0 auto 40px auto;">Controlar palpite na mão é coisa do passado. O PalpitoO resolve as brigas antes delas começarem.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+        <div class="cartao bg-escuro animacao-suave" style="border-left: 4px solid var(--accent-green); padding: 25px;">
+            <h4 class="font-russo mb-10" style="color: var(--text-white); font-size: 1.2rem;">⏱️ Mercado Blindado</h4>
+            <p style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.4;">Deu a hora do jogo, o mercado fecha. Ninguém edita palpite depois que a bola rola. Fim do "mandei atrasado mas valeu".</p>
+        </div>
+        <div class="cartao bg-escuro animacao-suave" style="border-left: 4px solid var(--accent-cyan); padding: 25px;">
+            <h4 class="font-russo mb-10" style="color: var(--text-white); font-size: 1.2rem;">🧮 Matemática Fria</h4>
+            <p style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.4;">Acabou o jogo? O sistema calcula tudo na hora. Sem "faz a conta direito". O ranking atualiza e a zoeira tá liberada.</p>
+        </div>
+        <div class="cartao bg-escuro animacao-suave" style="border-left: 4px solid var(--vermelho); padding: 25px;">
+            <h4 class="font-russo mb-10" style="color: var(--text-white); font-size: 1.2rem;">📊 Muro da Vergonha</h4>
+            <p style="color: var(--text-gray); font-size: 0.9rem; line-height: 1.4;">O histórico não perdoa. As estatísticas mostram quem é o rei da rodada e quem tem o título vitalício de bagre.</p>
+        </div>
+    </div>
+  </section>
+
+  <section class="container mt-20 mb-20" style="padding: 40px 24px;">
+    <div style="background-color: var(--card-dark); border-radius: 24px; border: 1px solid var(--borda-divisoria); padding: 40px;">
+        <h2 class="text-center font-russo mb-20" style="font-size: 2rem; color: var(--accent-cyan);">Dúvidas dos Bagres</h2>
+
+        <div style="display: flex; flex-direction: column; gap: 15px; max-width: 800px; margin: 0 auto;">
+            <div style="padding: 15px; border-bottom: 1px dashed var(--borda-divisoria);">
+                <h4 class="font-russo" style="color: var(--text-white); margin-bottom: 5px;">"Esqueci de colocar o placar, e agora?"</h4>
+                <p style="color: var(--text-gray); font-size: 0.95rem;">Senta e chora. O sistema te dá 0 pontos no jogo. É bom pra aprender a ficar esperto na próxima rodada.</p>
+            </div>
+            <div style="padding: 15px; border-bottom: 1px dashed var(--borda-divisoria);">
+                <h4 class="font-russo" style="color: var(--text-white); margin-bottom: 5px;">"Posso participar de mais de uma panela?"</h4>
+                <p style="color: var(--text-gray); font-size: 0.95rem;">Pode. Você tem o direito de ser o rei numa liga e o Pato Mestre em outra ao mesmo tempo. Tudo na mesma conta.</p>
+            </div>
+            <div style="padding: 15px;">
+                <h4 class="font-russo" style="color: var(--text-white); margin-bottom: 5px;">"O app cobra pra jogar?"</h4>
+                <p style="color: var(--text-gray); font-size: 0.95rem;">A plataforma é de graça. Se vocês apostam o churrasco ou a caixa de cerveja por fora, a gestão de risco é 100% de vocês.</p>
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <footer style="background-color: var(--bg-header); padding: 40px 20px; text-align: center; border-top: 2px solid var(--borda-divisoria); margin-top: 40px;">
+    <img src="./img/pato.png" alt="Pato Mestre" style="width: 50px; opacity: 0.6; margin-bottom: 15px;">
+    <p class="font-russo" style="color: var(--text-white); font-size: 1.2rem; margin-bottom: 5px;">PalpitoO</p>
+    <p style="color: var(--text-gray); font-size: 0.85rem; font-weight: 600; margin-bottom: 5px;">© 2026. A resenha oficial.</p>
+    <p style="color: var(--accent-cyan); font-size: 0.75rem; font-weight: 700;">Desenvolvido para quem não aguenta mais calcular ponto no Excel.</p>
+  </footer>
 
 </body>
 </html>
