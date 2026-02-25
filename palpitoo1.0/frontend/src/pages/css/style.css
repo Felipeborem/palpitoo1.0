@@ -817,6 +817,46 @@ body {
 .hamburger.aberto span:nth-child(2) { opacity: 0; }
 .hamburger.aberto span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* ── CONFIGURAÇÃO DA NAVBAR (CENTRALIZANDO OS LINKS) ── */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centraliza a tag <nav> no meio do espaço */
+  position: relative; /* Permite posicionar o logo livremente */
+  padding: 15px 20px; /* Ajuste o espaçamento interno conforme precisar */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fixa o logotipo no canto esquerdo */
+.navbar .logo-link {
+  position: absolute;
+  left: 20px; /* Distância da borda esquerda */
+}
+
+/* Deixa os links lado a lado e limpa estilos de lista padrão */
+.nav-links {
+  display: flex;
+  gap: 24px; /* Espaço entre os links "Início", "Ligas", etc. */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* (Opcional) Ajuste para celular: empilha os links ou oculta */
+@media (max-width: 768px) {
+  .navbar {
+    justify-content: flex-end; /* Empurra o botão hamburger (se houver) pra direita */
+  }
+  .nav-links {
+    display: none; /* Esconde no mobile para usar o menu hamburger */
+    /* Aqui entraria o CSS do seu menu aberto no celular */
+  }
+}
+
+
+
+
 /* =========================================
    RESPONSIVIDADE MOBILE
    ========================================= */
