@@ -237,7 +237,8 @@ app.get('/ranking', async (req, res) => {
 // ROTA PARA CRIAR UMA NOVA LIGA
 app.post('/criar-liga', async (req, res) => {
   try {
-    const { nome_liga, id_dono } = req.body;
+    const { nome_liga, dono_id, id_dono } = req.body;
+    const donoCerto = dono_id || id_dono;
 
     // Gera um código aleatório de 6 letras/números (Ex: X7B9KQ)
     const codigo_convite = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -245,7 +246,7 @@ app.post('/criar-liga', async (req, res) => {
     // 1. Salva a liga nova no banco
     const novaLiga = await pool.query(
       'INSERT INTO ligas (nome, codigo_convite, dono_id) VALUES ($1, $2, $3) RETURNING *',
-      [nome_liga, codigo_convite, id_dono]
+      [nome_liga, codigo_convite, donoCerto]
     );
 
     const idLigaGerada = novaLiga.rows[0].id_liga;
@@ -253,7 +254,7 @@ app.post('/criar-liga', async (req, res) => {
     // 2. Coloca o dono automaticamente dentro da liga que ele acabou de criar
     await pool.query(
       'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2)',
-      [idLigaGerada, id_dono]
+      [idLigaGerada, donoCerto]
     );
 
     res.status(201).json({ 
@@ -270,7 +271,8 @@ app.post('/criar-liga', async (req, res) => {
 // ROTA PARA ENTRAR EM UMA LIGA USANDO O CÓDIGO
 app.post('/entrar-liga', async (req, res) => {
   try {
-    const { codigo_convite, id_usuario } = req.body;
+    const { codigo_convite, id_usuario, usuario_id } = req.body;
+    const usuarioCerto = id_usuario || usuario_id;
 
     // 1. Verifica se a liga com esse código existe
     const buscaLiga = await pool.query('SELECT * FROM ligas WHERE codigo_convite = $1', [codigo_convite]);
@@ -284,7 +286,7 @@ app.post('/entrar-liga', async (req, res) => {
     // 2. Tenta colocar o usuário na liga
     await pool.query(
       'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2)',
-      [liga_id, id_usuario]
+      [liga_id, usuarioCerto]
     );
 
     res.json({ mensagem: `Bem-vindo à liga ${buscaLiga.rows[0].nome}!` });
@@ -877,6 +879,62 @@ app.put('/atualizar-perfil', async (req, res) => {
     res.status(500).json({ erro: 'Erro interno no servidor ao tentar salvar o time.' });
   }
 });
+
+// =========================================================================
+// ROTA: BUSCAR LIGAS DISPONÍVEIS (Que o usuário ainda não está)
+// =========================================================================
+app.get('/ligas-disponiveis/:usuario_id', async (req, res) => {
+  try {
+    const { usuario_id } = req.params;
+    
+    // CORREÇÃO NO SQL: Usar 'id_liga' em vez de 'id'
+    const resultado = await pool.query(
+      `SELECT * FROM ligas 
+       WHERE id_liga NOT IN (
+         SELECT liga_id FROM usuarios_ligas WHERE usuario_id = $1
+       )
+       ORDER BY id_liga DESC LIMIT 10`, 
+      [usuario_id]
+    );
+
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error("Erro ao buscar ligas disponíveis:", err);
+    res.status(500).json({ erro: 'Erro ao buscar a vitrine de ligas no banco.' });
+  }
+});
+
+
+// =========================================================================
+// ROTA: ENTRAR NA LIGA PELO CLIQUE (Usando o ID direto)
+// =========================================================================
+app.post('/entrar-liga-clique', async (req, res) => {
+  try {
+    const { liga_id, usuario_id } = req.body;
+
+    // 1. Verifica se ele já está na liga por segurança
+    const jaEsta = await pool.query(
+      'SELECT * FROM usuarios_ligas WHERE liga_id = $1 AND usuario_id = $2', 
+      [liga_id, usuario_id]
+    );
+    if (jaEsta.rows.length > 0) {
+      return res.status(400).json({ erro: 'Você já está participando desta liga!' });
+    }
+
+    // 2. Insere o craque na liga
+    await pool.query(
+      'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2)', 
+      [liga_id, usuario_id]
+    );
+
+    res.json({ mensagem: 'Parabéns! Você entrou na liga com sucesso! ⚽' });
+  } catch (err) {
+    console.error("Erro ao entrar na liga:", err);
+    res.status(500).json({ erro: 'Erro interno ao tentar entrar na liga.' });
+  }
+});
+
+
 
 //--------------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
