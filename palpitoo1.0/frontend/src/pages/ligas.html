@@ -11,14 +11,91 @@
   <link rel="icon" href="./img/pato.png" type="image/png">
 
   <style>
-    /* Estilos para as Abas */
-    .tabs-principais { display: flex; gap: 10px; margin-bottom: 30px; justify-content: center; border-bottom: 2px solid var(--borda-divisoria); padding-bottom: 10px; }
-    .tab-principal-btn { background: transparent; border: 1px solid var(--borda-divisoria); border-radius: 10px; color: var(--text-gray); font-size: 16px; padding: 10px 20px; cursor: pointer; font-family: 'Russo One', sans-serif; transition: all 0.2s; }
+    .tabs-principais {
+      display: flex; gap: 10px; margin-bottom: 30px;
+      justify-content: center; border-bottom: 2px solid var(--borda-divisoria); padding-bottom: 10px;
+    }
+    .tab-principal-btn {
+      background: transparent; border: 1px solid var(--borda-divisoria);
+      border-radius: 10px; color: var(--text-gray); font-size: 16px;
+      padding: 10px 20px; cursor: pointer; font-family: 'Russo One', sans-serif; transition: all 0.2s;
+    }
     .tab-principal-btn:hover { border-color: var(--accent-cyan); color: var(--text-white); }
-    .tab-principal-btn.ativo { background: var(--accent-cyan); border-color: var(--accent-cyan); color: var(--text-white); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(122, 30, 58, 0.3); }
+    .tab-principal-btn.ativo {
+      background: var(--accent-cyan); border-color: var(--accent-cyan);
+      color: var(--text-white); transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(122,30,58,0.3);
+    }
     .aba-conteudo { display: none; animation: fadeIn 0.3s ease-in-out; }
     .aba-conteudo.ativo { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    .liga-card {
+      padding: 15px; margin-bottom: 12px; list-style: none;
+      border-radius: 14px; border: 1px solid var(--borda-divisoria);
+      background: var(--bg-dark); border-left: 4px solid var(--accent-cyan);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .liga-card:hover { transform: translateX(3px); }
+    .liga-card-topo { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px; }
+    .liga-card-nome { font-family:'Russo One',sans-serif; font-size:15px; color:var(--text-white); margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .liga-badge { padding:2px 9px; border-radius:6px; font-size:10px; font-family:'Russo One',sans-serif; white-space:nowrap; flex-shrink:0; }
+    .liga-badge.dono         { background:var(--accent-cyan); color:#fff; }
+    .liga-badge.participante { background:var(--borda-divisoria); color:var(--text-gray); }
+    .liga-card-rodape { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+    .liga-codigo { font-size:12px; color:var(--text-gray); }
+    .liga-codigo strong { color:var(--text-white); letter-spacing:2px; }
+    .liga-membros { font-family:'Russo One',sans-serif; font-size:12px; color:var(--accent-cyan); margin-top:3px; }
+
+    .vitrine-card {
+      padding:12px 14px; margin-bottom:10px; list-style:none;
+      background:rgba(122,30,58,0.06); border:1px solid var(--borda-divisoria);
+      border-radius:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;
+      transition: border-color 0.2s;
+    }
+    .vitrine-card:hover { border-color: var(--accent-cyan); }
+    .vitrine-nome { font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-white); }
+    .vitrine-info { font-size:11px; color:var(--text-gray); margin-top:2px; }
+    .btn-entrar-verde {
+      background:#22c55e; color:#fff; border:none; padding:7px 14px;
+      border-radius:8px; font-size:11px; font-family:'Russo One',sans-serif;
+      cursor:pointer; transition:opacity 0.2s; white-space:nowrap; flex-shrink:0;
+    }
+    .btn-entrar-verde:hover { opacity:0.85; }
+    .btn-entrar-verde:disabled { opacity:0.5; cursor:not-allowed; }
+
+    .input-codigo {
+      flex:1; padding:11px 14px; background:var(--bg-dark);
+      border:2px solid var(--borda-divisoria); border-radius:10px;
+      font-family:'Russo One',sans-serif; font-size:14px; color:var(--text-white);
+      text-transform:uppercase; letter-spacing:3px; outline:none;
+      transition:border-color 0.3s; text-align:center; box-sizing:border-box;
+    }
+    .input-codigo:focus { border-color: var(--accent-cyan); }
+    .input-codigo::placeholder { letter-spacing:1px; font-size:12px; color:var(--text-gray); }
+
+    .modal-overlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,0.75); z-index:1000;
+      align-items:center; justify-content:center;
+    }
+    .modal-overlay.aberto { display:flex; }
+    .modal-box {
+      background:var(--bg-card,#15111a); border:1px solid var(--accent-cyan);
+      border-radius:18px; padding:30px 26px; width:100%; max-width:400px; margin:16px;
+    }
+    .modal-input {
+      width:100%; padding:12px 14px; margin-top:8px;
+      background:var(--bg-dark); border:2px solid var(--borda-divisoria);
+      border-radius:10px; font-family:'Russo One',sans-serif; font-size:14px;
+      color:var(--text-white); outline:none; transition:border-color 0.3s; box-sizing:border-box;
+    }
+    .modal-input:focus { border-color: var(--accent-cyan); }
+    .modal-btns { display:flex; gap:10px; margin-top:18px; }
+    .modal-btns .btn { flex:1; }
+
+    .empty-state { text-align:center; padding:28px 10px; color:var(--text-gray); font-size:13px; }
+    .empty-state .emoji { font-size:36px; margin-bottom:8px; }
   </style>
 </head>
 <body>
@@ -27,8 +104,8 @@
     <a href="index.html" class="logo-link"><img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem"></a>
     <nav>
       <ul class="nav-links">
-        <li><a href="index.html">Início</a></li> 
-        <li><a href="ligas.html" class="ativo">Ligas</a></li> 
+        <li><a href="index.html">Início</a></li>
+        <li><a href="ligas.html" class="ativo">Ligas</a></li>
         <li><a href="palpites.html">Palpites</a></li>
         <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
@@ -38,243 +115,383 @@
     <div class="navbar-user" id="navbar-user-area"></div>
   </header>
 
-  <main class="container-principal" style="margin-top: 40px; max-width: 1000px; margin-left: auto; margin-right: auto;">
-    
+  <main class="container-principal" style="margin-top:40px; max-width:1000px; margin-left:auto; margin-right:auto;">
+
     <div class="text-center mb-20 animacao-suave">
-      <h2 class="font-russo titulo-branco" style="font-size: 32px;">Suas <span style="color: var(--accent-cyan);">Ligas</span></h2>
-      <p style="color: var(--text-gray); font-size: 16px;">Gerencie seus campeonatos e faça seus palpites no mesmo lugar</p>
+      <h2 class="font-russo titulo-branco" style="font-size:32px;">Suas <span style="color:var(--accent-cyan);">Ligas</span></h2>
+      <p style="color:var(--text-gray); font-size:16px;">Gerencie seus campeonatos e faça seus palpites no mesmo lugar</p>
     </div>
 
     <div class="tabs-principais animacao-suave">
-      <button class="tab-principal-btn ativo" onclick="mudarAba('aba-ligas', this)" id="btn-aba-ligas">🏆 Minhas Ligas</button>
-      <button class="tab-principal-btn" onclick="mudarAba('aba-palpites', this)" id="btn-aba-palpites">⚽ Jogos & Palpites</button>
+      <button class="tab-principal-btn ativo" onclick="mudarAba('aba-ligas',this)" id="btn-aba-ligas">🏆 Minhas Ligas</button>
+      <button class="tab-principal-btn"        onclick="mudarAba('aba-palpites',this)" id="btn-aba-palpites">⚽ Jogos & Palpites</button>
     </div>
 
+    <!-- ABA: MINHAS LIGAS -->
     <div id="aba-ligas" class="aba-conteudo ativo">
-      
       <div class="text-center mb-20">
-        <button class="btn btn-primary font-russo" onclick="criarLiga()" style="width: auto; padding: 12px 30px; font-size: 14px; background-color: var(--accent-cyan);">👑 + Criar Nova Liga</button>
+        <button class="btn btn-primary font-russo" onclick="abrirModal()"
+                style="width:auto; padding:12px 30px; font-size:14px; background-color:var(--accent-cyan);">
+          👑 + Criar Nova Liga
+        </button>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
-        
-        <section class="cartao bg-escuro">
-          <h3 class="font-russo titulo-branco mb-15" style="font-size: 20px;">🏆 Meus Campeonatos</h3>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(350px,1fr)); gap:30px;">
+
+        <section class="cartao bg-escuro animacao-suave">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 class="font-russo titulo-branco" style="font-size:20px;">🏆 Meus Campeonatos</h3>
+            <span id="contador-minhas" style="font-family:'Russo One',sans-serif; font-size:13px; color:var(--accent-cyan);"></span>
+          </div>
           <div class="divisor-tracejado mb-20"></div>
-          <ul id="lista-ligas-ativas" style="list-style: none; padding: 0;">
-            <li class="text-center text-gray-400 font-russo py-4">Buscando... 🔄</li>
+          <ul id="lista-ligas-ativas" style="list-style:none; padding:0; margin:0;">
+            <li class="empty-state"><div class="emoji">🔄</div><p>Buscando...</p></li>
           </ul>
         </section>
 
-        <section class="cartao bg-escuro">
-          <h3 class="font-russo titulo-branco mb-15" style="font-size: 20px;">🌍 Explorar Ligas (Vitrine)</h3>
+        <section class="cartao bg-escuro animacao-suave">
+          <h3 class="font-russo titulo-branco mb-15" style="font-size:20px;">🌍 Ligas Disponíveis</h3>
           <div class="divisor-tracejado mb-20"></div>
-          <p style="color: var(--text-gray); font-size: 13px; margin-bottom: 15px;">Ligas públicas disponíveis para você entrar com 1 clique:</p>
-          
-          <ul id="lista-ligas-disponiveis" style="list-style: none; padding: 0;">
-            <li class="text-center text-gray-400 font-russo py-4">Buscando ligas... 🔄</li>
+          <p style="color:var(--text-gray); font-size:13px; margin-bottom:15px;">Ligas que você ainda não participa — entre com 1 clique:</p>
+          <ul id="lista-ligas-disponiveis" style="list-style:none; padding:0; margin:0 0 20px;">
+            <li class="empty-state"><div class="emoji">🔄</div><p>Buscando ligas...</p></li>
           </ul>
-
-          <div class="divisor-tracejado mb-20" style="margin-top: 20px;"></div>
-          <p style="color: var(--text-gray); font-size: 12px; margin-bottom: 10px;">Ou entre com um código privado:</p>
-          <div class="form-group" style="display: flex; gap: 10px; margin-bottom: 0;">
-            <input type="text" id="codigoLiga" placeholder="Ex: X7B9KQ" style="margin-bottom: 0; text-transform: uppercase;">
-            <button class="btn btn-salvar font-russo" onclick="entrarNaLigaCodigo()" style="margin-top: 0; padding: 0 20px;">Entrar</button>
+          <div class="divisor-tracejado mb-15"></div>
+          <p style="color:var(--text-gray); font-size:12px; margin-bottom:10px;">Ou entre com um código privado:</p>
+          <div style="display:flex; gap:10px;">
+            <input type="text" id="codigoLiga" class="input-codigo" placeholder="XXXXXX" maxlength="6"
+                   onkeydown="if(event.key==='Enter') entrarCodigo()">
+            <button class="btn btn-salvar font-russo" onclick="entrarCodigo()"
+                    style="padding:0 18px; white-space:nowrap;">Entrar</button>
           </div>
         </section>
 
       </div>
     </div>
 
+    <!-- ABA: JOGOS & PALPITES -->
     <div id="aba-palpites" class="aba-conteudo">
       <section class="cartao bg-escuro text-center">
-        <div id="alerta-sem-liga" style="display: block; padding: 40px 20px;">
+        <div id="alerta-sem-liga" style="padding:40px 20px;">
           <h3 class="font-russo titulo-branco mb-15">Nenhuma Liga Selecionada ⚠️</h3>
-          <p style="color: var(--text-gray); margin-bottom: 20px;">Vá na aba "Minhas Ligas" e clique em "Ver Jogos" para fazer seus palpites.</p>
-          <button class="btn btn-primary" onclick="mudarAba('aba-ligas', document.getElementById('btn-aba-ligas'))" style="width: auto; padding: 10px 20px;">Ir para Minhas Ligas</button>
+          <p style="color:var(--text-gray); margin-bottom:20px;">Vá na aba "Minhas Ligas" e clique em "Ver Jogos" para fazer seus palpites.</p>
+          <button class="btn btn-primary" onclick="mudarAba('aba-ligas',document.getElementById('btn-aba-ligas'))"
+                  style="width:auto; padding:10px 20px;">Ir para Minhas Ligas</button>
         </div>
-        <div id="area-palpites" style="display: none;">
-          <h3 class="font-russo titulo-branco mb-10">Palpites: <span id="nome-liga-ativa" style="color: var(--accent-cyan);">Liga XYZ</span></h3>
+        <div id="area-palpites" style="display:none;">
+          <h3 class="font-russo titulo-branco mb-10">
+            Palpites: <span id="nome-liga-ativa" style="color:var(--accent-cyan);">—</span>
+          </h3>
           <div class="divisor-tracejado mb-20"></div>
-          <p style="color: var(--text-gray);">Listagem de jogos para palpitar aparecerá aqui...</p>
+          <p style="color:var(--text-gray);">Listagem de jogos para palpitar aparecerá aqui...</p>
         </div>
       </section>
     </div>
 
   </main>
 
-  <script>
-    const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque'); 
-    if (!idUsuario) window.location.href = 'login.html'; 
+  <!-- MODAL: CRIAR LIGA -->
+  <div class="modal-overlay" id="modal-criar">
+    <div class="modal-box animacao-suave">
+      <h3 class="font-russo titulo-branco" style="font-size:20px; margin-bottom:6px;">👑 Nova Liga</h3>
+      <p style="color:var(--text-gray); font-size:13px; margin-bottom:16px;">Escolha um nome épico para seu campeonato.</p>
+      <div class="divisor-tracejado mb-20"></div>
+      <label style="font-size:11px; color:var(--text-gray); text-transform:uppercase; font-weight:700;">Nome da Liga</label>
+      <input type="text" id="inputNomeLiga" class="modal-input" placeholder="Ex: Liga dos Bagres 🦆" maxlength="40"
+             onkeydown="if(event.key==='Enter') confirmarCriar()">
+      <div class="modal-btns">
+        <button class="btn btn-cancelar font-russo" onclick="fecharModal()">Cancelar</button>
+        <button class="btn btn-salvar font-russo"   onclick="confirmarCriar()">Criar Liga 🚀</button>
+      </div>
+    </div>
+  </div>
 
-    function mudarAba(idAba, btn) {
-      document.querySelectorAll('.aba-conteudo').forEach(aba => aba.classList.remove('ativo'));
-      document.querySelectorAll('.tab-principal-btn').forEach(b => b.classList.remove('ativo'));
-      document.getElementById(idAba).classList.add('ativo');
-      btn.classList.add('ativo');
-      if(idAba === 'aba-palpites') verificarLigaAtiva();
+  <div id="container-avisos"></div>
+<script>
+  // 1. Configurações Globais
+  const API       = 'https://palpitoo-api.onrender.com'; // Mude para localhost:3000 se for testar local
+  const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque') || localStorage.getItem('usuario_id');
+  const nomeLogado = localStorage.getItem('nome_craque');
+  
+  // Variável de controle: O usuário só pode ter UMA liga
+  let usuarioPossuiLiga = false;
+
+  if (!idUsuario) {
+    console.warn("Usuário não logado na sessão.");
+    // window.location.href = 'login.html';
+  }
+
+  // 2. Sistema de Avisos (Toast)
+  function toast(msg, tipo = 'info') {
+    const cont = document.getElementById('container-avisos');
+    if (!cont) return;
+    const el   = document.createElement('div');
+    const icon = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+    el.className = `aviso-toast aviso-${tipo}`;
+    el.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
+    cont.appendChild(el);
+    setTimeout(() => { el.classList.add('aviso-saindo'); setTimeout(() => el.remove(), 300); }, 3500);
+  }
+
+  // 3. Controle de Abas
+  function mudarAba(idAba, btn) {
+    document.querySelectorAll('.aba-conteudo').forEach(a => a.classList.remove('ativo'));
+    document.querySelectorAll('.tab-principal-btn').forEach(b => b.classList.remove('ativo'));
+    document.getElementById(idAba).classList.add('ativo');
+    btn.classList.add('ativo');
+    if (idAba === 'aba-palpites') verificarLigaAtiva();
+  }
+
+  // 4. Controle do Modal
+  function abrirModal() {
+    if (usuarioPossuiLiga) {
+      toast('Você já participa de uma liga! Saia dela antes de criar outra.', 'erro');
+      return;
     }
+    document.getElementById('modal-criar').classList.add('aberto');
+    setTimeout(() => document.getElementById('inputNomeLiga').focus(), 80);
+  }
+  function fecharModal() {
+    document.getElementById('modal-criar').classList.remove('aberto');
+    document.getElementById('inputNomeLiga').value = '';
+  }
+  document.getElementById('modal-criar').addEventListener('click', e => {
+    if (e.target === e.currentTarget) fecharModal();
+  });
 
-    // ==========================================
-    // CARREGAR MEUS CAMPEONATOS
-    // ==========================================
-    async function carregarLigas() {
-      try {
-        const resposta = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idUsuario}`);
-        const ligas = await resposta.json();
-        const ul = document.getElementById('lista-ligas-ativas');
-        ul.innerHTML = ''; 
+  // 5. Carregar Ligas do Usuário
+  async function carregarLigas() {
+    try {
+      const res   = await fetch(`${API}/minhas-ligas/${idUsuario}`);
+      const ligas = await res.json();
+      const ul    = document.getElementById('lista-ligas-ativas');
+      ul.innerHTML = '';
 
-        if (ligas.length === 0) {
-          ul.innerHTML = '<li class="text-center" style="color: var(--text-gray); padding: 20px 0;">Você não participa de nenhuma liga ainda.</li>';
-          return;
-        }
+      // Atualiza o controle global: se tem liga, bloqueia novas entradas
+      usuarioPossuiLiga = ligas.length > 0;
 
-        ligas.forEach(liga => {
-          ul.innerHTML += `
-            <li class="cartao bg-dark" style="padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--accent-cyan);">
-              <h4 class="font-russo text-white" style="font-size: 16px; margin-bottom: 5px;">⚜️ ${liga.nome}</h4>
-              <p style="color: var(--text-gray); font-size: 11px; margin-bottom: 10px;">Cód: ${liga.codigo_convite}</p>
-              <button onclick="selecionarLiga(${liga.id}, '${liga.nome}')" class="btn btn-salvar font-russo" style="width: 100%; padding: 8px; font-size: 12px;">Ver Jogos ⚽</button>
-            </li>
-          `;
-        });
-      } catch (erro) { console.error(erro); }
-    }
-// ==========================================
-    // CARREGAR VITRINE DE LIGAS (Para Entrar)
-    // ==========================================
-    async function carregarLigasDisponiveis() {
-      const ul = document.getElementById('lista-ligas-disponiveis');
-      
-      try {
-        const resposta = await fetch(`https://palpitoo-api.onrender.com/ligas-disponiveis/${idUsuario}`);
+      document.getElementById('contador-minhas').innerText =
+        ligas.length ? `${ligas.length} liga${ligas.length > 1 ? 's' : ''}` : '';
+
+      if (!ligas.length) {
+        ul.innerHTML = `<li class="empty-state"><div class="emoji">🦆</div><p>Você não participa de nenhuma liga ainda.</p></li>`;
+        return;
+      }
+
+      ligas.forEach(liga => {
+        const ehDono  = String(liga.dono_id) === String(idUsuario);
+        const membros = liga.total_participantes || liga.total_membros || 0; 
         
-        // Se a Render der erro 404, a gente já trava aqui e avisa o usuário
-        if (!resposta.ok) {
-            throw new Error(`Erro do servidor: ${resposta.status}`);
-        }
+        ul.innerHTML += `
+          <li class="liga-card">
+            <div class="liga-card-topo">
+              <h4 class="liga-card-nome">⚜️ ${liga.nome}</h4>
+              <span class="liga-badge ${ehDono ? 'dono' : 'participante'}">
+                ${ehDono ? '👑 DONO' : 'MEMBRO'}
+              </span>
+            </div>
+            <div class="liga-card-rodape">
+              <div>
+                <p class="liga-codigo">Cód: <strong>${liga.codigo_convite || liga.codigo || 'N/A'}</strong></p>
+                <p class="liga-membros">👥 ${membros} membro${membros !== 1 ? 's' : ''}</p>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button onclick="sairLiga(${liga.id_liga || liga.id})"
+                        class="btn font-russo"
+                        style="padding:8px 14px; font-size:12px; background: transparent; border: 1px solid #ef4444; color: #ef4444; border-radius: 8px; cursor: pointer;">
+                  Sair
+                </button>
+                <button onclick="selecionarLiga(${liga.id_liga || liga.id}, '${liga.nome}')"
+                        class="btn btn-salvar font-russo"
+                        style="padding:8px 14px; font-size:12px;">
+                  Ver Liga
+                </button>
+              </div>
+            </div>
+          </li>`;
+      });
+    } catch (err) {
+      console.error(err);
+      document.getElementById('lista-ligas-ativas').innerHTML =
+        `<li class="empty-state"><div class="emoji">⚠️</div><p>Erro ao conectar com o servidor.</p></li>`;
+    }
+  }
 
-        const ligas = await resposta.json();
-        ul.innerHTML = ''; 
+  // 6. Carregar Ligas Disponíveis (Vitrine)
+  async function carregarVitrine() {
+    const ul = document.getElementById('lista-ligas-disponiveis');
+    try {
+      const res   = await fetch(`${API}/ligas-disponiveis/${idUsuario}`);
+      const ligas = await res.json();
+      ul.innerHTML = '';
 
-        if (ligas.length === 0) {
-          ul.innerHTML = '<li class="text-center" style="color: var(--text-gray); font-size: 12px; padding: 20px 0;">Nenhuma nova liga disponível no momento.</li>';
-          return;
-        }
-
-        ligas.forEach(liga => {
-          ul.innerHTML += `
-            <li class="cartao" style="padding: 12px; margin-bottom: 10px; background: #1a0a10; border: 1px solid var(--borda-divisoria); display: flex; justify-content: space-between; align-items: center;">
-              <h4 class="font-russo text-white" style="font-size: 14px; margin: 0;">${liga.nome}</h4>
-              <button onclick="entrarNaLigaClique(${liga.id})" class="btn font-russo" style="background: #2ecc71; color: white; border: none; padding: 6px 12px; font-size: 11px; cursor: pointer; border-radius: 6px;">Entrar +</button>
-            </li>
-          `;
-        });
-      } catch (erro) { 
-        console.error("Deu ruim na busca:", erro); 
-        // Em vez de carregar para sempre, mostra o erro na tela!
-        ul.innerHTML = '<li class="text-center font-russo" style="color: #e74c3c; font-size: 12px; padding: 20px 0;">❌ Erro ao buscar ligas. O servidor está atualizando?</li>';
+      if (usuarioPossuiLiga) {
+        ul.innerHTML = `<li class="empty-state"><div class="emoji">🔒</div><p>Você já está em uma liga. Saia da atual para ver outras disponíveis.</p></li>`;
+        return;
       }
+
+      if (!ligas.length) {
+        ul.innerHTML = `<li class="empty-state"><div class="emoji">🏆</div><p>Não há ligas disponíveis no momento.</p></li>`;
+        return;
+      }
+
+      ligas.forEach(liga => {
+        ul.innerHTML += `
+          <li class="vitrine-card">
+            <div>
+              <p class="vitrine-nome">${liga.nome}</p>
+              <p class="vitrine-info">Código: ${liga.codigo_convite || liga.codigo}</p>
+            </div>
+            <button class="btn-entrar-verde" onclick="entrarClique(${liga.id_liga || liga.id}, this)">Entrar +</button>
+          </li>`;
+      });
+    } catch (err) {
+      ul.innerHTML = `<li class="empty-state"><div class="emoji">⚠️</div><p>Erro ao carregar ligas disponíveis.</p></li>`;
     }
-    // ==========================================
-    // ENTRAR NA LIGA AO CLICAR NO BOTÃO VERDE
-    // ==========================================
-    async function entrarNaLigaClique(idLiga) {
-      try {
-        const resposta = await fetch('https://palpitoo-api.onrender.com/entrar-liga-clique', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ liga_id: idLiga, usuario_id: idUsuario })
-        });
-        const resultado = await resposta.json();
-        if (resposta.ok) {
-          alert(resultado.mensagem);
-          // Atualiza as duas listas! Tira da vitrine e joga pros "Meus Campeonatos"
-          carregarLigas(); 
-          carregarLigasDisponiveis(); 
-        } else {
-          alert("❌ " + resultado.erro);
-        }
-      } catch (erro) { console.error(erro); }
+  }
+
+  // 7. Entrar na liga via Vitrine (Clique)
+  async function entrarClique(idLiga, btn) {
+    if (usuarioPossuiLiga) {
+      toast('Você já participa de uma liga!', 'erro');
+      return;
     }
 
-    // Entrar por Código (Modo Antigo)
-    async function entrarNaLigaCodigo() {
-      const codigo = document.getElementById('codigoLiga').value.trim().toUpperCase();
-      if (!codigo) return alert("Digite o código.");
-      try {
-        const resposta = await fetch('https://palpitoo-api.onrender.com/entrar-liga', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ codigo_convite: codigo, usuario_id: idUsuario })
-        });
-        const res = await resposta.json();
-        if (resposta.ok) {
-          alert("✅ " + res.mensagem);
-          document.getElementById('codigoLiga').value = '';
-          carregarLigas();
-          carregarLigasDisponiveis();
-        } else { alert("❌ " + res.erro); }
-      } catch (err) { console.error(err); }
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/entrar-liga-clique`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ liga_id: idLiga, usuario_id: idUsuario })
+      });
+      const r = await res.json();
+      if (res.ok) { 
+        toast(r.mensagem, 'sucesso'); 
+        carregarLigas().then(() => carregarVitrine()); 
+      }
+      else { toast(r.erro || 'Erro ao entrar na liga.', 'erro'); btn.disabled = false; }
+    } catch (e) { toast('Erro ao conectar com o servidor.', 'erro'); btn.disabled = false; }
+  }
+
+  // 8. Entrar na liga via Código
+  async function entrarCodigo() {
+    if (usuarioPossuiLiga) {
+      toast('Você já participa de uma liga! Saia dela antes de entrar em outra.', 'erro');
+      return;
     }
 
-    // Criar Liga
-    async function criarLiga() {
-      const nomeLiga = prompt("Nome da sua nova Liga:");
-      if (!nomeLiga || nomeLiga.trim() === "") return;
-      try {
-        const resposta = await fetch('https://palpitoo-api.onrender.com/criar-liga', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome_liga: nomeLiga.trim(), dono_id: idUsuario })
-        });
-        const res = await resposta.json();
-        if (resposta.ok) {
-          alert(`✅ Criada com sucesso!\nCódigo: ${res.liga.codigo_convite}`);
-          carregarLigas();
-        } else { alert("❌ " + res.erro); }
-      } catch (err) { console.error(err); }
+    const codigo = document.getElementById('codigoLiga').value.trim().toUpperCase();
+    if (!codigo) { toast('Digite o código da liga!', 'erro'); return; }
+    try {
+      const res = await fetch(`${API}/entrar-liga`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo: codigo, usuario_id: idUsuario })
+      });
+      const r = await res.json();
+      if (res.ok) {
+        toast(r.mensagem, 'sucesso');
+        document.getElementById('codigoLiga').value = '';
+        carregarLigas().then(() => carregarVitrine());
+      } else { toast(r.erro || 'Código inválido ou você já está na liga.', 'erro'); }
+    } catch (e) { toast('Erro ao conectar com o servidor.', 'erro'); }
+  }
+
+  // 9. Criar uma Nova Liga
+  async function confirmarCriar() {
+    if (usuarioPossuiLiga) {
+      toast('Você já participa de uma liga!', 'erro');
+      return;
     }
 
-    function selecionarLiga(idDaLiga, nomeDaLiga) {
-      localStorage.setItem('liga_ativa_id', idDaLiga);
-      localStorage.setItem('liga_ativa_nome', nomeDaLiga);
-      mudarAba('aba-palpites', document.getElementById('btn-aba-palpites'));
+    const nome = document.getElementById('inputNomeLiga').value.trim();
+    if (!nome) { toast('Digite um nome para a liga!', 'erro'); return; }
+    try {
+      const res = await fetch(`${API}/criar-liga`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome_liga: nome, id_dono: idUsuario })
+      });
+      const r = await res.json();
+      if (res.ok) { 
+        fecharModal(); 
+        toast(`Liga criada! Código: ${r.liga.codigo_convite || r.liga.codigo}`, 'sucesso'); 
+        carregarLigas().then(() => carregarVitrine());
+      } else { toast(r.erro || 'Erro ao criar liga.', 'erro'); }
+    } catch (e) { toast('Erro ao conectar com o servidor.', 'erro'); }
+  }
+
+  // NOVO: Função para SAIR da Liga
+  async function sairLiga(idLiga) {
+    if (!confirm("Tem certeza que deseja abandonar sua liga? Seus palpites podem ser perdidos.")) {
+      return;
     }
 
-    function verificarLigaAtiva() {
-      const ligaAtivaId = localStorage.getItem('liga_ativa_id');
-      const ligaAtivaNome = localStorage.getItem('liga_ativa_nome');
-      if (ligaAtivaId) {
-        document.getElementById('alerta-sem-liga').style.display = 'none';
-        document.getElementById('area-palpites').style.display = 'block';
-        document.getElementById('nome-liga-ativa').innerText = ligaAtivaNome;
+    try {
+      const res = await fetch(`${API}/sair-liga`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ liga_id: idLiga, usuario_id: idUsuario })
+      });
+      const r = await res.json();
+      
+      if (res.ok) {
+        toast(r.mensagem, 'sucesso');
+        // Remove a liga ativa do localStorage por segurança
+        localStorage.removeItem('liga_ativa_id');
+        localStorage.removeItem('liga_ativa_nome');
+        
+        // Recarrega tudo
+        carregarLigas().then(() => carregarVitrine());
       } else {
-        document.getElementById('alerta-sem-liga').style.display = 'block';
-        document.getElementById('area-palpites').style.display = 'none';
+        toast(r.erro || 'Erro ao sair da liga.', 'erro');
       }
+    } catch (e) {
+      toast('Erro ao conectar com o servidor.', 'erro');
     }
+  }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      carregarLigas();
-      carregarLigasDisponiveis(); // <-- Chama a função nova pra carregar a vitrine!
-    });
+  // 10. Selecionar Liga (Ir para minhaliga.html)
+  function selecionarLiga(idLiga, nomeLiga) {
+    localStorage.setItem('liga_ativa_id', idLiga);
+    localStorage.setItem('liga_ativa_nome', nomeLiga);
+    window.location.href = 'minhaliga.html';
+  }
 
-    // Navbar config
-    (function() {
-      const nome = localStorage.getItem('nome_craque') || '';
-      const foto = localStorage.getItem('foto_craque');
-      const userArea = document.getElementById('navbar-user-area');
-      if (!userArea) return;
-      if (nome) {
-        const initials = encodeURIComponent(nome.split(' ')[0]);
-        const src = (foto && foto !== 'null' && foto !== 'undefined') ? foto : `https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36`;
-        userArea.innerHTML = `<a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" onerror="this.src='https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36'"></a>
-          <button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
-      }
-    })();
-    function fazerLogout() { localStorage.clear(); window.location.href = 'index.html'; }
-  </script>
+  function verificarLigaAtiva() {
+    const id   = localStorage.getItem('liga_ativa_id');
+    const nome = localStorage.getItem('liga_ativa_nome');
+    if (id) {
+      document.getElementById('alerta-sem-liga').style.display = 'none';
+      document.getElementById('area-palpites').style.display   = 'block';
+      document.getElementById('nome-liga-ativa').innerText     = nome;
+    } else {
+      document.getElementById('alerta-sem-liga').style.display = 'block';
+      document.getElementById('area-palpites').style.display   = 'none';
+    }
+  }
+
+  // 11. Navbar e Inicialização
+  (function() {
+    const nome = localStorage.getItem('nome_craque') || '';
+    const foto = localStorage.getItem('foto_craque');
+    const area = document.getElementById('navbar-user-area');
+    if (!area || !nome) return;
+    const initials = encodeURIComponent(nome.split(' ')[0]);
+    const src = (foto && foto !== 'null' && foto !== 'undefined')
+      ? foto : `https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36`;
+    area.innerHTML = `
+      <a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar"
+         onerror="this.src='https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36'"></a>
+      <button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
+  })();
+
+  function fazerLogout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Usamos o .then para garantir que a vitrine só carregue APÓS sabermos se o usuário tem liga
+    carregarLigas().then(() => carregarVitrine());
+  });
+</script>
 </body>
 </html>

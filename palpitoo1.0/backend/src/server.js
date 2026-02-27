@@ -376,7 +376,7 @@ app.post('/criar-jogo', async (req, res) => {
     // Insere no banco agora com a coluna RODADA
     const resultado = await pool.query(
       `INSERT INTO jogos (time_casa, time_fora, status, rodada) 
-       VALUES ($1, $2, 'em andamento', $3) RETURNING *`,
+       VALUES ($1, $2, 'andamento', $3) RETURNING *`,
       [time_casa, time_fora, rodada]
     );
 
@@ -934,10 +934,102 @@ app.post('/entrar-liga-clique', async (req, res) => {
   }
 });
 
+// -----------------------------------------------------------------------------
+// ROTA PARA ENTRAR EM UMA LIGA
+app.post('/entrar-liga', async (req, res) => {
+  try {
+    const { codigo, usuario_id } = req.body;
+
+    // 1. Busca a liga pelo código
+    const ligaResult = await pool.query('SELECT * FROM ligas WHERE codigo = $1', [codigo.toUpperCase()]);
+
+    if (ligaResult.rows.length === 0) {
+      return res.status(404).json({ erro: 'Liga não encontrada. Verifique o código.' });
+    }
+
+    const liga_id = ligaResult.rows[0].id;
+
+    // 2. Verifica se o usuário já está nessa liga para evitar duplicidade
+    const verificaMembro = await pool.query(
+      'SELECT * FROM usuarios_ligas WHERE usuario_id = $1 AND liga_id = $2',
+      [usuario_id, liga_id]
+    );
+
+    if (verificaMembro.rows.length > 0) {
+      return res.status(400).json({ erro: 'Você já participa desta liga!' });
+    }
+
+    // 3. Insere o usuário na liga
+    await pool.query(
+      'INSERT INTO usuarios_ligas (usuario_id, liga_id) VALUES ($1, $2)',
+      [usuario_id, liga_id]
+    );
+
+    res.json({ mensagem: 'Você entrou na liga com sucesso!' });
+
+  } catch (err) {
+    console.error("Erro ao entrar na liga:", err);
+    res.status(500).json({ erro: 'Erro interno ao tentar entrar na liga.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ROTA PARA BUSCAR AS LIGAS DO USUÁRIO E O NÚMERO DE PARTICIPANTES
+app.get('/minhas-ligas/:usuario_id', async (req, res) => {
+  try {
+    const { usuario_id } = req.params;
+
+    // A subquery (SELECT COUNT...) traz o total de participantes daquela liga em tempo real
+    const resultado = await pool.query(`
+      SELECT 
+        l.id, 
+        l.nome, 
+        l.tipo_disputa, 
+        l.privacidade,
+        (SELECT COUNT(*) FROM usuarios_ligas ul2 WHERE ul2.liga_id = l.id) AS total_participantes
+      FROM ligas l
+      JOIN usuarios_ligas ul ON l.id = ul.liga_id
+      WHERE ul.usuario_id = $1
+    `, [usuario_id]);
+
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error("Erro ao buscar ligas:", err);
+    res.status(500).json({ erro: 'Erro interno ao buscar suas ligas.' });
+  }
+});
+
+
+// -----------------------------------------------------------------------------
+// ROTA PARA SAIR DE UMA LIGA
+app.post('/sair-liga', async (req, res) => {
+  try {
+    const { liga_id, usuario_id } = req.body;
+
+    // Remove o usuário da liga
+    const deletar = await pool.query(
+      'DELETE FROM usuarios_ligas WHERE liga_id = $1 AND usuario_id = $2 RETURNING *',
+      [liga_id, usuario_id]
+    );
+
+    if (deletar.rows.length === 0) {
+      return res.status(400).json({ erro: 'Você não faz parte desta liga ou ela não existe.' });
+    }
+
+    res.json({ mensagem: 'Você saiu da liga com sucesso!' });
+
+  } catch (err) {
+    console.error("Erro ao sair da liga:", err);
+    res.status(500).json({ erro: 'Erro interno ao tentar sair da liga.' });
+  }
+});
 
 
 //--------------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando bem demais na porta ${PORT}`);
+
+
+
 });
