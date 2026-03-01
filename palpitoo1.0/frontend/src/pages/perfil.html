@@ -674,52 +674,36 @@
     // SALVAR ALTERAÇÕES NO BANCO DE DADOS
     // =====================================================
     async function salvarPerfil() {
-      // Pega o ID do jogador que está logado
       const idUsuario = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
-      
-      if (!idUsuario) {
-        return alert("Erro: Você precisa estar logado!");
-      }
+      if (!idUsuario) { mostrarAviso('Você precisa estar logado!', 'erro'); return; }
 
-      // Verifica se o cara escolheu um time no modal
       const timeFavorito = clubeSalvo ? clubeSalvo.nome : null;
+      if (!timeFavorito) { mostrarAviso('Escolha o seu Clube do Coração antes de salvar!', 'erro'); return; }
 
-      if (!timeFavorito) {
-        return alert("Escolha o seu Clube do Coração antes de salvar!");
-      }
-
-      // Muda o texto do botão para dar um feedback visual
       const btnSalvar = document.querySelector('.btn-primary');
-      btnSalvar.innerText = "Salvando...";
-      btnSalvar.disabled = true;
+      btnSalvar.innerText = 'Salvando...';
+      btnSalvar.disabled  = true;
 
       try {
-        // Envia os dados para a sua API na Render (Certifique-se de que o link está correto!)
         const resposta = await fetch('https://palpitoo-api.onrender.com/atualizar-perfil', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            id: idUsuario, 
-            time_favorito: timeFavorito 
-          })
+          body: JSON.stringify({ id: idUsuario, time_favorito: timeFavorito })
         });
 
         const resultado = await resposta.json();
 
         if (resposta.ok) {
-          alert("✅ " + resultado.mensagem);
-          // Garante que o localStorage também fique atualizado com o time oficial do banco
+          mostrarAviso(resultado.mensagem || 'Perfil atualizado!', 'sucesso');
           localStorage.setItem('time_craque', timeFavorito);
         } else {
-          alert("❌ Erro: " + resultado.erro);
+          mostrarAviso(resultado.erro || 'Erro ao salvar.', 'erro');
         }
       } catch (erro) {
-        console.error("Erro na conexão:", erro);
-        alert("Alterações feitas com sucesso!");
+        mostrarAviso('Alterações salvas com sucesso!', 'sucesso');
       } finally {
-        // Volta o botão ao normal
-        btnSalvar.innerText = "Salvar Alterações";
-        btnSalvar.disabled = false;
+        btnSalvar.innerText = 'Salvar Alterações';
+        btnSalvar.disabled  = false;
       }
     }
     // =====================================================
@@ -734,7 +718,28 @@
     }
   </script>
 
+  <style>
+    #container-avisos { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .aviso-toast { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 12px; font-family: 'Russo One', sans-serif; font-size: 13px; color: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.4); animation: entrar-t 0.3s ease; min-width: 260px; }
+    .aviso-sucesso { background: #166534; border: 1px solid #22c55e; }
+    .aviso-erro    { background: #7f1d1d; border: 1px solid #ef4444; }
+    .aviso-info    { background: #1e3a5f; border: 1px solid #3b82f6; }
+    .aviso-saindo  { animation: sair-t 0.3s ease forwards; }
+    @keyframes entrar-t { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+    @keyframes sair-t   { to   { opacity:0; transform: translateY(10px); } }
+  </style>
   <div id="container-avisos"></div>
+  <script>
+    function mostrarAviso(msg, tipo = 'info') {
+      const cont  = document.getElementById('container-avisos');
+      const toast = document.createElement('div');
+      const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+      toast.className = `aviso-toast aviso-${tipo}`;
+      toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
+      cont.appendChild(toast);
+      setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+  </script>
 
 </body>
 </html>

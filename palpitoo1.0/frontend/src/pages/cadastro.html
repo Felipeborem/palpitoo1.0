@@ -317,6 +317,28 @@
   <link rel="icon" href="./img/pato.png" type="image/png">
 </head>
 <body>
+  <style>
+    #container-avisos { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .aviso-toast { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 12px; font-family: 'Russo One', sans-serif; font-size: 13px; color: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.4); animation: entrar 0.3s ease; min-width: 260px; }
+    .aviso-sucesso { background: #166534; border: 1px solid #22c55e; }
+    .aviso-erro    { background: #7f1d1d; border: 1px solid #ef4444; }
+    .aviso-info    { background: #1e3a5f; border: 1px solid #3b82f6; }
+    .aviso-saindo  { animation: sair 0.3s ease forwards; }
+    @keyframes entrar { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+    @keyframes sair   { to   { opacity:0; transform: translateY(10px); } }
+  </style>
+  <div id="container-avisos"></div>
+  <script>
+    function mostrarAviso(msg, tipo = 'info') {
+      const cont  = document.getElementById('container-avisos');
+      const toast = document.createElement('div');
+      const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+      toast.className = `aviso-toast aviso-${tipo}`;
+      toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
+      cont.appendChild(toast);
+      setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+  </script>
 
   <main class="hero-section" style="justify-content: center; width: 100%;">
     <div class="login-area" style="justify-content: center; width: 100%;">
@@ -608,62 +630,54 @@
     // ENVIO PARA O BANCO DE DADOS
     // =====================================================
     async function enviarDados() {
-      const nome = document.getElementById('campoNome').value;
+      const nome  = document.getElementById('campoNome').value;
       const email = document.getElementById('campoEmail').value;
       const senha = document.getElementById('campoSenha').value;
-      
-      // Pega o time da variável salva pelo Modal, e não mais do input
       const time_favorito = clubeSalvo ? clubeSalvo.nome : null;
-      
+      const btn   = document.querySelector('.btn-primary');
+
       if (!nome || !email || !senha) {
-        alert("Preencha todos os campos para entrar em campo!");
+        mostrarAviso('Preencha todos os campos para entrar em campo!', 'erro');
+        return;
+      }
+      if (!time_favorito) {
+        mostrarAviso('Escolha o seu Clube do Coração!', 'erro');
         return;
       }
 
-      if (!time_favorito) {
-        alert("Escolha o seu Clube do Coração!");
-        return;
-      }
+      btn.innerText = 'Criando conta...';
+      btn.disabled  = true;
 
       try {
         const resposta = await fetch('https://palpitoo-api.onrender.com/cadastro', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ 
-            nome: nome, 
-            email: email, 
-            senha: senha,
-            time_favorito: time_favorito,
-            foto_perfil: fotoBase64 
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, senha, time_favorito, foto_perfil: fotoBase64 })
         });
 
         const resultado = await resposta.json();
 
         if (resposta.ok) {
-          alert("✅ " + resultado.mensagem);
-          
+          mostrarAviso(resultado.mensagem || 'Conta criada com sucesso!', 'sucesso');
           document.getElementById('meuFormulario').reset();
-          document.getElementById('previewImagem').src = "https://via.placeholder.com/80";
-          
-          // Reseta o visual do botão de time
+          document.getElementById('previewImagem').src = "https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=80";
           document.getElementById('escudoMini').textContent = '⚽';
           const textoEl = document.getElementById('textoTimeSelecionado');
           textoEl.textContent = 'Selecione seu clube...';
           textoEl.className = 'placeholder-time';
           clubeSalvo = null;
-          fotoBase64 = ""; 
-          
-          window.location.href = 'login.html'; 
+          fotoBase64 = "";
+          setTimeout(() => window.location.href = 'login.html', 1200);
         } else {
-          alert("❌ Ops: " + resultado.erro);
+          mostrarAviso(resultado.erro || 'Erro ao criar conta.', 'erro');
+          btn.innerText = 'Criar Minha Conta';
+          btn.disabled  = false;
         }
 
       } catch (error) {
-        console.error("Erro na conexão:", error);
-        alert("Servidor desligado! Verifique a conexão com a API.");
+        mostrarAviso('Servidor offline. Verifique a conexão.', 'erro');
+        btn.innerText = 'Criar Minha Conta';
+        btn.disabled  = false;
       }
     }
   </script>

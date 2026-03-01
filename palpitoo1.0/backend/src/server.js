@@ -183,6 +183,30 @@ app.post('/encerrar-jogo', async (req, res) => {
     }
 
     res.json({ mensagem: 'Jogo encerrado e pontos distribuídos com sucesso!' });
+    
+// ── AUTO-BLOQUEIO (substitua o bloco try/catch do auto-bloqueio por este) ──
+    try {
+      const jogoInfo = await pool.query('SELECT rodada FROM jogos WHERE id_jogo = $1', [id_jogo]);
+      if (jogoInfo.rows.length > 0) {
+        const rodada = jogoInfo.rows[0].rodada;
+        const pendentes = await pool.query(
+          `SELECT COUNT(*) AS total FROM jogos WHERE rodada = $1 AND status != 'finalizado'`,
+          [rodada]
+        );
+        if (Number(pendentes.rows[0].total) === 0) {
+          // Todos os jogos da rodada finalizados → bloqueia automaticamente
+          const rodadaExiste = await pool.query('SELECT rodada FROM prazos_rodadas WHERE rodada = $1', [rodada]);
+          if (rodadaExiste.rows.length > 0) {
+            await pool.query('UPDATE prazos_rodadas SET bloqueada = true WHERE rodada = $1', [rodada]);
+          } else {
+            await pool.query('INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada) VALUES ($1, NOW(), true)', [rodada]);
+          }
+          console.log(`✅ Rodada ${rodada} bloqueada automaticamente (todos os jogos finalizados).`);
+        }
+      }
+    } catch (autoErr) {
+      console.error("Aviso: erro no auto-bloqueio da rodada:", autoErr);
+    }
 
   } catch (err) {
     console.error("Erro ao encerrar jogo:", err);
@@ -307,9 +331,9 @@ app.get('/minhas-ligas/:usuario_id', async (req, res) => {
   try {
     const { usuario_id } = req.params;
 
-    // Essa query faz um JOIN para buscar os dados da liga através da tabela ponte
     const resultado = await pool.query(`
-      SELECT l.id_liga, l.nome, l.codigo_convite, l.dono_id 
+      SELECT l.id_liga, l.nome, l.codigo_convite, l.dono_id,
+             (SELECT COUNT(*) FROM usuarios_ligas ul2 WHERE ul2.liga_id = l.id_liga) AS total_participantes
       FROM ligas l
       JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
       WHERE ul.usuario_id = $1
@@ -508,21 +532,7 @@ app.get('/liga/:id_liga', async (req, res) => {
   }
 });
 
-// -----------------------------------------------------------------------------
-// ROTA PARA SAIR DE UMA LIGA
-app.post('/sair-liga', async (req, res) => {
-  try {
-    const { id_usuario } = req.body;
-    await pool.query(
-      'DELETE FROM usuarios_ligas WHERE usuario_id = $1',
-      [id_usuario]
-    );
-    res.json({ mensagem: 'Você saiu da liga com sucesso.' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ erro: 'Erro ao sair da liga.' });
-  }
-});
+// (rota /sair-liga definida abaixo com filtro correto por liga_id)
 
 // -----------------------------------------------------------------------------
 // ROTA PARA BUSCAR PALPITES DA GALERA EM UMA LIGA (usada pelo minhaliga.html)
@@ -934,70 +944,9 @@ app.post('/entrar-liga-clique', async (req, res) => {
   }
 });
 
-// -----------------------------------------------------------------------------
-// ROTA PARA ENTRAR EM UMA LIGA
-app.post('/entrar-liga', async (req, res) => {
-  try {
-    const { codigo, usuario_id } = req.body;
+// (rota /entrar-liga já definida acima com codigo_convite correto)
 
-    // 1. Busca a liga pelo código
-    const ligaResult = await pool.query('SELECT * FROM ligas WHERE codigo = $1', [codigo.toUpperCase()]);
-
-    if (ligaResult.rows.length === 0) {
-      return res.status(404).json({ erro: 'Liga não encontrada. Verifique o código.' });
-    }
-
-    const liga_id = ligaResult.rows[0].id;
-
-    // 2. Verifica se o usuário já está nessa liga para evitar duplicidade
-    const verificaMembro = await pool.query(
-      'SELECT * FROM usuarios_ligas WHERE usuario_id = $1 AND liga_id = $2',
-      [usuario_id, liga_id]
-    );
-
-    if (verificaMembro.rows.length > 0) {
-      return res.status(400).json({ erro: 'Você já participa desta liga!' });
-    }
-
-    // 3. Insere o usuário na liga
-    await pool.query(
-      'INSERT INTO usuarios_ligas (usuario_id, liga_id) VALUES ($1, $2)',
-      [usuario_id, liga_id]
-    );
-
-    res.json({ mensagem: 'Você entrou na liga com sucesso!' });
-
-  } catch (err) {
-    console.error("Erro ao entrar na liga:", err);
-    res.status(500).json({ erro: 'Erro interno ao tentar entrar na liga.' });
-  }
-});
-
-// -----------------------------------------------------------------------------
-// ROTA PARA BUSCAR AS LIGAS DO USUÁRIO E O NÚMERO DE PARTICIPANTES
-app.get('/minhas-ligas/:usuario_id', async (req, res) => {
-  try {
-    const { usuario_id } = req.params;
-
-    // A subquery (SELECT COUNT...) traz o total de participantes daquela liga em tempo real
-    const resultado = await pool.query(`
-      SELECT 
-        l.id, 
-        l.nome, 
-        l.tipo_disputa, 
-        l.privacidade,
-        (SELECT COUNT(*) FROM usuarios_ligas ul2 WHERE ul2.liga_id = l.id) AS total_participantes
-      FROM ligas l
-      JOIN usuarios_ligas ul ON l.id = ul.liga_id
-      WHERE ul.usuario_id = $1
-    `, [usuario_id]);
-
-    res.json(resultado.rows);
-  } catch (err) {
-    console.error("Erro ao buscar ligas:", err);
-    res.status(500).json({ erro: 'Erro interno ao buscar suas ligas.' });
-  }
-});
+// (rota /minhas-ligas já definida acima com id_liga correto)
 
 
 // -----------------------------------------------------------------------------
@@ -1024,6 +973,107 @@ app.post('/sair-liga', async (req, res) => {
   }
 });
 
+// =========================================================================
+// ROTA: DEFINIR PRAZO DE PALPITES POR RODADA (ADM)
+// =========================================================================
+app.post('/definir-prazo-rodada', async (req, res) => {
+  try {
+    const { rodada, prazo_rodada } = req.body;
+    if (!rodada || !prazo_rodada) {
+      return res.status(400).json({ erro: 'Informe a rodada e o prazo.' });
+    }
+
+    // 1. Verifica se a rodada já tem um prazo salvo
+    const existe = await pool.query('SELECT rodada FROM prazos_rodadas WHERE rodada = $1', [rodada]);
+
+    if (existe.rows.length > 0) {
+      // 2. Se já existe, apenas ATUALIZA
+      await pool.query(
+        'UPDATE prazos_rodadas SET prazo_limite = $1, bloqueada = false WHERE rodada = $2',
+        [prazo_rodada, rodada]
+      );
+    } else {
+      // 3. Se não existe, INSERE a nova
+      await pool.query(
+        'INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada) VALUES ($1, $2, false)',
+        [rodada, prazo_rodada]
+      );
+    }
+
+    res.json({ mensagem: `Prazo da Rodada ${rodada} definido com sucesso!` });
+  } catch (err) {
+    console.error("Erro ao definir prazo:", err);
+    res.status(500).json({ erro: 'Erro ao salvar prazo no banco.' });
+  }
+});
+
+// =========================================================================
+// ROTA: BLOQUEAR RODADA MANUALMENTE (ADM)
+// =========================================================================
+app.post('/bloquear-rodada', async (req, res) => {
+  try {
+    const { rodada } = req.body;
+    if (!rodada) return res.status(400).json({ erro: 'Informe a rodada.' });
+
+    const existe = await pool.query('SELECT rodada FROM prazos_rodadas WHERE rodada = $1', [rodada]);
+
+    if (existe.rows.length > 0) {
+      await pool.query('UPDATE prazos_rodadas SET bloqueada = true WHERE rodada = $1', [rodada]);
+    } else {
+      await pool.query('INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada) VALUES ($1, NOW(), true)', [rodada]);
+    }
+    
+    res.json({ mensagem: `Rodada ${rodada} bloqueada! Ninguém mais pode palpitar.` });
+  } catch (err) {
+    console.error("Erro ao bloquear rodada:", err);
+    res.status(500).json({ erro: 'Erro ao bloquear rodada.' });
+  }
+});
+
+// =========================================================================
+// ROTA: VERIFICAR SE RODADA ESTÁ BLOQUEADA (usada pelo palpites.html)
+// Retorna bloqueada=true se: ADM bloqueou manualmente OU prazo já venceu
+// =========================================================================
+app.get('/status-rodada/:rodada', async (req, res) => {
+  try {
+    const { rodada } = req.params;
+
+    // Verifica bloqueio manual ou prazo vencido no banco
+    const resultado = await pool.query(
+      `SELECT rodada, prazo_limite, bloqueada FROM prazos_rodadas WHERE rodada = $1`,
+      [rodada]
+    );
+
+    if (resultado.rows.length === 0) {
+      // Sem registro = rodada aberta
+      return res.json({ rodada: Number(rodada), bloqueada: false, prazo_limite: null });
+    }
+
+    const r = resultado.rows[0];
+    const prazoVencido = r.prazo_limite && new Date(r.prazo_limite) < new Date();
+    const bloqueada    = r.bloqueada || prazoVencido;
+
+    res.json({ rodada: Number(rodada), bloqueada, prazo_limite: r.prazo_limite });
+  } catch (err) {
+    console.error("Erro ao verificar status da rodada:", err);
+    res.status(500).json({ erro: 'Erro ao verificar rodada.' });
+  }
+});
+
+// =========================================================================
+// ROTA: LISTAR STATUS DE TODAS AS RODADAS (ADM)
+// =========================================================================
+app.get('/status-rodadas', async (req, res) => {
+  try {
+    const resultado = await pool.query(
+      `SELECT rodada, prazo_limite, bloqueada FROM prazos_rodadas ORDER BY rodada ASC`
+    );
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao listar rodadas.' });
+  }
+});
 
 //--------------------------------------------------------------------
 const PORT = process.env.PORT || 3000;

@@ -12,8 +12,34 @@
   <link rel="stylesheet" href="./css/style.css">
   <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
   <link rel="icon" href="./img/pato.png" type="image/png">
+  <style>
+    #container-avisos { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .aviso-toast { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 12px; font-family: 'Russo One', sans-serif; font-size: 13px; color: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.4); animation: entrar 0.3s ease; min-width: 260px; }
+    .aviso-sucesso { background: #166534; border: 1px solid #22c55e; }
+    .aviso-erro    { background: #7f1d1d; border: 1px solid #ef4444; }
+    .aviso-info    { background: #1e3a5f; border: 1px solid #3b82f6; }
+    .aviso-saindo  { animation: sair 0.3s ease forwards; }
+    @keyframes entrar { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+    @keyframes sair   { to   { opacity:0; transform: translateY(10px); } }
+  </style>
 </head>
 <body>
+  <script>
+    if (!localStorage.getItem('craqueId')) {} // página pública, sem redirect
+  </script>
+  <div id="container-avisos"></div>
+
+  <script>
+    function mostrarAviso(msg, tipo = 'info') {
+      const cont  = document.getElementById('container-avisos');
+      const toast = document.createElement('div');
+      const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+      toast.className = `aviso-toast aviso-${tipo}`;
+      toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
+      cont.appendChild(toast);
+      setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+  </script>
 
   <main class="hero-section" style="justify-content: center; width: 100%;">
     <div class="login-area" style="justify-content: center; width: 100%;">
@@ -53,43 +79,43 @@
     async function fazerLogin() {
       const email = document.getElementById('campoEmail').value;
       const senha = document.getElementById('campoSenha').value;
+      const btn   = document.querySelector('.btn-primary');
 
       if (!email || !senha) {
-        alert("Ei! Preencha e-mail e senha para entrar.");
+        mostrarAviso('Preencha e-mail e senha para entrar.', 'erro');
         return;
       }
+
+      btn.innerText = 'Entrando...';
+      btn.disabled  = true;
 
       try {
         const resposta = await fetch('https://palpitoo-api.onrender.com/login', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ 
-            email: email, 
-            senha: senha 
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, senha })
         });
 
         const resultado = await resposta.json();
 
         if (resposta.ok) {
-            alert("✅ " + resultado.mensagem);
-            
-            localStorage.setItem('craqueId', resultado.usuario.id);
-            localStorage.setItem('nome_craque', resultado.usuario.nome);
-            localStorage.setItem('time_craque', resultado.usuario.time);
-            localStorage.setItem('email_craque', resultado.usuario.email); 
-            localStorage.setItem('foto_craque', resultado.usuario.foto_perfil || resultado.usuario.foto || '');
-            
-            window.location.href = 'index.html'; 
-          } else {
-          alert("❌ " + resultado.erro);
+          mostrarAviso(resultado.mensagem || 'Login realizado!', 'sucesso');
+          localStorage.setItem('craqueId',     resultado.usuario.id);
+          localStorage.setItem('nome_craque',  resultado.usuario.nome);
+          localStorage.setItem('time_craque',  resultado.usuario.time);
+          localStorage.setItem('email_craque', resultado.usuario.email);
+          localStorage.setItem('foto_craque',  resultado.usuario.foto_perfil || resultado.usuario.foto || '');
+          setTimeout(() => window.location.href = 'index.html', 1000);
+        } else {
+          mostrarAviso(resultado.erro || 'Erro ao entrar.', 'erro');
+          btn.innerText = 'Entrar';
+          btn.disabled  = false;
         }
 
       } catch (error) {
-        console.error("Erro na conexão:", error);
-        alert("Ih! O servidor está desligado. Ligue o node server.js!");
+        mostrarAviso('Servidor offline. Tente novamente.', 'erro');
+        btn.innerText = 'Entrar';
+        btn.disabled  = false;
       }
     }
   </script>
