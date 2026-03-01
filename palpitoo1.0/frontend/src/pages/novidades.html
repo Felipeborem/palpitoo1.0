@@ -19,10 +19,7 @@
       animation: fadeSlide 0.4s ease forwards;
       opacity: 0;
     }
-    .feed-item:hover {
-      border-color: var(--accent-cyan);
-      transform: translateX(3px);
-    }
+    .feed-item:hover { border-color: var(--accent-cyan); transform: translateX(3px); }
     @keyframes fadeSlide {
       from { opacity: 0; transform: translateY(10px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -31,80 +28,47 @@
     .feed-item.tipo-pessoal { border-left: 3px solid var(--accent-cyan); }
     .feed-item.tipo-liga    { border-left: 3px solid var(--accent-green); }
     .feed-item.tipo-sistema { border-left: 3px solid #eab308; }
-    .feed-item.tipo-pato    { border-left: 3px solid var(--accent-cyan); background: rgba(122,30,58,0.06); }
+    .feed-item.tipo-pato    { border-left: 3px solid var(--accent-cyan); background: rgba(192,52,90,0.05); }
 
     .feed-icone {
       font-size: 22px;
-      width: 42px;
-      height: 42px;
+      width: 42px; height: 42px;
       flex-shrink: 0;
       background: var(--bg-header);
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       border: 1px solid var(--borda-divisoria);
     }
-
     .feed-corpo { flex-grow: 1; }
-    .feed-titulo {
-      font-family: 'Russo One', sans-serif;
-      font-size: 14px;
-      color: var(--text-white);
-      margin-bottom: 4px;
-    }
-    .feed-descricao {
-      font-size: 13px;
-      color: var(--text-gray);
-      line-height: 1.5;
-    }
-    .feed-tempo {
-      font-size: 10px;
-      color: var(--text-gray);
-      margin-top: 6px;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
+    .feed-titulo    { font-family: 'Russo One', sans-serif; font-size: 14px; color: var(--text-white); margin-bottom: 4px; }
+    .feed-descricao { font-size: 13px; color: var(--text-gray); line-height: 1.5; }
+    .feed-tempo     { font-size: 10px; color: var(--text-gray); margin-top: 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
 
     .filtro-btn {
-      padding: 7px 16px;
-      border-radius: 20px;
-      font-family: 'Russo One', sans-serif;
-      font-size: 11px;
-      text-transform: uppercase;
-      border: 1px solid var(--borda-divisoria);
-      background: var(--bg-dark);
-      color: var(--text-gray);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      padding: 7px 16px; border-radius: 20px;
+      font-family: 'Russo One', sans-serif; font-size: 11px; text-transform: uppercase;
+      border: 1px solid var(--borda-divisoria); background: var(--bg-dark);
+      color: var(--text-gray); cursor: pointer; transition: all 0.2s;
     }
     .filtro-btn:hover { border-color: var(--accent-cyan); color: var(--text-white); }
-    .filtro-btn.ativo { background: var(--accent-cyan); color: var(--text-white); border-color: var(--accent-cyan); }
+    .filtro-btn.ativo { background: var(--accent-cyan); color: #fff; border-color: var(--accent-cyan); }
 
     .regra-linha {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px dashed var(--borda-divisoria);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px dashed var(--borda-divisoria);
     }
     .regra-linha:last-child { border-bottom: none; }
 
     .badge-tipo {
-      font-family: 'Russo One', sans-serif;
-      font-size: 9px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: inline-block;
-      margin-bottom: 4px;
+      font-family: 'Russo One', sans-serif; font-size: 9px;
+      padding: 2px 8px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 1px;
+      display: inline-block; margin-bottom: 4px;
     }
-    .badge-pessoal { background: rgba(122,30,58,0.2);  color: var(--accent-cyan);  border: 1px solid var(--accent-cyan); }
-    .badge-liga    { background: rgba(46,125,50,0.2);  color: #4ade80;              border: 1px solid #4ade80; }
-    .badge-sistema { background: rgba(234,179,8,0.15); color: #eab308;             border: 1px solid #eab308; }
-    .badge-pato    { background: rgba(122,30,58,0.2);  color: var(--accent-cyan);  border: 1px solid var(--accent-cyan); }
+    .badge-pessoal { background: rgba(192,52,90,0.2);  color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+    .badge-liga    { background: rgba(34,197,94,0.15); color: #4ade80;            border: 1px solid #4ade80; }
+    .badge-sistema { background: rgba(234,179,8,0.15); color: #eab308;            border: 1px solid #eab308; }
+    .badge-pato    { background: rgba(192,52,90,0.2);  color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
   </style>
   <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
   <link rel="icon" href="./img/pato.png" type="image/png">
@@ -112,10 +76,9 @@
 <body>
 
   <header class="navbar">
-        <a href="inicio.html" class="logo-link">
-        <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
+    <a href="inicio.html" class="logo-link">
+      <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
     </a>
-    
     <nav>
       <ul class="nav-links">
         <li><a href="index.html">Início</a></li>
@@ -134,18 +97,15 @@
 
   <main class="container-principal" style="max-width: 960px; margin-top: 40px;">
 
-    <!-- Cabeçalho -->
     <div class="text-center mb-20 animacao-suave">
-      <h2 class="font-russo titulo-branco" style="font-size: 32px;">Central da <span style="color: var(--accent-cyan);">Brah.Bet</span></h2>
+      <h2 class="font-russo titulo-branco" style="font-size: 32px;">Central da <span style="color: var(--accent-cyan);">Palpitoo</span></h2>
       <p style="color: var(--text-gray); font-size: 15px;">Feed da liga, notificações pessoais e decretos do Pato Mestre</p>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 320px; gap: 30px; align-items: start;">
 
-      <!-- ══ COLUNA ESQUERDA: FEED ══ -->
+      <!-- FEED -->
       <div>
-
-        <!-- Filtros -->
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
           <button class="filtro-btn ativo" onclick="filtrar('todos', this)">🌐 Todos</button>
           <button class="filtro-btn" onclick="filtrar('pessoal', this)">👤 Pessoal</button>
@@ -153,24 +113,18 @@
           <button class="filtro-btn" onclick="filtrar('sistema', this)">⚙️ Sistema</button>
           <button class="filtro-btn" onclick="filtrar('pato', this)">🦆 Pato</button>
         </div>
-
-        <!-- Feed -->
         <div id="feed-container">
           <p class="text-center font-russo" style="color: var(--text-gray); margin-top: 30px;">Carregando novidades... 🔄</p>
         </div>
-
       </div>
 
-      <!-- ══ COLUNA DIREITA: REGULAMENTO ══ -->
+      <!-- SIDEBAR -->
       <div style="display: flex; flex-direction: column; gap: 20px;">
 
-        <!-- Regulamento -->
         <section class="cartao bg-escuro animacao-suave" style="border-top: 3px solid var(--text-white);">
           <h3 class="font-russo titulo-branco mb-15" style="font-size: 17px;">⚖️ Regulamento</h3>
           <div class="divisor-tracejado mb-15"></div>
-
           <p class="font-russo" style="font-size: 13px; color: var(--text-gray); margin-bottom: 12px; text-transform: uppercase;">🎯 Pontuação</p>
-
           <div style="background: var(--bg-dark); padding: 14px; border-radius: 12px; border: 1px solid var(--borda-divisoria);">
             <div class="regra-linha">
               <span style="font-size: 13px; color: var(--text-white);">Placar exato</span>
@@ -185,49 +139,31 @@
               <span class="font-russo" style="color: var(--vermelho);">0 PTS</span>
             </div>
           </div>
-
           <p class="font-russo" style="font-size: 13px; color: var(--text-gray); margin-top: 16px; margin-bottom: 12px; text-transform: uppercase;">🏆 Premiação</p>
-
           <div style="background: var(--bg-dark); padding: 14px; border-radius: 12px; border: 1px solid #eab308; text-align: center;">
-            <p style="color: #eab308; font-size: 13px; margin: 0; line-height: 1.5;">
-              O Campeão leva a <strong>Taça Pato de Ouro</strong> e a glória eterna no mural da Brah.Bet!
-            </p>
+            <p style="color: #eab308; font-size: 13px; margin: 0; line-height: 1.5;">O Campeão leva a <strong>Taça Pato de Ouro</strong> e a glória eterna!</p>
           </div>
         </section>
 
-        <!-- Legenda do feed -->
         <section class="cartao bg-escuro animacao-suave">
           <h3 class="font-russo titulo-branco mb-15" style="font-size: 17px;">📌 Legenda do Feed</h3>
           <div class="divisor-tracejado mb-15"></div>
-
           <div style="display: flex; flex-direction: column; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
               <div style="width: 4px; height: 36px; background: var(--accent-cyan); border-radius: 2px; flex-shrink: 0;"></div>
-              <div>
-                <p class="font-russo" style="font-size: 12px; color: var(--text-white);">Pessoal</p>
-                <p style="font-size: 11px; color: var(--text-gray);">Suas posições, pontos e conquistas</p>
-              </div>
+              <div><p class="font-russo" style="font-size: 12px; color: var(--text-white);">Pessoal</p><p style="font-size: 11px; color: var(--text-gray);">Suas posições, pontos e conquistas</p></div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <div style="width: 4px; height: 36px; background: var(--accent-green); border-radius: 2px; flex-shrink: 0;"></div>
-              <div>
-                <p class="font-russo" style="font-size: 12px; color: var(--text-white);">Liga</p>
-                <p style="font-size: 11px; color: var(--text-gray);">Resultados, rodadas e eventos da sua liga</p>
-              </div>
+              <div><p class="font-russo" style="font-size: 12px; color: var(--text-white);">Liga</p><p style="font-size: 11px; color: var(--text-gray);">Resultados, rodadas e eventos da liga</p></div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <div style="width: 4px; height: 36px; background: #eab308; border-radius: 2px; flex-shrink: 0;"></div>
-              <div>
-                <p class="font-russo" style="font-size: 12px; color: var(--text-white);">Sistema</p>
-                <p style="font-size: 11px; color: var(--text-gray);">Atualizações e novidades do Palpitoo</p>
-              </div>
+              <div><p class="font-russo" style="font-size: 12px; color: var(--text-white);">Sistema</p><p style="font-size: 11px; color: var(--text-gray);">Atualizações e novidades do Palpitoo</p></div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
               <div style="width: 4px; height: 36px; background: var(--accent-cyan); border-radius: 2px; flex-shrink: 0;"></div>
-              <div>
-                <p class="font-russo" style="font-size: 12px; color: var(--text-white);">🦆 Decreto do Pato</p>
-                <p style="font-size: 11px; color: var(--text-gray);">Mensagens automáticas do Pato Mestre</p>
-              </div>
+              <div><p class="font-russo" style="font-size: 12px; color: var(--text-white);">🦆 Decreto do Pato</p><p style="font-size: 11px; color: var(--text-gray);">Julgamentos automáticos do Pato Mestre</p></div>
             </div>
           </div>
         </section>
@@ -241,80 +177,249 @@
 <script>
   const idLogado   = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
   const nomeLogado = localStorage.getItem('nome_craque') || 'Craque';
-  let filtroAtivo  = 'todos';
+  const primeiro   = nomeLogado.split(' ')[0];
+
+  let filtroAtivo    = 'todos';
   let todosFeedItens = [];
 
-  // ── DECRETOS AUTOMÁTICOS DO PATO ─────────────────────────
-  // O Pato Mestre gera frases baseadas nos dados reais do sistema
+  // ════════════════════════════════════════════════════════
+  //  BANCO DE FRASES — PATO MESTRE
+  //  Cada situação tem pelo menos 3 variações. A função
+  //  pega(arr) sorteia uma diferente a cada carregamento.
+  // ════════════════════════════════════════════════════════
+  const pega = arr => arr[Math.floor(Math.random() * arr.length)];
+
+  const FRASES = {
+
+    // ── Subiu 2 posições ──────────────────────────────────
+    subiu2: [
+      (n, pos) => `"${n}, subiu 2 posições e agora está em ${pos}º. Mas não venha me pedir parabéns — isso é obrigação."`,
+      (n, pos) => `"Dois degraus de uma vez, ${n}? Quase me impressionou. Falta só mais ${pos - 1} pra chegar onde eu mando."`,
+      (n, pos) => `"${n} escalou 2 posições. O ranking notou. Eu também. Não deixa cair de volta, porque vou zoar muito."`,
+    ],
+
+    // ── Subiu 3+ posições ─────────────────────────────────
+    subiu3mais: [
+      (n, delta, pos) => `"ATENÇÃO GERAL: ${n} subiu ${delta} posições de uma vez! Isso não é palpite, isso é macumba. Tô de olho em você."`,
+      (n, delta, pos) => `"${n} subiu ${delta} posições e chegou em ${pos}º. O Pato Mestre oficialmente declara: essa rodada foi sua. Só essa."`,
+      (n, delta, pos) => `"${delta} posições de subida, ${n}?! A galera deve estar em choque. Eu também tô, mas não vou admitir."`,
+    ],
+
+    // ── Mitada (8+ pontos na rodada) ──────────────────────
+    mitada: [
+      (n, pts) => `"${pts} pontos em uma rodada só, ${n}?! O Pato Mestre decreta: isso foi uma mitada histórica. Não estrague na próxima."`,
+      (n, pts) => `"${n} fez ${pts} pontos nessa rodada. ${pts >= 12 ? 'Isso é humano? Alguém checa os palpites desse aí.' : 'Tá bom demais pra ser verdade. O Pato desconfia.'}"`,
+      (n, pts) => `"DECRETO URGENTE: ${n} acumulou ${pts} pts nessa rodada. A liga inteira já te odeia. Parabéns e tome cuidado."`,
+      (n, pts) => `"${pts} pontos numa rodada, ${n}. Digno de um veterano da Brah.Bet. Não que eu vá falar isso na sua cara, mas... tá dito."`,
+    ],
+
+    // ── Rodada zerada (0 pontos) ──────────────────────────
+    zero: [
+      n => `"${n}... zero pontos. ZERO. Você palpitou ou jogou uma moeda? Porque a moeda iria errar menos."`,
+      n => `"Rodada zerada, ${n}. O Pato Mestre decreta: você é oficialmente o bagre da rodada. Título vitalício por enquanto."`,
+      n => `"0 pts nessa rodada, ${n}. Eu tentei te avisar. Mas você não ouviu. Agora senta e reflete o que fez de errado."`,
+      n => `"${n} zerou a rodada. Eu não vou rir. Vou só anotar aqui no arquivo dos bagres históricos da liga. Segue."`,
+    ],
+
+    // ── Liderança ─────────────────────────────────────────
+    lider: [
+      n => `"DECRETO MÁXIMO: ${n} lidera o ranking. Aproveite enquanto dura, porque o Pato Mestre já escalou quem vai te destronar."`,
+      n => `"${n} no topo da tabela. Bonito. Mas já vi líder despencar em duas rodadas. O Pato não esquece."`,
+      n => `"Olha quem tá na ponta, ${n}! Não sei se isso é mérito ou sorte sua. Prefiro achar que é sorte — fica mais divertido."`,
+    ],
+
+    // ── Lanterna ──────────────────────────────────────────
+    lanterna: [
+      (n, pos, total) => `"${n} está em ${pos}º de ${total}. Lanterna oficial. O Pato Mestre decreta: você tem muito trabalho pela frente, bagre."`,
+      (n, pos, total) => `"Último lugar, ${n}. ÚLTIMO. Isso é difícil de conseguir — tem que errar com consistência. Respeito, de certo modo."`,
+      (n, pos, total) => `"${n} fecha o ranking em ${pos}º. O troféu de Pato Mestre da liga é seu por enquanto. Não é um prêmio que você quer guardar."`,
+    ],
+
+    // ── Pódio (2º ou 3º lugar) ────────────────────────────
+    podio: [
+      (n, pos) => `"${n} no pódio, ${pos}º lugar! Falta pouco pra derrubar o líder. O Pato autoriza a tentativa."`,
+      (n, pos) => `"Top ${pos} do ranking, ${n}. Não to mal impressionado. Vamos ver se você aguenta a pressão nas próximas rodadas."`,
+      (n, pos) => `"${pos}º lugar, ${n}. Você está perturbando o sono do líder. Continue perturbando — é o que o Pato gosta de ver."`,
+    ],
+
+    // ── Aproveitamento alto (50%+ de cravações) ───────────
+    aproveitamentoAlto: [
+      (n, taxa) => `"${taxa}% de cravações, ${n}?! Ou você tem uma bola de cristal, ou você tá assistindo a todos os treinos. Suspeito."`,
+      (n, taxa) => `"O Pato decreta: ${taxa}% de placar exato é o tipo de coisa que faz os outros bagres da liga perderem o sono. Bom."`,
+      (n, taxa) => `"${n} está cravando ${taxa}% dos placares. Isso não é palpite — isso é ciência. Ou trapaça. Vou apurar."`,
+    ],
+
+    // ── Aproveitamento zero (0% de cravações) ─────────────
+    aproveitamentoZero: [
+      n => `"Nenhuma cravação ainda, ${n}. O Pato Mestre informa: acertar só o vencedor é o mínimo. Tente dar uma olhada nos jogos antes de palpitar."`,
+      n => `"Zero cravações, ${n}. Você palpita de olho fechado? Porque fechado aberto tá dando na mesma. Abre o olho."`,
+      n => `"${n} ainda não acertou um placar exato sequer. O Pato Mestre registra oficialmente: isso é triste. Mas recuperável. Por enquanto."`,
+    ],
+
+    // ── Primeiro palpite / sem jogos encerrados ────────────
+    semJogos: [
+      n => `"${n}! A temporada começou e você ainda não tem resultado nenhum. O Pato não vai esperar — vai logo palpitar antes que eu decrete bagre precoce."`,
+      n => `"Nenhum jogo encerrado ainda, ${n}. O Pato aguarda. Com paciência finita."`,
+      n => `"${n}, seus palpites ainda não foram julgados pela bola. Mas já foram julgados pelo Pato. E o veredicto sai em breve."`,
+    ],
+
+    // ── Aproveitamento médio ───────────────────────────────
+    aproveitamentoMedio: [
+      (n, taxa) => `"${taxa}% de cravações, ${n}. Tá no meio do caminho entre genial e bagre. O Pato observa, sem dar nota ainda."`,
+      (n, taxa) => `"Apenas ${taxa}% de placar exato, ${n}. Não é feio, não é bonito. É medíocre. O Pato exige mais."`,
+      (n, taxa) => `"${taxa}% das cravações convertidas, ${n}. Isso não me emociona. O torcedor meia-boca da arquibancada acerta mais."`,
+    ],
+
+    // ── Sequência positiva (3+ jogos acertando pelo menos 1pt) ──
+    sequencia: [
+      (n, seq) => `"${n} pontuou em ${seq} jogos seguidos! O Pato Mestre decreta: isso não é sorte. É consistência. E me irrita."`,
+      (n, seq) => `"${seq} jogos seguidos pontuando, ${n}. O ranking inteiro já começou a te olhar diferente. Eu também. Não é elogio — é alerta."`,
+      (n, seq) => `"Sequência de ${seq} jogos no positivo, ${n}. Segue assim e vai ter que me passar na frente do ranking. O Pato tá avisado."`,
+    ],
+
+    // ── Servidor offline ──────────────────────────────────
+    offline: [
+      n => `"Servidor offline, ${n}. Nem eu consigo decretar nada agora. Volta mais tarde — o Pato precisa de conexão para julgar."`,
+      n => `"${n}, o servidor dormiu antes de mim. Raro. Tente novamente em instantes — os decretos não vão esperar pra sempre."`,
+      n => `"Queda de servidor, ${n}. Até o Pato Mestre tem seus limites técnicos. Mas os bagres continuam sendo bagres offline também."`,
+    ],
+
+  };
+
+  // ════════════════════════════════════════════════════════
+  //  DECRETOS DO PATO — lógica principal
+  // ════════════════════════════════════════════════════════
   function gerarDecretosPato(dados) {
+    const { palpites, ranking, posAnterior } = dados;
     const decretos = [];
-    const { palpites, ranking, ligaAtual } = dados;
 
-    // Decreto baseado em aproveitamento
     const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
-    if (finalizados.length > 0) {
-      const cravadas = finalizados.filter(p => p.pontos_obtidos === 3).length;
-      const taxa = Math.round((cravadas / finalizados.length) * 100);
+    const posAtual    = ranking ? ranking.findIndex(r => String(r.id) === String(idLogado)) : -1;
 
-      if (taxa >= 50) {
+    // ── Subida de posições ────────────────────────────────
+    if (posAnterior !== null && posAnterior !== undefined && posAtual !== -1) {
+      const delta = posAnterior - posAtual; // positivo = subiu
+      if (delta >= 3) {
         decretos.push({
-          tipo: 'pato',
-          icone: '🦆',
-          badge: 'Decreto do Pato',
-          titulo: 'O Pato aprova!',
-          descricao: `"${nomeLogado.split(' ')[0]}, ${taxa}% de cravações?! Quase me envergonhando na frente da galera. Continue assim!"`,
-          tempo: 'Agora'
+          tipo: 'pato', icone: '🚀', badge: 'Decreto do Pato',
+          titulo: `Subiu ${delta} posições!`,
+          descricao: pega(FRASES.subiu3mais)(primeiro, delta, posAtual + 1),
+          tempo: 'Após última rodada'
         });
-      } else if (taxa === 0) {
+      } else if (delta === 2) {
         decretos.push({
-          tipo: 'pato',
-          icone: '🦆',
-          badge: 'Decreto do Pato',
-          titulo: 'O Pato está desapontado',
-          descricao: `"${nomeLogado.split(' ')[0]}... zero cravações. ZERO. Você tá me deixando sem palavras, bagre."`,
-          tempo: 'Agora'
-        });
-      } else {
-        decretos.push({
-          tipo: 'pato',
-          icone: '🦆',
-          badge: 'Decreto do Pato',
-          titulo: 'O Pato observa...',
-          descricao: `"Olho em você, ${nomeLogado.split(' ')[0]}. Apenas ${taxa}% de cravações não é digno da Brah.Bet. Mais esforço!"`,
-          tempo: 'Agora'
+          tipo: 'pato', icone: '📈', badge: 'Decreto do Pato',
+          titulo: `Subiu 2 posições!`,
+          descricao: pega(FRASES.subiu2)(primeiro, posAtual + 1),
+          tempo: 'Após última rodada'
         });
       }
-    } else {
+    }
+
+    // ── Pontuação da última rodada ────────────────────────
+    const ultimaRodada = finalizados.length > 0
+      ? Math.max(...finalizados.map(p => p.rodada || p.numero_rodada || 1))
+      : null;
+
+    if (ultimaRodada) {
+      const jogosUltimaRodada = finalizados.filter(p => (p.rodada || p.numero_rodada || 1) === ultimaRodada);
+      const ptsRodada = jogosUltimaRodada.reduce((s, p) => s + (p.pontos_obtidos || 0), 0);
+
+      if (ptsRodada >= 8) {
+        decretos.push({
+          tipo: 'pato', icone: '🔥', badge: 'Decreto do Pato',
+          titulo: `Mitada na Rodada ${ultimaRodada}!`,
+          descricao: pega(FRASES.mitada)(primeiro, ptsRodada),
+          tempo: `Rodada ${ultimaRodada}`
+        });
+      } else if (ptsRodada === 0 && jogosUltimaRodada.length > 0) {
+        decretos.push({
+          tipo: 'pato', icone: '🦆', badge: 'Decreto do Pato',
+          titulo: `Rodada ${ultimaRodada} zerada`,
+          descricao: pega(FRASES.zero)(primeiro),
+          tempo: `Rodada ${ultimaRodada}`
+        });
+      }
+    }
+
+    // ── Posição no ranking ────────────────────────────────
+    if (posAtual === 0) {
       decretos.push({
-        tipo: 'pato',
-        icone: '🦆',
-        badge: 'Decreto do Pato',
-        titulo: 'O Pato convoca!',
-        descricao: `"${nomeLogado.split(' ')[0]}! Nenhum jogo encerrado ainda. A temporada não vai esperar você, vai logo palpitar!"`,
+        tipo: 'pato', icone: '🏆', badge: 'Decreto do Pato',
+        titulo: 'Decreto de Liderança!',
+        descricao: pega(FRASES.lider)(primeiro),
+        tempo: 'Agora'
+      });
+    } else if (posAtual === 1 || posAtual === 2) {
+      decretos.push({
+        tipo: 'pato', icone: '🥈', badge: 'Decreto do Pato',
+        titulo: `Você está no pódio! (${posAtual + 1}º)`,
+        descricao: pega(FRASES.podio)(primeiro, posAtual + 1),
+        tempo: 'Agora'
+      });
+    } else if (ranking && posAtual === ranking.length - 1 && ranking.length > 2) {
+      decretos.push({
+        tipo: 'pato', icone: '🪣', badge: 'Decreto do Pato',
+        titulo: 'Lanterna oficial 🪣',
+        descricao: pega(FRASES.lanterna)(primeiro, posAtual + 1, ranking.length),
         tempo: 'Agora'
       });
     }
 
-    // Decreto baseado na posição no ranking
-    if (ranking && ranking.length > 0) {
-      const minhaPos = ranking.findIndex(r => String(r.id) === String(idLogado));
-      if (minhaPos === 0) {
+    // ── Aproveitamento de cravações ───────────────────────
+    if (finalizados.length >= 3) {
+      const cravadas = finalizados.filter(p => p.pontos_obtidos === 3).length;
+      const taxa     = Math.round((cravadas / finalizados.length) * 100);
+
+      if (taxa >= 50) {
         decretos.push({
-          tipo: 'pato',
-          icone: '🦆',
-          badge: 'Decreto do Pato',
-          titulo: 'Decreto de Liderança!',
-          descricao: `"ATENÇÃO a todos os bagres: ${nomeLogado.split(' ')[0]} está na liderança. Não é digno de mim, mas... tá bom."`,
-          tempo: 'Agora'
+          tipo: 'pato', icone: '🎯', badge: 'Decreto do Pato',
+          titulo: `${taxa}% de cravações!`,
+          descricao: pega(FRASES.aproveitamentoAlto)(primeiro, taxa),
+          tempo: 'Esta temporada'
         });
-      } else if (minhaPos !== -1 && minhaPos <= 2) {
+      } else if (taxa === 0) {
         decretos.push({
-          tipo: 'pato',
-          icone: '🦆',
-          badge: 'Decreto do Pato',
-          titulo: 'Você está no pódio!',
-          descricao: `"${nomeLogado.split(' ')[0]} no top 3! Falta pouco pra chegar onde o Pato Mestre manda. Não relaxe!"`,
-          tempo: 'Agora'
+          tipo: 'pato', icone: '😬', badge: 'Decreto do Pato',
+          titulo: 'Nenhuma cravação ainda',
+          descricao: pega(FRASES.aproveitamentoZero)(primeiro),
+          tempo: 'Esta temporada'
+        });
+      } else {
+        decretos.push({
+          tipo: 'pato', icone: '🦆', badge: 'Decreto do Pato',
+          titulo: `${taxa}% de aproveitamento`,
+          descricao: pega(FRASES.aproveitamentoMedio)(primeiro, taxa),
+          tempo: 'Esta temporada'
+        });
+      }
+    }
+
+    // ── Sem jogos encerrados ──────────────────────────────
+    if (finalizados.length === 0) {
+      decretos.push({
+        tipo: 'pato', icone: '🦆', badge: 'Decreto do Pato',
+        titulo: 'O Pato aguarda...',
+        descricao: pega(FRASES.semJogos)(primeiro),
+        tempo: 'Agora'
+      });
+    }
+
+    // ── Sequência positiva ────────────────────────────────
+    if (finalizados.length >= 3) {
+      // Detecta sequência de jogos consecutivos com pelo menos 1 ponto
+      const ordenados = [...finalizados].sort((a, b) => (b.rodada || 0) - (a.rodada || 0));
+      let seq = 0;
+      for (const p of ordenados) {
+        if ((p.pontos_obtidos || 0) > 0) seq++;
+        else break;
+      }
+      if (seq >= 3) {
+        decretos.push({
+          tipo: 'pato', icone: '⚡', badge: 'Decreto do Pato',
+          titulo: `Sequência de ${seq} jogos pontuando!`,
+          descricao: pega(FRASES.sequencia)(primeiro, seq),
+          tempo: 'Esta temporada'
         });
       }
     }
@@ -322,21 +427,24 @@
     return decretos;
   }
 
-  // ── GERAR FEED PESSOAL ────────────────────────────────────
+  // ════════════════════════════════════════════════════════
+  //  FEED PESSOAL
+  // ════════════════════════════════════════════════════════
   function gerarFeedPessoal(palpites, ranking) {
-    const itens = [];
+    const itens       = [];
     const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
 
     if (finalizados.length > 0) {
-      const totalPontos  = finalizados.reduce((s, p) => s + p.pontos_obtidos, 0);
-      const cravadas     = finalizados.filter(p => p.pontos_obtidos === 3).length;
-      const erros        = finalizados.filter(p => p.pontos_obtidos === 0).length;
+      const totalPontos = finalizados.reduce((s, p) => s + (p.pontos_obtidos || 0), 0);
+      const cravadas    = finalizados.filter(p => p.pontos_obtidos === 3).length;
+      const naTraves    = finalizados.filter(p => p.pontos_obtidos === 1).length;
+      const erros       = finalizados.filter(p => p.pontos_obtidos === 0).length;
 
       if (cravadas > 0) {
         itens.push({
           tipo: 'pessoal', icone: '🎯', badge: 'Pessoal',
           titulo: `${cravadas} cravação${cravadas > 1 ? 'ões' : ''} na temporada!`,
-          descricao: `Você acertou o placar exato em ${cravadas} jogo${cravadas > 1 ? 's' : ''}. Cada um vale 3 pontos — continue assim!`,
+          descricao: `Você acertou o placar exato em ${cravadas} jogo${cravadas > 1 ? 's' : ''} (+${cravadas * 3} pts). ${naTraves > 0 ? `Mais ${naTraves} acerto${naTraves > 1 ? 's' : ''} de resultado (+${naTraves} pt${naTraves > 1 ? 's' : ''}).` : ''}`,
           tempo: 'Esta temporada'
         });
       }
@@ -344,20 +452,25 @@
       itens.push({
         tipo: 'pessoal', icone: '📊', badge: 'Pessoal',
         titulo: `${totalPontos} pontos acumulados`,
-        descricao: `Você somou ${totalPontos} pts em ${finalizados.length} jogo${finalizados.length > 1 ? 's' : ''} encerrado${finalizados.length > 1 ? 's' : ''}. ${erros > 0 ? `Teve ${erros} erro${erros > 1 ? 's' : ''} também — não conta pra ninguém 🤫` : 'Sem erros até agora!'}`,
+        descricao: `${finalizados.length} jogo${finalizados.length > 1 ? 's' : ''} encerrado${finalizados.length > 1 ? 's' : ''}: ${cravadas} cravação${cravadas !== 1 ? 'ões' : ''}, ${naTraves} na trave, ${erros} erro${erros !== 1 ? 's' : ''}. ${erros > 0 ? '🤫 Não conta pra ninguém.' : '👏 Clean sheet de erros!'}`,
         tempo: 'Esta temporada'
       });
 
-      // Posição no ranking
+      // Posição
       if (ranking && ranking.length > 0) {
         const pos = ranking.findIndex(r => String(r.id) === String(idLogado));
         if (pos !== -1) {
-          const emojis = ['🥇', '🥈', '🥉'];
+          const emojis = ['🥇','🥈','🥉'];
           const emoji  = pos < 3 ? emojis[pos] : '📍';
+          const texto  = pos === 0
+            ? 'Você lidera o ranking! Mas não relaxe, a temporada não acabou.'
+            : pos <= 2
+              ? 'Você está no pódio do ranking. Continue firme!'
+              : `Você ocupa a ${pos + 1}ª posição. Hora de apertar o passo!`;
           itens.push({
             tipo: 'pessoal', icone: emoji, badge: 'Pessoal',
-            titulo: `Você está em ${pos + 1}º lugar`,
-            descricao: `${pos === 0 ? 'Você lidera o ranking geral! Mas não relaxe, a temporada ainda não acabou.' : pos <= 2 ? 'Você está no pódio do ranking geral. Continue firme!' : `Você ocupa a ${pos + 1}ª posição no ranking geral. Hora de dar uma pressão!`}`,
+            titulo: `${pos + 1}º lugar no ranking`,
+            descricao: texto,
             tempo: 'Agora'
           });
         }
@@ -366,7 +479,7 @@
       itens.push({
         tipo: 'pessoal', icone: '⚽', badge: 'Pessoal',
         titulo: 'Nenhum jogo encerrado ainda',
-        descricao: 'Seus palpites ainda estão aguardando os resultados. Assim que os jogos forem encerrados, sua pontuação aparece aqui.',
+        descricao: 'Seus palpites ainda aguardam os resultados. Assim que os jogos encerrarem, sua pontuação aparece aqui.',
         tempo: 'Agora'
       });
     }
@@ -374,14 +487,15 @@
     return itens;
   }
 
-  // ── GERAR FEED DE LIGA ────────────────────────────────────
+  // ════════════════════════════════════════════════════════
+  //  FEED DE LIGA
+  // ════════════════════════════════════════════════════════
   function gerarFeedLiga(jogos, ligaAtual) {
     const itens = [];
 
     const finalizados = jogos.filter(j => j.status === 'finalizado');
     const emAndamento = jogos.filter(j => j.status === 'em andamento');
 
-    // Agrupa jogos por rodada
     const rodadas = {};
     finalizados.forEach(j => {
       const r = j.rodada || 1;
@@ -389,7 +503,6 @@
       rodadas[r].push(j);
     });
 
-    // Notifica cada rodada encerrada
     Object.keys(rodadas).sort((a, b) => b - a).forEach(r => {
       const jogosRodada = rodadas[r];
       itens.push({
@@ -405,7 +518,7 @@
       itens.push({
         tipo: 'liga', icone: '⚡', badge: 'Liga',
         titulo: `Rodada ${rodadaAtual} em andamento`,
-        descricao: `${emAndamento.length} jogo${emAndamento.length > 1 ? 's' : ''} aguardando resultado. ${emAndamento.map(j => `${j.time_casa} x ${j.time_fora}`).join(' • ')}`,
+        descricao: `${emAndamento.length} jogo${emAndamento.length > 1 ? 's' : ''} aguardando resultado: ${emAndamento.map(j => `${j.time_casa} x ${j.time_fora}`).join(' • ')}`,
         tempo: 'Agora'
       });
     }
@@ -422,37 +535,50 @@
     return itens;
   }
 
-  // ── ITENS FIXOS DE SISTEMA ────────────────────────────────
+  // ════════════════════════════════════════════════════════
+  //  FEED DE SISTEMA
+  // ════════════════════════════════════════════════════════
   function gerarFeedSistema() {
     return [
       {
-        tipo: 'sistema', icone: '🆕', badge: 'Sistema',
-        titulo: 'Perfil Público disponível!',
-        descricao: 'Agora você pode visitar o perfil de qualquer palpiteiro pelo Social e ver a carreira completa dele.',
+        tipo: 'sistema', icone: '📖', badge: 'Sistema',
+        titulo: 'Histórico da Liga disponível!',
+        descricao: 'Agora em "Minha Liga" tem a aba Histórico: fundação, frase marcante, temporada, prêmios encerrados e linha do tempo.',
         tempo: 'Novidade'
+      },
+      {
+        tipo: 'sistema', icone: '🔗', badge: 'Sistema',
+        titulo: 'Ranking clicável',
+        descricao: 'Cada membro do ranking da liga agora é clicável — vai direto pro perfil público e carreira dele.',
+        tempo: 'Novidade'
+      },
+      {
+        tipo: 'sistema', icone: '👤', badge: 'Sistema',
+        titulo: 'Perfil Público disponível!',
+        descricao: 'Visite o perfil de qualquer palpiteiro pelo Social e veja a carreira completa dele.',
+        tempo: 'Disponível'
       },
       {
         tipo: 'sistema', icone: '👥', badge: 'Sistema',
         titulo: 'Seguir Palpiteiros',
-        descricao: 'Você pode seguir seus rivais na aba Social e acompanhar o desempenho deles em tempo real.',
-        tempo: 'Novidade'
+        descricao: 'Siga seus rivais na aba Social e acompanhe o desempenho deles em tempo real.',
+        tempo: 'Disponível'
       },
       {
         tipo: 'sistema', icone: '⚙️', badge: 'Sistema',
-        titulo: 'Sistema de Ligas Privadas',
+        titulo: 'Ligas Privadas com código',
         descricao: 'Crie sua liga, convide os amigos com um código exclusivo e dispute o ranking privado.',
         tempo: 'Disponível'
       }
     ];
   }
 
-  // ── RENDERIZAR FEED ───────────────────────────────────────
+  // ════════════════════════════════════════════════════════
+  //  RENDERIZAR
+  // ════════════════════════════════════════════════════════
   function renderizarFeed(itens) {
     const container = document.getElementById('feed-container');
-
-    const filtrados = filtroAtivo === 'todos'
-      ? itens
-      : itens.filter(i => i.tipo === filtroAtivo);
+    const filtrados  = filtroAtivo === 'todos' ? itens : itens.filter(i => i.tipo === filtroAtivo);
 
     if (!filtrados.length) {
       container.innerHTML = `<p class="text-center font-russo" style="color:var(--text-gray);margin-top:30px;">Nenhuma novidade nesta categoria ainda. 🦆</p>`;
@@ -461,12 +587,11 @@
 
     container.innerHTML = '';
     filtrados.forEach((item, idx) => {
-      const badgeClass = `badge-${item.tipo}`;
       container.innerHTML += `
-        <div class="feed-item tipo-${item.tipo}" style="animation-delay: ${idx * 0.05}s;">
+        <div class="feed-item tipo-${item.tipo}" style="animation-delay:${idx * 0.05}s;">
           <div class="feed-icone">${item.icone}</div>
           <div class="feed-corpo">
-            <span class="badge-tipo ${badgeClass}">${item.badge}</span>
+            <span class="badge-tipo badge-${item.tipo}">${item.badge}</span>
             <p class="feed-titulo">${item.titulo}</p>
             <p class="feed-descricao">${item.descricao}</p>
             <p class="feed-tempo">🕐 ${item.tempo}</p>
@@ -475,7 +600,6 @@
     });
   }
 
-  // ── FILTRAR ───────────────────────────────────────────────
   function filtrar(tipo, btn) {
     filtroAtivo = tipo;
     document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
@@ -483,12 +607,11 @@
     renderizarFeed(todosFeedItens);
   }
 
-  // ── MOTOR PRINCIPAL ───────────────────────────────────────
+  // ════════════════════════════════════════════════════════
+  //  MOTOR PRINCIPAL
+  // ════════════════════════════════════════════════════════
   async function carregarFeed() {
-    const container = document.getElementById('feed-container');
-
     try {
-      // Busca dados em paralelo
       const [resJogos, resPalpites, resRanking] = await Promise.all([
         fetch('https://palpitoo-api.onrender.com/jogos'),
         idLogado ? fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`) : Promise.resolve({ json: () => [] }),
@@ -499,39 +622,38 @@
       const palpites = await resPalpites.json();
       const ranking  = await resRanking.json();
 
-      // Busca liga atual
-      let ligaAtual = null;
+      let ligaAtual   = null;
+      let posAnterior = null;
+
       if (idLogado) {
         try {
           const resLiga = await fetch(`https://palpitoo-api.onrender.com/minha-liga/${idLogado}`);
-          const dadosLiga = await resLiga.json();
-          if (dadosLiga.liga) ligaAtual = dadosLiga.liga.nome;
-        } catch (e) {}
+          const dLiga   = await resLiga.json();
+          if (dLiga.liga) ligaAtual = dLiga.liga.nome;
+        } catch(_) {}
+
+        // Posição anterior pode vir do histórico ou de um endpoint específico
+        // Por enquanto guarda/lê no sessionStorage para comparar entre rodadas
+        const posAtual = ranking.findIndex(r => String(r.id) === String(idLogado));
+        const chave    = `pos_anterior_${idLogado}`;
+        posAnterior    = sessionStorage.getItem(chave) !== null ? parseInt(sessionStorage.getItem(chave)) : null;
+        if (posAtual !== -1) sessionStorage.setItem(chave, posAtual);
       }
 
-      // Monta o feed completo
-      const feedPessoal  = idLogado ? gerarFeedPessoal(palpites, ranking) : [];
-      const feedLiga     = gerarFeedLiga(jogos, ligaAtual);
-      const feedSistema  = gerarFeedSistema();
-      const feedPato     = idLogado ? gerarDecretosPato({ palpites, ranking, ligaAtual }) : [];
+      const feedPato    = idLogado ? gerarDecretosPato({ palpites, ranking, posAnterior }) : [];
+      const feedPessoal = idLogado ? gerarFeedPessoal(palpites, ranking) : [];
+      const feedLiga    = gerarFeedLiga(jogos, ligaAtual);
+      const feedSistema = gerarFeedSistema();
 
-      // Mistura tudo: pessoal primeiro, depois pato, depois liga, depois sistema
-      todosFeedItens = [
-        ...feedPato,
-        ...feedPessoal,
-        ...feedLiga,
-        ...feedSistema
-      ];
-
+      todosFeedItens = [...feedPato, ...feedPessoal, ...feedLiga, ...feedSistema];
       renderizarFeed(todosFeedItens);
 
-    } catch (e) {
-      // Servidor offline — mostra feed de sistema + mensagem do Pato
+    } catch(e) {
       todosFeedItens = [
         {
           tipo: 'pato', icone: '🦆', badge: 'Decreto do Pato',
-          titulo: 'O Pato está dormindo...',
-          descricao: `"Servidor offline, ${nomeLogado.split(' ')[0]}. Nem eu consigo decretar nada agora. Volta mais tarde!"`,
+          titulo: 'O Pato está offline...',
+          descricao: pega(FRASES.offline)(primeiro),
           tempo: 'Agora'
         },
         ...gerarFeedSistema()
@@ -543,9 +665,7 @@
   carregarFeed();
 </script>
 
-
   <script>
-    // Navbar: avatar + logout para páginas autenticadas
     (function() {
       const nome = localStorage.getItem('nome_craque') || '';
       const foto = localStorage.getItem('foto_craque');
@@ -558,27 +678,18 @@
           : `https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36`;
         userArea.innerHTML = `
           <a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${initials}&background=7A1E3A&color=fff&size=36'"></a>
-          <button class="btn-logout" onclick="fazerLogout()">Sair</button>
-        `;
+          <button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
       } else {
         userArea.innerHTML = '<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>';
       }
     })();
 
-    function fazerLogout() {
-      localStorage.clear();
-      window.location.href = 'inicio.html';
-    }
+    function fazerLogout() { localStorage.clear(); window.location.href = 'inicio.html'; }
 
-    // Hamburger menu
     document.addEventListener('DOMContentLoaded', function() {
       const btn = document.getElementById('hamburger-btn');
       const nav = document.querySelector('.nav-links');
-      if (!btn || !nav) return;
-      btn.addEventListener('click', function() {
-        btn.classList.toggle('aberto');
-        nav.classList.toggle('aberto');
-      });
+      if (btn && nav) btn.addEventListener('click', () => { btn.classList.toggle('aberto'); nav.classList.toggle('aberto'); });
     });
   </script>
 

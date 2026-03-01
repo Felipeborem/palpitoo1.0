@@ -1,68 +1,88 @@
 /* =========================================
    IMPORTAÇÃO DE FONTES
    ========================================= */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Teko:wght@500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Salsa&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Barlow+Condensed:wght@500;600;700&display=swap');
 
 /* =========================================
-   VARIÁVEIS DE CORES (NOVA PALETA VINHO/PRETO)
+   VARIÁVEIS DE CORES
    ========================================= */
 :root {
-  /* Cores Principais baseadas na sua escolha VIP */
-  --bg-dark: #0F0F0F;          /* Base: Preto fosco */
-  --bg-header: #181818;        /* Cabeçalho: Cinza carvão */
-  --card-light: #181818;       /* Cards: Cinza carvão */
-  --card-dark: #181818;        /* Cards: Cinza carvão */
-  
-  --accent-cyan: #7A1E3A;      /* Destaque principal: Vinho fechado */
-  --accent-green: #2E7D32;     /* Sucesso: Verde discreto */
-  
-  --text-white: #F1F1F1;       /* Texto: Branco gelo */
-  --text-gray: #9A9A9A;        /* Secundário: Cinza */
-  --text-dark: #F1F1F1;        /* Adaptado para o tema dark */
-  
-  --borda-divisoria: #262626;  /* Bordas: Cinza um tom acima do cartão para separar sutilmente */
+  /* Fundos — tinta escura com leve toque roxo */
+  --bg-dark:      #0D0C12;
+  --bg-header:    #121119;
+  --card-dark:    #1C1A26;
+  --card-light:   #1C1A26;
+  --bg-cartao-escuro: #1C1A26;
+  --mint-cream:   #1C1A26;
 
-  /* Mapeamento das variáveis do Dashboard antigo */
-  --ink-black: #0F0F0F;        /* Fundo do dashboard */
-  --bg-cartao-escuro: #181818; /* Fundo dos cartões */
-  --mint-cream: #181818;       /* Fundo dos cartões "claros" */
-  --emerald: #2E7D32;          /* Verde discreto nos acertos e ícones */
-  --vermelho: #8B1E1E;         /* Erro: Vermelho escuro */
-  --dourado: #7A1E3A;          /* Destaques (status, relógio, inputs) usam o Vinho fechado */
-  --azul-texto: #9A9A9A;       /* Subtítulos usam o cinza secundário */
+  /* Cores de destaque */
+  --accent-cyan:   #C0345A;   /* Vinho vibrante — CTA principal */
+  --accent-green:  #22C55E;   /* Verde limpo — sucesso */
+  --vermelho:      #EF4444;   /* Erro */
+  --dourado:       #C0345A;
+  --emerald:       #22C55E;
 
-  /* Fontes Globais */
-  --font-main: 'Montserrat', sans-serif;
-  --font-display: 'Teko', sans-serif;
+  /* Tipografia */
+  --text-white:  #F2F1FA;
+  --text-gray:   #8A87A2;
+  --text-dark:   #F2F1FA;
+  --azul-texto:  #8A87A2;
+
+  /* Bordas */
+  --borda-divisoria: #2A2837;
+  --ink-black:       #0D0C12;
+
+  /* Fontes */
+  --font-main:    'DM Sans', sans-serif;
+  --font-display: 'Barlow Condensed', sans-serif;
 }
 
 /* =========================================
-   RESET E CONFIGURAÇÕES GERAIS
+   RESET E BASE
    ========================================= */
-* {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html { scroll-behavior: smooth; }
+
 body {
   background-color: var(--bg-dark);
   color: var(--text-white);
   font-family: var(--font-main);
+  font-size: 16px;
+  line-height: 1.6;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  animation: fadeInApp 0.35s ease-out both;
 }
 
-h1, h2, h3, .font-russo { 
-  font-family: 'Russo One', sans-serif; 
+/* Grain overlay sutil */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
 }
+
+h1, h2, h3, .font-russo {
+  font-family: 'Russo One', sans-serif;
+  letter-spacing: 0.01em;
+}
+
+a { color: inherit; }
 
 /* =========================================
-   CLASSES UTILITÁRIAS (Helpers)
+   UTILITÁRIOS
    ========================================= */
 .mt-10 { margin-top: 10px; }
 .mt-15 { margin-top: 15px; }
@@ -71,76 +91,164 @@ h1, h2, h3, .font-russo {
 .mb-15 { margin-bottom: 15px; }
 .mb-20 { margin-bottom: 20px; }
 .text-center { text-align: center; }
-.text-left { text-align: left; }
-.lh-grande { line-height: 1.6; }
+.text-left   { text-align: left; }
+.lh-grande   { line-height: 1.7; }
+.mx-auto     { margin-left: auto; margin-right: auto; }
 
 /* =========================================
-   NAVBAR (CABEÇALHO)
+   NAVBAR
    ========================================= */
 .navbar, .cabecalho-palpitoo {
   background-color: var(--bg-header);
   color: var(--text-white);
-  padding: 12px 32px;
+  padding: 0 32px;
+  height: 64px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid var(--borda-divisoria); 
-  position: relative;
-  z-index: 50;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--accent-cyan); /* Círculo em vinho */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  font-weight: 900;
-  font-size: 1.5rem;
+  align-items: center;
+  border-bottom: 1px solid var(--borda-divisoria);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.logo-text {
-  font-weight: 900;
-  font-size: 1.8rem;
-  letter-spacing: -1px;
+/* Logo */
+.logo-link {
+  position: absolute;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
 }
 
+.logo-imagem {
+  height: 40px;
+  width: auto;
+  display: block;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.logo-link:hover .logo-imagem {
+  transform: scale(1.07) rotate(-3deg);
+}
+
+/* Nav links */
 .nav-menu, .nav-links {
   display: flex;
-  gap: 24px;
+  gap: 4px;
   list-style: none;
 }
 
 .nav-link, .nav-links a {
   text-decoration: none;
-  color: var(--text-gray); 
-  font-weight: 700;
-  font-size: 0.875rem;
+  color: var(--text-gray);
+  font-family: var(--font-main);
+  font-weight: 600;
+  font-size: 0.82rem;
   text-transform: uppercase;
-  padding: 8px 16px;
-  transition: all 0.3s ease;
-  border-radius: 6px;
+  letter-spacing: 0.05em;
+  padding: 7px 14px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
 }
 
 .nav-link:hover, .nav-links a:hover {
-  color: var(--accent-cyan);
+  color: var(--text-white);
+  background: rgba(255,255,255,0.05);
 }
 
 .nav-link.active, .nav-links a.ativo {
-  background-color: var(--bg-dark); /* Botão ativo no menu fica Preto Fosco */
-  color: var(--text-white);
+  background: var(--accent-cyan);
+  color: #fff;
 }
 
+/* User area */
+.navbar-user {
+  position: absolute;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--borda-divisoria);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.navbar-avatar:hover {
+  border-color: var(--accent-cyan);
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(192, 52, 90, 0.4);
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid var(--borda-divisoria);
+  color: var(--text-gray);
+  font-family: var(--font-main);
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-logout:hover {
+  border-color: var(--vermelho);
+  color: var(--vermelho);
+}
+
+/* Logo container legacy */
+.logo-container { display: flex; align-items: center; gap: 6px; }
+.logo-icon {
+  width: 38px; height: 38px;
+  border: 2px solid var(--accent-cyan);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1.3rem;
+}
+.logo-text { font-weight: 900; font-size: 1.6rem; letter-spacing: -0.02em; }
+
 /* =========================================
-   MAIN HERO SECTION (Página Inicial de Login)
+   HAMBURGER MOBILE
+   ========================================= */
+.hamburger {
+  display: none;
+  position: absolute;
+  right: 20px;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 6px;
+  background: none;
+  border: none;
+  z-index: 110;
+}
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text-white);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+.hamburger.aberto span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.aberto span:nth-child(2) { opacity: 0; }
+.hamburger.aberto span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* =========================================
+   HERO SECTION (landing)
    ========================================= */
 .hero-section {
   flex-grow: 1;
@@ -148,31 +256,27 @@ h1, h2, h3, .font-russo {
   align-items: center;
   position: relative;
   overflow: hidden;
-  padding: 48px 24px;
+  padding: 64px 24px;
 }
 
 .glow-blue {
   position: absolute;
-  top: 10%;
-  left: 10%;
-  width: 250px;
-  height: 250px;
-  background-color: var(--borda-divisoria);
+  top: -5%;
+  left: -8%;
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(192,52,90,0.12) 0%, transparent 70%);
   border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.3;
+  pointer-events: none;
 }
 
 .glow-green {
   position: absolute;
-  bottom: 10%;
-  right: 10%;
-  width: 300px;
-  height: 300px;
-  background-color: var(--accent-cyan); /* Brilho em Vinho */
+  bottom: -10%;
+  right: -5%;
+  width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(34,197,94,0.07) 0%, transparent 70%);
   border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15; 
+  pointer-events: none;
 }
 
 .container {
@@ -180,7 +284,7 @@ h1, h2, h3, .font-russo {
   margin: 0 auto;
   width: 100%;
   position: relative;
-  z-index: 10;
+  z-index: 1;
 }
 
 .hero-grid {
@@ -191,96 +295,91 @@ h1, h2, h3, .font-russo {
 }
 
 @media (min-width: 992px) {
-  .hero-grid {
-    grid-template-columns: 1fr 1fr;
-  }
+  .hero-grid { grid-template-columns: 1fr 1fr; }
 }
 
 .subtitle {
   font-family: var(--font-display);
   color: var(--accent-cyan);
-  font-size: 2rem;
-  letter-spacing: 2px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 3px;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  opacity: 0.9;
 }
 
 .main-title {
-  font-weight: 900;
-  font-size: 3.5rem;
-  line-height: 1.1;
+  font-family: 'Russo One', sans-serif;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 1.08;
   text-transform: uppercase;
   margin-bottom: 24px;
+  letter-spacing: -0.01em;
 }
 
 .text-gradient {
-  background: linear-gradient(to right, var(--text-white), var(--accent-cyan));
+  background: linear-gradient(135deg, var(--text-white) 30%, var(--accent-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .description {
   color: var(--text-gray);
-  font-size: 1.125rem;
-  line-height: 1.6;
+  font-size: 1.05rem;
+  line-height: 1.7;
   margin-bottom: 32px;
-  max-width: 450px;
+  max-width: 460px;
+  font-weight: 400;
 }
 
 .feature-cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 14px;
   max-width: 400px;
 }
 
 .feature-card {
-  background-color: var(--card-dark);
-  border: 1px solid var(--borda-divisoria); 
+  background: var(--card-dark);
+  border: 1px solid var(--borda-divisoria);
   padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  border-radius: 14px;
 }
 
-.feature-icon {
-  font-family: var(--font-display);
-  font-size: 2rem;
-}
-
+.feature-icon { font-size: 1.8rem; }
 .feature-icon.green { color: var(--accent-cyan); }
-.feature-icon.blue { color: var(--text-gray); }
+.feature-icon.blue  { color: var(--text-gray); }
 
 .feature-title {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-gray);
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.06em;
   margin-top: 4px;
 }
 
 /* =========================================
-   CARD DE LOGIN
+   LOGIN CARD
    ========================================= */
 .login-area {
   display: flex;
   justify-content: center;
 }
-
 @media (min-width: 992px) {
-  .login-area {
-    justify-content: flex-end;
-  }
+  .login-area { justify-content: flex-end; }
 }
 
 .login-card {
-  background-color: var(--card-light);
-  color: var(--text-white);
+  background: var(--card-dark);
+  border: 1px solid var(--borda-divisoria);
+  border-radius: 24px;
   padding: 40px;
-  border-radius: 2rem;
   width: 100%;
   max-width: 400px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8);
-  border: 1px solid var(--borda-divisoria);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(192,52,90,0.08);
 }
 
 .login-header {
@@ -290,93 +389,173 @@ h1, h2, h3, .font-russo {
 
 .login-header h3 {
   font-family: var(--font-display);
-  font-size: 2.5rem;
+  font-size: 2.2rem;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--accent-cyan);
 }
 
 .login-header p {
   color: var(--text-gray);
   font-size: 0.875rem;
-  font-weight: 600;
+  margin-top: 4px;
 }
 
-.form-group { margin-bottom: 20px; }
+/* =========================================
+   FORMULÁRIOS
+   ========================================= */
+.form-group { margin-bottom: 18px; }
 .form-group.hidden { display: none; }
 
 .form-group label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.07em;
   color: var(--text-gray);
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
 
-.form-group input {
+.form-group input,
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 12px 16px;
-  background-color: var(--bg-dark); 
-  border: 2px solid var(--borda-divisoria);
+  background: rgba(255,255,255,0.03);
+  border: 1.5px solid var(--borda-divisoria);
   border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: var(--font-main);
   color: var(--text-white);
   outline: none;
-  transition: border-color 0.3s;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
-.form-group input:focus {
-  border-color: var(--accent-cyan); /* Borda fica Vinho ao digitar */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent-cyan);
+  background: rgba(192,52,90,0.05);
+  box-shadow: 0 0 0 3px rgba(192,52,90,0.12);
 }
 
-/* O botão de entrar mantemos no verde discreto de Sucesso para criar um contraponto legal com o Vinho */
-.btn-primary {
-  width: 100%;
-  background-color: var(--accent-green);
-  color: var(--text-white);
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  text-transform: uppercase;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  margin-top: 16px;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.btn-primary:hover {
-  background-color: #1B5E20; /* Tom mais escuro do verde discreto no hover */
-  transform: translateY(-2px);
-}
+.form-group input::placeholder { color: rgba(138,135,162,0.5); }
 
 .login-footer {
-  margin-top: 32px;
-  padding-top: 24px;
+  margin-top: 28px;
+  padding-top: 22px;
   border-top: 1px solid var(--borda-divisoria);
   text-align: center;
   font-size: 0.875rem;
-  font-weight: 700;
   color: var(--text-gray);
 }
 
 .btn-link {
   background: none;
   border: none;
-  color: var(--text-white);
-  font-weight: 900;
+  color: var(--accent-cyan);
+  font-weight: 700;
   cursor: pointer;
-  text-decoration: underline;
-  font-size: 0.875rem;
+  text-decoration: none;
+  font-size: inherit;
   margin-left: 4px;
+  transition: opacity 0.2s;
+}
+.btn-link:hover { opacity: 0.75; }
+
+/* =========================================
+   BOTÕES
+   ========================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 22px;
+  border-radius: 12px;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
 }
 
-.btn-link:hover {
-  color: var(--accent-cyan);
+.btn-primary {
+  width: 100%;
+  background: var(--accent-cyan);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: filter 0.2s, transform 0.2s;
+}
+.btn-primary:hover {
+  filter: brightness(1.15);
+  transform: translateY(-2px);
+}
+.btn-primary:active { transform: translateY(0); filter: brightness(0.95); }
+
+.btn-salvar {
+  background: var(--accent-cyan);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(192,52,90,0.25);
+}
+.btn-salvar:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(192,52,90,0.35);
+}
+
+.btn-cancelar {
+  background: transparent;
+  color: var(--text-gray);
+  border: 1.5px solid var(--borda-divisoria);
+}
+.btn-cancelar:hover {
+  border-color: var(--text-gray);
+  color: var(--text-white);
+  background: rgba(255,255,255,0.04);
 }
 
 /* =========================================
-   ESTRUTURA GRID (DASHBOARD)
+   CARDS E CARTÕES
+   ========================================= */
+.cartao {
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid var(--borda-divisoria);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+.animacao-suave {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.animacao-suave:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  border-color: rgba(192,52,90,0.35);
+}
+
+.bg-claro, .bg-escuro {
+  background-color: var(--card-dark);
+  color: var(--text-white);
+}
+.bg-claro { border-top-left-radius: 48px; }
+
+/* =========================================
+   DASHBOARD LAYOUT
    ========================================= */
 .container-principal {
   max-width: 1200px;
@@ -386,109 +565,122 @@ h1, h2, h3, .font-russo {
 
 .dashboard-layout {
   display: grid;
-  grid-template-columns: 280px 1fr 280px; 
-  gap: 30px;
+  grid-template-columns: 270px 1fr 270px;
+  gap: 24px;
   align-items: start;
 }
 
-.cartao {
-  border-radius: 24px;
-  padding: 30px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6); 
-  border: 1px solid var(--borda-divisoria); 
-}
-
-.animacao-suave {
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-.animacao-suave:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
-  border-color: var(--accent-cyan); /* Borda brilha em Vinho ao passar o mouse */
-}
-
-.bg-claro, .bg-escuro {
-  background-color: var(--bg-cartao-escuro);
-  color: var(--text-white);
-}
-
-.bg-claro {
-  border-top-left-radius: 60px;
-}
-
-.perfil-topo { display: flex; align-items: center; gap: 15px; }
+/* =========================================
+   PERFIL
+   ========================================= */
+.perfil-topo { display: flex; align-items: center; gap: 14px; }
 .foto-perfil {
-  width: 65px; height: 65px; border-radius: 50%; object-fit: cover;
-  border: 2px solid var(--borda-divisoria);
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-cyan);
 }
-.titulo-azul { font-size: 20px; color: var(--text-gray); }
-
-.linha-divisoria { border: none; border-top: 2px solid var(--borda-divisoria); }
-
-.lista-desempenho { list-style: none; }
-.lista-desempenho li {
-  display: flex; align-items: center; gap: 15px; margin-bottom: 12px;
-  font-size: 18px; padding: 5px; border-radius: 8px; transition: background 0.2s ease;
-}
-.lista-desempenho li:hover { background: var(--borda-divisoria); }
-
-.icone { font-size: 20px; }
-.icone-grande { font-size: 32px; filter: grayscale(100%); opacity: 0.6; }
-
-.aproveitamento-box {
-  display: flex; align-items: center; gap: 15px;
-  background: var(--bg-dark); 
-  padding: 15px; border-radius: 12px;
-  border: 1px solid var(--borda-divisoria);
-}
-
-.final-linha { margin-top: 40px; margin-bottom: 20px;}
-.perfil-rodape { display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; color: var(--text-gray); }
-.texto-hover { transition: color 0.2s ease; }
-.perfil-rodape:hover .texto-hover { color: var(--text-white); }
-
-.texto-centralizado { text-align: center; }
-
-.divisor-tracejado {
-  width: 100%; height: 2px;
-  background-image: linear-gradient(to right, var(--borda-divisoria) 50%, transparent 50%);
-  background-size: 15px 2px; background-repeat: repeat-x;
-}
-
-.destaque-dourado { color: var(--accent-cyan); font-size: 18px; margin: 5px 0; }
-.brilha-suave { text-shadow: 0 0 12px rgba(122, 30, 58, 0.5); } /* Aura Vinho */
-
-.destaque-status { 
-  background: var(--bg-dark); 
-  border: 1px solid var(--borda-divisoria);
-  display: inline-block; padding: 8px 20px; border-radius: 20px; 
-}
-
-.tabelona-container { display: inline-block; width: 100%; padding: 0 20px;}
-.tabelona-lista { list-style: none; }
-.item-interativo { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 15px; padding: 8px 15px; border-radius: 8px; transition: all 0.2s ease; cursor: default; }
-.item-interativo:hover { background: var(--bg-dark); transform: translateX(5px); }
-
-.quadrado { width: 14px; height: 14px; display: inline-block; border-radius: 4px; }
-.verde { background-color: var(--accent-green); }
-.amarelo { background-color: #eab308; } 
-.laranja { background-color: #f97316; }
-.vermelho { background-color: var(--vermelho); }
-
-.coluna-destaques { display: flex; flex-direction: column; }
-.titulo-branco { font-size: 18px; }
-.cor-emerald { color: var(--accent-cyan); margin-top: 5px; } 
-.cor-vermelha { color: var(--vermelho); margin-top: 5px; } 
-.efeito-texto { font-size: 16px; transition: transform 0.2s ease; }
-.bloco-destaque:hover .efeito-texto { transform: scale(1.05) translateX(5px); }
-.caixa-chat { flex-grow: 1; display: flex; align-items: center; justify-content: center; text-align: center; opacity: 0.5; }
+.titulo-azul { font-size: 18px; color: var(--text-gray); }
 
 /* =========================================
-   PÁGINA DE PALPITES - ESTILOS ESPECÍFICOS
+   DIVISORES E LINHAS
    ========================================= */
-.container-palpites { 
-  display: flex; 
-  gap: 30px; 
+.linha-divisoria { border: none; border-top: 1px solid var(--borda-divisoria); }
+
+.divisor-tracejado {
+  width: 100%;
+  height: 1px;
+  background-image: linear-gradient(to right, var(--borda-divisoria) 60%, transparent 60%);
+  background-size: 12px 1px;
+  background-repeat: repeat-x;
+}
+
+/* =========================================
+   LISTA DE DESEMPENHO
+   ========================================= */
+.lista-desempenho { list-style: none; }
+.lista-desempenho li {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 10px; font-size: 0.95rem;
+  padding: 8px 10px; border-radius: 10px;
+  transition: background 0.2s;
+}
+.lista-desempenho li:hover { background: rgba(255,255,255,0.035); }
+
+.icone { font-size: 18px; }
+.icone-grande { font-size: 30px; filter: grayscale(60%); opacity: 0.6; }
+
+/* =========================================
+   APROVEITAMENTO
+   ========================================= */
+.aproveitamento-box {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--bg-dark);
+  padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--borda-divisoria);
+}
+
+/* =========================================
+   LAYOUT COLUNA DESTAQUES
+   ========================================= */
+.coluna-destaques { display: flex; flex-direction: column; }
+.titulo-branco { font-size: 17px; color: var(--text-white); }
+.cor-emerald { color: var(--accent-green); margin-top: 4px; }
+.cor-vermelha { color: var(--vermelho); margin-top: 4px; }
+.efeito-texto { font-size: 15px; transition: transform 0.2s; }
+.bloco-destaque:hover .efeito-texto { transform: scale(1.03) translateX(4px); }
+.caixa-chat {
+  flex-grow: 1; display: flex; align-items: center;
+  justify-content: center; text-align: center; opacity: 0.4;
+}
+.final-linha { margin-top: 36px; margin-bottom: 18px; }
+.perfil-rodape {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; cursor: pointer; color: var(--text-gray);
+}
+.texto-hover { transition: color 0.2s; }
+.perfil-rodape:hover .texto-hover { color: var(--text-white); }
+.texto-centralizado { text-align: center; }
+
+/* =========================================
+   DESTAQUES / BADGES
+   ========================================= */
+.destaque-dourado { color: var(--accent-cyan); font-size: 17px; margin: 4px 0; }
+.brilha-suave { text-shadow: 0 0 16px rgba(192,52,90,0.45); }
+
+.destaque-status {
+  background: var(--bg-dark);
+  border: 1px solid var(--borda-divisoria);
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 20px;
+}
+
+/* =========================================
+   TABELA
+   ========================================= */
+.tabelona-container { display: inline-block; width: 100%; padding: 0 16px; }
+.tabelona-lista { list-style: none; }
+.item-interativo {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 6px; font-size: 14px;
+  padding: 9px 14px; border-radius: 10px;
+  transition: all 0.2s; cursor: default;
+}
+.item-interativo:hover { background: rgba(255,255,255,0.04); transform: translateX(4px); }
+
+.quadrado { width: 12px; height: 12px; display: inline-block; border-radius: 3px; }
+.verde   { background-color: var(--accent-green); }
+.amarelo { background-color: #F59E0B; }
+.laranja { background-color: #F97316; }
+.vermelho { background-color: var(--vermelho); }
+
+/* =========================================
+   PÁGINA DE PALPITES
+   ========================================= */
+.container-palpites {
+  display: flex;
+  gap: 24px;
 }
 
 .cartao-palpite {
@@ -497,400 +689,186 @@ h1, h2, h3, .font-russo {
   flex-direction: column;
 }
 
-.subtitulo-tempo { 
-  font-family: 'Russo One', sans-serif; 
-  font-size: 13px; 
-  color: var(--accent-cyan); 
+.subtitulo-tempo {
+  font-family: 'Russo One', sans-serif;
+  font-size: 12px;
+  color: var(--accent-cyan);
   opacity: 0.8;
-  margin-top: 5px;
+  margin-top: 4px;
 }
 
 .linha-jogo {
   display: grid;
-  grid-template-columns: 1fr auto 1fr; 
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 15px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--borda-divisoria); 
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--borda-divisoria);
 }
+.linha-jogo:last-child { border-bottom: none; }
 
-.linha-jogo:last-child {
-  border-bottom: none;
-}
-
-.nome-time {
-  font-size: 16px;
-  color: var(--text-white);
-}
-
-.time-casa { text-align: right; } 
-.time-fora { text-align: left; }  
+.nome-time { font-size: 15px; color: var(--text-white); font-weight: 600; }
+.time-casa { text-align: right; }
+.time-fora { text-align: left; }
 
 .area-placar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg-dark); 
-  padding: 5px 10px;
-  border-radius: 12px;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-dark);
+  padding: 5px 10px; border-radius: 12px;
   border: 1px solid var(--borda-divisoria);
 }
 
-.versus {
-  font-size: 14px;
-  color: var(--text-gray);
+.versus { font-size: 12px; color: var(--text-gray); font-family: 'Russo One', sans-serif; }
+
+/* INPUTS PLACAR */
+.input-placar {
+  width: 44px; height: 44px;
+  background: var(--card-dark);
+  border: 1.5px solid var(--borda-divisoria);
+  border-radius: 10px;
+  color: var(--accent-cyan);
+  font-size: 19px;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: all 0.2s;
   font-family: 'Russo One', sans-serif;
 }
-
-/* =========================================
-   INPUTS (Campos de Placar Minimalistas)
-   ========================================= */
-.input-placar {
-  width: 45px;
-  height: 45px;
-  background-color: var(--bg-cartao-escuro); 
-  border: 1px solid var(--borda-divisoria); 
-  border-radius: 8px;
-  color: var(--accent-cyan); /* Números em Vinho Fechado */
-  font-size: 20px;
-  text-align: center; 
-  outline: none; 
-  transition: all 0.3s ease;
-}
-
 .input-placar:focus {
   border-color: var(--accent-cyan);
-  background-color: var(--bg-dark);
-  box-shadow: 0 0 10px rgba(122, 30, 58, 0.3); /* Sombra de foco em Vinho */
-  transform: scale(1.05); 
+  background: rgba(192,52,90,0.08);
+  box-shadow: 0 0 0 3px rgba(192,52,90,0.15);
+  transform: scale(1.05);
 }
-
 .input-placar::-webkit-outer-spin-button,
-.input-placar::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.input-placar[type=number] {
-  -moz-appearance: textfield;
-}
+.input-placar::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.input-placar[type=number] { -moz-appearance: textfield; }
 
-/* =========================================
-   BOTÕES DE AÇÃO (Página de Palpites)
-   ========================================= */
 .botoes-acao {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: auto; 
-  padding-top: 20px;
-}
-
-.btn {
-  padding: 12px 24px;
-  border-radius: 12px;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 700;
-}
-
-/* Botão Vermelho (Cancelar/Limpar) */
-.btn-cancelar {
-  background-color: transparent; 
-  color: var(--vermelho);
-  border: 1px solid var(--vermelho);
-}
-.btn-cancelar:hover {
-  background-color: var(--vermelho);
-  color: var(--text-white);
-}
-
-/* Botão Verde (Salvar Palpites) - Usando o Verde Discreto de sucesso */
-.btn-salvar {
-  background-color: var(--accent-green);
-  color: var(--text-white); 
-  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
-}
-.btn-salvar:hover {
-  background-color: #1B5E20; /* Escurece o verde ao focar */
-  transform: translateY(-2px); 
+  display: flex; justify-content: center; gap: 12px;
+  margin-top: auto; padding-top: 20px;
 }
 
 .area-vazia {
-  flex-grow: 1; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-gray);
-  opacity: 0.5; 
+  flex-grow: 1; display: flex; align-items: center;
+  justify-content: center; color: var(--text-gray); opacity: 0.4;
 }
 
 /* =========================================
-   SKELETON LOADING (Animação de Carregamento)
+   SKELETON LOADING
    ========================================= */
 .skeleton-box {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 15px;
+  gap: 14px;
   padding: 12px 0;
   border-bottom: 1px dashed var(--borda-divisoria);
-  animation: pulso-esqueleto 1.5s infinite ease-in-out;
+  animation: pulso-esqueleto 1.6s infinite ease-in-out;
 }
-
 .skeleton-text {
-  height: 18px;
-  width: 90px;
-  background-color: var(--borda-divisoria);
+  height: 16px; width: 85px;
+  background: var(--borda-divisoria);
   border-radius: 6px;
 }
-
 .skeleton-text.right { justify-self: end; }
-.skeleton-text.left { justify-self: start; }
-
+.skeleton-text.left  { justify-self: start; }
 .skeleton-placar {
-  width: 115px;
-  height: 55px;
-  background-color: var(--bg-dark);
+  width: 110px; height: 52px;
+  background: var(--bg-dark);
   border-radius: 12px;
   border: 1px solid var(--borda-divisoria);
 }
 
 @keyframes pulso-esqueleto {
-  0% { opacity: 0.3; }
-  50% { opacity: 0.7; }
-  100% { opacity: 0.3; }
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.65; }
 }
 
 /* =========================================
-   TRANSIÇÃO SUAVE ENTRE PÁGINAS (FADE IN)
-   ========================================= */
-body {
-  animation: fadeInApp 0.4s ease-out forwards;
-}
-
-@keyframes fadeInApp {
-  0% {
-    opacity: 0;
-    transform: translateY(10px); /* Faz a tela subir bem de leve */
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* =========================================
-   LOGO OFICIAL DA BRAH.BET
-   ========================================= */
-.logo-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-
-.logo-imagem {
-    height: 60px; /* Se achar que a logo ficou muito grande ou pequena, é só mudar esse número */
-    width: auto;
-    display: block;
-    transition: transform 0.3s ease;
-}
-
-.logo-link:hover .logo-imagem {
-    transform: scale(1.05); /* Dá uma leve "crescida" na logo ao passar o mouse */
-}
-
-/* =========================================
-   SISTEMA DE AVISOS (TOASTS FLUTUANTES)
+   TOASTS / AVISOS
    ========================================= */
 #container-avisos {
   position: fixed;
-  top: 20px;
+  top: 80px;
   right: 20px;
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .aviso-toast {
-  min-width: 250px;
-  padding: 15px 20px;
-  border-radius: 8px;
-  background-color: var(--bg-dark);
+  min-width: 240px;
+  padding: 13px 18px;
+  border-radius: 12px;
+  background: var(--card-dark);
   color: var(--text-white);
-  font-family: 'Russo One', sans-serif;
-  font-size: 14px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-left: 5px solid;
-  animation: deslizarAviso 0.3s ease-out forwards;
+  font-family: var(--font-main);
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  display: flex; align-items: center; gap: 10px;
+  border-left: 4px solid;
+  animation: deslizarAviso 0.28s ease-out both;
 }
-
-/* Cores por tipo de aviso */
-.aviso-sucesso { border-left-color: #4ade80; } /* Verde */
-.aviso-erro { border-left-color: #f87171; } /* Vermelho */
-.aviso-info { border-left-color: #eab308; } /* Amarelo */
-
-/* Animação para o aviso sumir da tela */
-.aviso-saindo {
-  animation: sumirAviso 0.3s ease-in forwards;
-}
+.aviso-sucesso { border-left-color: var(--accent-green); }
+.aviso-erro    { border-left-color: var(--vermelho); }
+.aviso-info    { border-left-color: #F59E0B; }
+.aviso-saindo  { animation: sumirAviso 0.25s ease-in both; }
 
 @keyframes deslizarAviso {
-  from { transform: translateX(120%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
-
 @keyframes sumirAviso {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(120%); opacity: 0; }
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(110%); opacity: 0; }
 }
+
 /* =========================================
-   NAVBAR - BOTÃO PERFIL / LOGOUT
+   PAGE TRANSITION
    ========================================= */
-.navbar-user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: 16px;
-}
-
-.navbar-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--accent-cyan);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.navbar-avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 10px rgba(122, 30, 58, 0.5);
-}
-
-.btn-logout {
-  background: transparent;
-  border: 1px solid var(--vermelho);
-  color: var(--vermelho);
-  font-family: 'Russo One', sans-serif;
-  font-size: 0.75rem;
-  padding: 6px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  display: inline-block;
-}
-.btn-logout:hover {
-  background: var(--vermelho);
-  color: var(--text-white);
+@keyframes fadeInApp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================================
-   NAVBAR - MENU HAMBURGUER (MOBILE)
-   ========================================= */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  padding: 4px;
-  background: none;
-  border: none;
-  z-index: 100;
-}
-.hamburger span {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: var(--text-white);
-  border-radius: 2px;
-  transition: all 0.3s ease;
-}
-.hamburger.aberto span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger.aberto span:nth-child(2) { opacity: 0; }
-.hamburger.aberto span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-/* ── CONFIGURAÇÃO DA NAVBAR (CENTRALIZANDO OS LINKS) ── */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: center; /* Centraliza a tag <nav> no meio do espaço */
-  position: relative; /* Permite posicionar o logo livremente */
-  padding: 15px 20px; /* Ajuste o espaçamento interno conforme precisar */
-  width: 100%;
-  box-sizing: border-box;
-}
-
-
-/* Deixa os links lado a lado e limpa estilos de lista padrão */
-.nav-links {
-  display: flex;
-  gap: 24px; /* Espaço entre os links "Início", "Ligas", etc. */
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-
-
-/* =========================================
-   RESPONSIVIDADE MOBILE
+   RESPONSIVIDADE
    ========================================= */
 @media (max-width: 768px) {
-  .hamburger { display: flex; }
+  .navbar { justify-content: space-between; }
+  .logo-link { position: static; }
+  .navbar-user { position: static; display: none; }
+  .hamburger { display: flex; position: static; }
 
   .nav-links {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
+    top: 64px;
+    left: 0; right: 0;
     flex-direction: column;
-    background-color: var(--bg-header);
-    border-bottom: 2px solid var(--borda-divisoria);
-    padding: 16px;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--borda-divisoria);
+    padding: 12px 16px;
     gap: 4px;
     z-index: 99;
   }
   .nav-links.aberto { display: flex; }
   .nav-links li { width: 100%; }
-  .nav-links a {
-    display: block;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-  }
+  .nav-links a { display: block; padding: 11px 14px; font-size: 0.85rem; }
 
-  .navbar-user { display: none; }
-
-  .dashboard-layout {
-    grid-template-columns: 1fr !important;
-  }
-
-  .hero-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .main-title { font-size: 2.4rem; }
-
-  .container-palpites {
-    flex-direction: column;
-  }
-
-  .cartao { padding: 20px; }
-
+  .dashboard-layout  { grid-template-columns: 1fr !important; }
+  .hero-grid         { grid-template-columns: 1fr !important; }
+  .container-palpites { flex-direction: column; }
+  .main-title        { font-size: 2.2rem; }
+  .cartao            { padding: 20px; }
   .container-principal { margin-top: 20px; }
 }
 
 @media (max-width: 480px) {
-  .main-title { font-size: 1.9rem; }
-  .navbar { padding: 10px 16px; }
-  .login-card { padding: 24px 20px; }
+  .main-title  { font-size: 1.85rem; }
+  .navbar      { padding: 0 16px; }
+  .login-card  { padding: 24px 18px; }
 }

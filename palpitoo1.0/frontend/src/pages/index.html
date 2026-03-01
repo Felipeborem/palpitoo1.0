@@ -9,9 +9,9 @@
   <link rel="stylesheet" href="./css/style.css">
   <style>
     .card-liga { width:100%; background:var(--card-dark); border:1px solid var(--borda-divisoria); border-radius:20px; overflow:hidden; transition:border-color .3s,box-shadow .3s; }
-    .card-liga:hover { border-color:var(--accent-cyan); box-shadow:0 8px 30px rgba(122,30,58,.15); }
+    .card-liga:hover { border-color:var(--accent-cyan); box-shadow:0 8px 30px rgba(192,52,90,.15); }
     .card-liga-header { padding:20px 24px; cursor:pointer; text-align:center; }
-    .card-liga-titulo { font-family:'Russo One',sans-serif; color:var(--accent-cyan); font-size:17px; letter-spacing:1px; text-shadow:0 0 12px rgba(122,30,58,.4); }
+    .card-liga-titulo { font-family:'Russo One',sans-serif; color:var(--accent-cyan); font-size:17px; letter-spacing:1px; text-shadow:0 0 12px rgba(192,52,90,.4); }
     .card-liga-subtitulo { font-family:'Russo One',sans-serif; color:var(--text-white); font-size:13px; margin-top:4px; opacity:.7; }
     .card-liga-divisor { width:100%; height:1px; background-image:linear-gradient(to right,var(--borda-divisoria) 50%,transparent 50%); background-size:15px 1px; background-repeat:repeat-x; }
     .card-liga-status { display:inline-block; background:var(--bg-dark); border:1px solid var(--borda-divisoria); border-radius:20px; padding:8px 22px; font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-white); margin:14px 0; }
@@ -23,14 +23,14 @@
     .tabelona-expansivel.aberto { max-height:600px; border-top:1px dashed var(--borda-divisoria); }
     .tabelona-expansivel-inner { padding:16px 20px 20px; }
     .link-pagina-completa { display:block; text-align:center; margin-top:14px; font-family:'Russo One',sans-serif; font-size:12px; color:var(--accent-cyan); text-decoration:none; padding:8px; border-radius:8px; border:1px solid var(--accent-cyan); transition:background .2s; }
-    .link-pagina-completa:hover { background:rgba(122,30,58,.15); }
+    .link-pagina-completa:hover { background:rgba(192,52,90,.12); }
     .rank-item { display:flex; align-items:center; gap:10px; padding:8px 6px; border-radius:8px; transition:background .15s; font-family:'Russo One',sans-serif; font-size:13px; }
     .rank-item:hover { background:var(--bg-dark); }
-    .rank-item.rank-eu { background:rgba(122,30,58,.1); border:1px solid var(--accent-cyan); }
+    .rank-item.rank-eu { background:rgba(192,52,90,.08); border:1px solid var(--accent-cyan); }
     .quadrado { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
     .verde{background:var(--accent-green);} .amarelo{background:#eab308;} .laranja{background:#f97316;} .vermelho{background:var(--vermelho);}
 
-    /* FEED */
+    /* ── FEED SIDEBAR ── */
     .coluna-feed { display:flex; flex-direction:column; gap:14px; min-width:0; }
     .feed-filtros { display:flex; gap:6px; flex-wrap:wrap; }
     .filtro-btn { padding:5px 12px; border-radius:20px; font-family:'Russo One',sans-serif; font-size:10px; text-transform:uppercase; border:1px solid var(--borda-divisoria); background:var(--bg-dark); color:var(--text-gray); cursor:pointer; transition:all .2s; white-space:nowrap; }
@@ -42,22 +42,31 @@
     .feed-item { display:flex; gap:12px; padding:13px 14px; background:var(--bg-dark); border-radius:12px; border:1px solid var(--borda-divisoria); transition:border-color .2s; animation:fadeSlide .35s ease forwards; opacity:0; }
     .feed-item:hover { border-color:var(--accent-cyan); }
     @keyframes fadeSlide { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-    .feed-item.tipo-pessoal{border-left:3px solid var(--accent-cyan);}
-    .feed-item.tipo-liga{border-left:3px solid var(--accent-green);}
-    .feed-item.tipo-sistema{border-left:3px solid #eab308;}
-    .feed-item.tipo-pato{border-left:3px solid var(--accent-cyan);background:rgba(122,30,58,.06);}
+    .feed-item.tipo-pessoal { border-left:3px solid var(--accent-cyan); }
+    .feed-item.tipo-liga    { border-left:3px solid var(--accent-green); }
+    .feed-item.tipo-sistema { border-left:3px solid #eab308; }
+    .feed-item.tipo-pato    { border-left:3px solid var(--accent-cyan); background:rgba(192,52,90,.05); }
     .feed-icone { font-size:18px; width:36px; height:36px; flex-shrink:0; background:var(--bg-header); border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--borda-divisoria); }
     .feed-corpo { flex-grow:1; min-width:0; }
-    .feed-titulo { font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-white); margin-bottom:3px; }
+    .feed-titulo    { font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-white); margin-bottom:3px; }
     .feed-descricao { font-size:11px; color:var(--text-gray); line-height:1.45; }
-    .feed-tempo { font-size:9px; color:var(--text-gray); margin-top:5px; text-transform:uppercase; font-weight:700; letter-spacing:1px; }
+    .feed-tempo     { font-size:9px; color:var(--text-gray); margin-top:5px; text-transform:uppercase; font-weight:700; letter-spacing:1px; }
     .badge-tipo { font-family:'Russo One',sans-serif; font-size:8px; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:1px; display:inline-block; margin-bottom:3px; }
-    .badge-pessoal{background:rgba(122,30,58,.2);color:var(--accent-cyan);border:1px solid var(--accent-cyan);}
-    .badge-liga{background:rgba(46,125,50,.2);color:#4ade80;border:1px solid #4ade80;}
-    .badge-sistema{background:rgba(234,179,8,.15);color:#eab308;border:1px solid #eab308;}
-    .badge-pato{background:rgba(122,30,58,.2);color:var(--accent-cyan);border:1px solid var(--accent-cyan);}
+    .badge-pessoal { background:rgba(192,52,90,.2); color:var(--accent-cyan); border:1px solid var(--accent-cyan); }
+    .badge-liga    { background:rgba(34,197,94,.15); color:#4ade80; border:1px solid #4ade80; }
+    .badge-sistema { background:rgba(234,179,8,.15); color:#eab308; border:1px solid #eab308; }
+    .badge-pato    { background:rgba(192,52,90,.2); color:var(--accent-cyan); border:1px solid var(--accent-cyan); }
     .regra-linha { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed var(--borda-divisoria); }
     .regra-linha:last-child { border-bottom:none; }
+
+    /* Link para novidades completas */
+    .link-novidades-full {
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      text-decoration:none; font-family:'Russo One',sans-serif; font-size:11px;
+      color:var(--text-gray); padding:8px; border-radius:8px;
+      border:1px dashed var(--borda-divisoria); transition:all .2s;
+    }
+    .link-novidades-full:hover { border-color:var(--accent-cyan); color:var(--accent-cyan); }
 
     @media(max-width:1100px){ .dashboard-layout{grid-template-columns:260px 1fr!important;} .coluna-feed{display:none;} }
     @media(max-width:768px){ .dashboard-layout{grid-template-columns:1fr!important;} }
@@ -72,6 +81,7 @@
         <li><a href="index.html" class="ativo">Início</a></li>
         <li><a href="ligas.html">Ligas</a></li>
         <li><a href="palpites.html">Palpites</a></li>
+        <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
         <li><a href="carreira.html">Carreira</a></li>
       </ul>
@@ -82,7 +92,7 @@
 
   <main class="container-principal dashboard-layout" style="grid-template-columns:270px 1fr 300px;gap:24px;">
 
-    <!-- SIDEBAR ESQUERDA -->
+    <!-- SIDEBAR ESQUERDA: PERFIL -->
     <aside class="cartao bg-claro cartao-perfil animacao-suave">
       <div class="perfil-topo" style="display:flex;flex-direction:column;align-items:center;">
         <img src="https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=80" alt="Foto" id="fotoPerfil" class="foto-perfil" style="width:80px;height:80px;border-radius:50%;object-fit:cover;">
@@ -107,7 +117,7 @@
       </a>
     </aside>
 
-    <!-- COLUNA CENTRAL -->
+    <!-- COLUNA CENTRAL: RANKINGS -->
     <div style="display:flex;flex-direction:column;gap:20px;min-width:0;">
 
       <!-- LIGA GLOBAL -->
@@ -154,7 +164,7 @@
 
     </div>
 
-    <!-- COLUNA DIREITA: FEED -->
+    <!-- COLUNA DIREITA: FEED (versão compacta) -->
     <aside class="coluna-feed">
 
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
@@ -170,6 +180,11 @@
       <div class="feed-lista" id="feed-container">
         <p class="font-russo" style="color:var(--text-gray);font-size:12px;text-align:center;padding:20px 0;">Carregando... 🔄</p>
       </div>
+
+      <!-- Link para página completa de novidades -->
+      <a href="novidades.html" class="link-novidades-full">
+        Ver todas as novidades →
+      </a>
 
       <div class="cartao bg-escuro" style="padding:18px;border-top:2px solid var(--accent-cyan);">
         <h4 class="font-russo mb-10" style="font-size:14px;color:var(--text-white);">⚖️ Pontuação</h4>
@@ -189,6 +204,7 @@
   const timeLogado = localStorage.getItem('time_craque');
   const fotoLogada = localStorage.getItem('foto_craque');
   const idLogado   = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+  const primeiro   = nomeLogado.split(' ')[0];
 
   if (nomeLogado && nomeLogado !== 'Craque') {
     document.getElementById('textoNome').innerText = nomeLogado;
@@ -196,6 +212,289 @@
   }
   if (fotoLogada && fotoLogada !== 'undefined' && fotoLogada !== 'null') document.getElementById('fotoPerfil').src = fotoLogada;
 
+  // ════════════════════════════════════════════════════════
+  //  BANCO DE FRASES — igual ao novidades.html
+  //  pega(arr) sorteia uma variação diferente a cada load
+  // ════════════════════════════════════════════════════════
+  const pega = arr => arr[Math.floor(Math.random() * arr.length)];
+
+  const FRASES = {
+    subiu2: [
+      (n, pos) => `"${n}, subiu 2 posições e agora está em ${pos}º. Mas não venha me pedir parabéns — isso é obrigação."`,
+      (n, pos) => `"Dois degraus de uma vez, ${n}? Quase me impressionou. Falta só mais ${pos - 1} pra chegar onde eu mando."`,
+      (n, pos) => `"${n} escalou 2 posições. O ranking notou. Eu também. Não deixa cair de volta, porque vou zoar muito."`,
+    ],
+    subiu3mais: [
+      (n, delta, pos) => `"ATENÇÃO GERAL: ${n} subiu ${delta} posições de uma vez! Isso não é palpite, isso é macumba. Tô de olho."`,
+      (n, delta, pos) => `"${n} subiu ${delta} posições e chegou em ${pos}º. Decreto: essa rodada foi sua. Só essa."`,
+      (n, delta, pos) => `"${delta} posições de subida, ${n}?! A galera deve estar em choque. Eu também tô, mas não vou admitir."`,
+    ],
+    mitada: [
+      (n, pts) => `"${pts} pontos em uma rodada só, ${n}?! O Pato decreta: mitada histórica. Não estrague na próxima."`,
+      (n, pts) => `"${n} fez ${pts} pontos nessa rodada. ${pts >= 12 ? 'Isso é humano? Alguém checa os palpites desse aí.' : 'Tá bom demais pra ser verdade. O Pato desconfia.'}"`,
+      (n, pts) => `"DECRETO URGENTE: ${n} acumulou ${pts} pts. A liga inteira já te odeia. Parabéns e tome cuidado."`,
+      (n, pts) => `"${pts} pontos numa rodada, ${n}. Digno de um veterano. Não que eu vá falar isso na sua cara, mas... tá dito."`,
+    ],
+    zero: [
+      n => `"${n}... zero pontos. ZERO. Você palpitou ou jogou uma moeda? A moeda iria errar menos."`,
+      n => `"Rodada zerada, ${n}. Você é oficialmente o bagre da rodada. Título vitalício por enquanto."`,
+      n => `"0 pts nessa rodada, ${n}. Eu tentei te avisar. Agora senta e reflete o que fez de errado."`,
+      n => `"${n} zerou a rodada. Vou só anotar aqui no arquivo dos bagres históricos da liga. Segue."`,
+    ],
+    lider: [
+      n => `"DECRETO MÁXIMO: ${n} lidera o ranking. Aproveite enquanto dura, porque já escalei quem vai te destronar."`,
+      n => `"${n} no topo da tabela. Bonito. Mas já vi líder despencar em duas rodadas. O Pato não esquece."`,
+      n => `"Olha quem tá na ponta, ${n}! Não sei se é mérito ou sorte. Prefiro achar que é sorte — fica mais divertido."`,
+    ],
+    lanterna: [
+      (n, pos, total) => `"${n} está em ${pos}º de ${total}. Lanterna oficial. Muito trabalho pela frente, bagre."`,
+      (n, pos, total) => `"Último lugar, ${n}. ÚLTIMO. Isso é difícil — tem que errar com consistência. Respeito, de certo modo."`,
+      (n, pos, total) => `"${n} fecha o ranking em ${pos}º. O troféu de Pato Mestre é seu por enquanto. Não é prêmio que você quer."`,
+    ],
+    podio: [
+      (n, pos) => `"${n} no pódio, ${pos}º lugar! Falta pouco pra derrubar o líder. O Pato autoriza a tentativa."`,
+      (n, pos) => `"Top ${pos} do ranking, ${n}. Não to mal impressionado. Vamos ver se aguenta a pressão."`,
+      (n, pos) => `"${pos}º lugar, ${n}. Você está perturbando o sono do líder. Continue perturbando."`,
+    ],
+    aproveitamentoAlto: [
+      (n, taxa) => `"${taxa}% de cravações, ${n}?! Ou você tem uma bola de cristal, ou tá assistindo todos os treinos. Suspeito."`,
+      (n, taxa) => `"O Pato decreta: ${taxa}% de placar exato faz os outros bagres perderem o sono. Bom."`,
+      (n, taxa) => `"${n} está cravando ${taxa}% dos placares. Isso não é palpite — é ciência. Ou trapaça. Vou apurar."`,
+    ],
+    aproveitamentoZero: [
+      n => `"Nenhuma cravação ainda, ${n}. Acertar só o vencedor é o mínimo. Tente dar uma olhada nos jogos antes de palpitar."`,
+      n => `"Zero cravações, ${n}. Você palpita de olho fechado? Fechado aberto tá dando na mesma."`,
+      n => `"${n} ainda não acertou um placar exato sequer. O Pato registra: isso é triste. Mas recuperável. Por enquanto."`,
+    ],
+    semJogos: [
+      n => `"${n}! A temporada começou e você não tem resultado nenhum. Vai logo palpitar antes que eu decrete bagre precoce."`,
+      n => `"Nenhum jogo encerrado ainda, ${n}. O Pato aguarda. Com paciência finita."`,
+      n => `"${n}, seus palpites ainda não foram julgados pela bola. Mas já foram julgados pelo Pato. E o veredicto sai em breve."`,
+    ],
+    aproveitamentoMedio: [
+      (n, taxa) => `"${taxa}% de cravações, ${n}. Tá no meio do caminho entre genial e bagre. O Pato observa, sem dar nota ainda."`,
+      (n, taxa) => `"Apenas ${taxa}% de placar exato, ${n}. Não é feio, não é bonito. É medíocre. O Pato exige mais."`,
+      (n, taxa) => `"${taxa}% das cravações, ${n}. O torcedor meia-boca da arquibancada acerta mais. Reage."`,
+    ],
+    sequencia: [
+      (n, seq) => `"${n} pontuou em ${seq} jogos seguidos! O Pato decreta: isso não é sorte. É consistência. E me irrita."`,
+      (n, seq) => `"${seq} jogos seguidos pontuando, ${n}. O ranking inteiro já começou a te olhar diferente."`,
+      (n, seq) => `"Sequência de ${seq} jogos no positivo, ${n}. Segue assim e vai ter que me passar no ranking. Tô avisado."`,
+    ],
+    offline: [
+      n => `"Servidor offline, ${n}. Nem eu consigo decretar nada agora. Volta mais tarde."`,
+      n => `"${n}, o servidor dormiu antes de mim. Raro. Tente novamente — os decretos não esperam pra sempre."`,
+      n => `"Queda de servidor, ${n}. Até o Pato Mestre tem seus limites técnicos. Mas bagres continuam sendo bagres offline."`,
+    ],
+  };
+
+  // ════════════════════════════════════════════════════════
+  //  DECRETOS DO PATO — mesma lógica do novidades.html
+  // ════════════════════════════════════════════════════════
+  function gerarDecretosPato(palpites, ranking) {
+    const decretos   = [];
+    const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
+    const posAtual   = ranking ? ranking.findIndex(r => String(r.id) === String(idLogado)) : -1;
+
+    // Subida de posições (via sessionStorage)
+    const chave      = `pos_anterior_${idLogado}`;
+    const posAnterior = sessionStorage.getItem(chave) !== null ? parseInt(sessionStorage.getItem(chave)) : null;
+    if (posAtual !== -1) sessionStorage.setItem(chave, posAtual);
+
+    if (posAnterior !== null && posAtual !== -1) {
+      const delta = posAnterior - posAtual;
+      if (delta >= 3) {
+        decretos.push({ tipo:'pato', icone:'🚀', badge:'Decreto do Pato',
+          titulo:`Subiu ${delta} posições!`,
+          descricao: pega(FRASES.subiu3mais)(primeiro, delta, posAtual + 1),
+          tempo:'Após última rodada' });
+      } else if (delta === 2) {
+        decretos.push({ tipo:'pato', icone:'📈', badge:'Decreto do Pato',
+          titulo:'Subiu 2 posições!',
+          descricao: pega(FRASES.subiu2)(primeiro, posAtual + 1),
+          tempo:'Após última rodada' });
+      }
+    }
+
+    // Pontuação da última rodada
+    const ultimaRodada = finalizados.length > 0
+      ? Math.max(...finalizados.map(p => p.rodada || p.numero_rodada || 1)) : null;
+
+    if (ultimaRodada) {
+      const jogosUR  = finalizados.filter(p => (p.rodada || p.numero_rodada || 1) === ultimaRodada);
+      const ptsRodada = jogosUR.reduce((s, p) => s + (p.pontos_obtidos || 0), 0);
+      if (ptsRodada >= 8) {
+        decretos.push({ tipo:'pato', icone:'🔥', badge:'Decreto do Pato',
+          titulo:`Mitada na Rodada ${ultimaRodada}!`,
+          descricao: pega(FRASES.mitada)(primeiro, ptsRodada),
+          tempo:`Rodada ${ultimaRodada}` });
+      } else if (ptsRodada === 0 && jogosUR.length > 0) {
+        decretos.push({ tipo:'pato', icone:'🦆', badge:'Decreto do Pato',
+          titulo:`Rodada ${ultimaRodada} zerada`,
+          descricao: pega(FRASES.zero)(primeiro),
+          tempo:`Rodada ${ultimaRodada}` });
+      }
+    }
+
+    // Posição no ranking
+    if (posAtual === 0) {
+      decretos.push({ tipo:'pato', icone:'🏆', badge:'Decreto do Pato',
+        titulo:'Decreto de Liderança!',
+        descricao: pega(FRASES.lider)(primeiro), tempo:'Agora' });
+    } else if (posAtual === 1 || posAtual === 2) {
+      decretos.push({ tipo:'pato', icone:'🥈', badge:'Decreto do Pato',
+        titulo:`Você está no pódio! (${posAtual + 1}º)`,
+        descricao: pega(FRASES.podio)(primeiro, posAtual + 1), tempo:'Agora' });
+    } else if (ranking && posAtual === ranking.length - 1 && ranking.length > 2) {
+      decretos.push({ tipo:'pato', icone:'🪣', badge:'Decreto do Pato',
+        titulo:'Lanterna oficial 🪣',
+        descricao: pega(FRASES.lanterna)(primeiro, posAtual + 1, ranking.length), tempo:'Agora' });
+    }
+
+    // Aproveitamento de cravações
+    if (finalizados.length >= 3) {
+      const cravadas = finalizados.filter(p => p.pontos_obtidos === 3).length;
+      const taxa     = Math.round((cravadas / finalizados.length) * 100);
+      if (taxa >= 50) {
+        decretos.push({ tipo:'pato', icone:'🎯', badge:'Decreto do Pato',
+          titulo:`${taxa}% de cravações!`,
+          descricao: pega(FRASES.aproveitamentoAlto)(primeiro, taxa), tempo:'Esta temporada' });
+      } else if (taxa === 0) {
+        decretos.push({ tipo:'pato', icone:'😬', badge:'Decreto do Pato',
+          titulo:'Nenhuma cravação ainda',
+          descricao: pega(FRASES.aproveitamentoZero)(primeiro), tempo:'Esta temporada' });
+      } else {
+        decretos.push({ tipo:'pato', icone:'🦆', badge:'Decreto do Pato',
+          titulo:`${taxa}% de aproveitamento`,
+          descricao: pega(FRASES.aproveitamentoMedio)(primeiro, taxa), tempo:'Esta temporada' });
+      }
+    }
+
+    // Sem jogos encerrados
+    if (finalizados.length === 0) {
+      decretos.push({ tipo:'pato', icone:'🦆', badge:'Decreto do Pato',
+        titulo:'O Pato aguarda...',
+        descricao: pega(FRASES.semJogos)(primeiro), tempo:'Agora' });
+    }
+
+    // Sequência positiva
+    if (finalizados.length >= 3) {
+      const ordenados = [...finalizados].sort((a, b) => (b.rodada || 0) - (a.rodada || 0));
+      let seq = 0;
+      for (const p of ordenados) { if ((p.pontos_obtidos || 0) > 0) seq++; else break; }
+      if (seq >= 3) {
+        decretos.push({ tipo:'pato', icone:'⚡', badge:'Decreto do Pato',
+          titulo:`Sequência de ${seq} jogos pontuando!`,
+          descricao: pega(FRASES.sequencia)(primeiro, seq), tempo:'Esta temporada' });
+      }
+    }
+
+    return decretos;
+  }
+
+  // ════════════════════════════════════════════════════════
+  //  FEED PESSOAL
+  // ════════════════════════════════════════════════════════
+  function gerarFeedPessoal(palpites, ranking) {
+    const itens       = [];
+    const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
+
+    if (finalizados.length > 0) {
+      const total   = finalizados.reduce((s, p) => s + (p.pontos_obtidos || 0), 0);
+      const crav    = finalizados.filter(p => p.pontos_obtidos === 3).length;
+      const naTraves = finalizados.filter(p => p.pontos_obtidos === 1).length;
+      const erros   = finalizados.filter(p => p.pontos_obtidos === 0).length;
+
+      if (crav > 0) itens.push({ tipo:'pessoal', icone:'🎯', badge:'Pessoal',
+        titulo:`${crav} cravação${crav > 1 ? 'ões' : ''}!`,
+        descricao:`Placar exato em ${crav} jogo${crav>1?'s':''}. +${crav*3} pts garantidos!`,
+        tempo:'Esta temporada' });
+
+      itens.push({ tipo:'pessoal', icone:'📊', badge:'Pessoal',
+        titulo:`${total} pontos acumulados`,
+        descricao:`${finalizados.length} jogo${finalizados.length>1?'s':''} encerrado${finalizados.length>1?'s':''}. ${erros > 0 ? `${erros} erro${erros>1?'s':''} 🤫` : '👏 Sem erros!'}`,
+        tempo:'Esta temporada' });
+
+      if (ranking && ranking.length) {
+        const pos = ranking.findIndex(r => String(r.id) === String(idLogado));
+        if (pos !== -1) {
+          const emoji = pos < 3 ? ['🥇','🥈','🥉'][pos] : '📍';
+          itens.push({ tipo:'pessoal', icone:emoji, badge:'Pessoal',
+            titulo:`${pos+1}º lugar no ranking`,
+            descricao: pos===0 ? 'Você lidera! Não relaxe.' : pos<=2 ? 'Você está no pódio!' : 'Hora de apertar o passo!',
+            tempo:'Agora' });
+        }
+      }
+    } else {
+      itens.push({ tipo:'pessoal', icone:'⚽', badge:'Pessoal',
+        titulo:'Nenhum jogo encerrado ainda',
+        descricao:'Seus palpites aguardam resultados. Sua pontuação aparece assim que os jogos fecharem.',
+        tempo:'Agora' });
+    }
+    return itens;
+  }
+
+  // ════════════════════════════════════════════════════════
+  //  FEED DE LIGA
+  // ════════════════════════════════════════════════════════
+  function gerarFeedLiga(jogos, ligaAtual) {
+    const itens = [];
+    const fin   = jogos.filter(j => j.status === 'finalizado');
+    const ao    = jogos.filter(j => j.status === 'em andamento');
+    const rod   = {};
+    fin.forEach(j => { const r = j.rodada||1; if(!rod[r])rod[r]=[]; rod[r].push(j); });
+    Object.keys(rod).sort((a,b)=>b-a).forEach(r => {
+      const jr = rod[r];
+      itens.push({ tipo:'liga', icone:'🏁', badge:'Liga',
+        titulo:`Rodada ${r} encerrada!`,
+        descricao: jr.map(j=>`${j.time_casa} ${j.gols_casa_real}x${j.gols_fora_real} ${j.time_fora}`).join(' • '),
+        tempo:`Rodada ${r}` });
+    });
+    if (ao.length) itens.push({ tipo:'liga', icone:'⚡', badge:'Liga',
+      titulo:`Rodada ${ao[0].rodada||'?'} ao vivo`,
+      descricao: ao.map(j=>`${j.time_casa} x ${j.time_fora}`).join(' • '),
+      tempo:'Agora' });
+    if (ligaAtual) itens.push({ tipo:'liga', icone:'⚔️', badge:'Liga',
+      titulo:`Sua liga: ${ligaAtual}`,
+      descricao:'Acesse a página da sua liga para ver o ranking e os palpites.',
+      tempo:'Esta temporada' });
+    return itens;
+  }
+
+  // ════════════════════════════════════════════════════════
+  //  RENDERIZAR FEED
+  // ════════════════════════════════════════════════════════
+  let filtroAtivo = 'todos', todosFeedItens = [];
+
+  function renderizarFeed(itens) {
+    const c = document.getElementById('feed-container');
+    const f = filtroAtivo === 'todos' ? itens : itens.filter(i => i.tipo === filtroAtivo);
+    if (!f.length) { c.innerHTML = `<p class="font-russo" style="color:var(--text-gray);font-size:12px;text-align:center;padding:20px 0;">Nenhuma novidade aqui. 🦆</p>`; return; }
+    c.innerHTML = '';
+    f.forEach((item, idx) => {
+      c.innerHTML += `
+        <div class="feed-item tipo-${item.tipo}" style="animation-delay:${idx*.05}s;">
+          <div class="feed-icone">${item.icone}</div>
+          <div class="feed-corpo">
+            <span class="badge-tipo badge-${item.tipo}">${item.badge}</span>
+            <p class="feed-titulo">${item.titulo}</p>
+            <p class="feed-descricao">${item.descricao}</p>
+            <p class="feed-tempo">🕐 ${item.tempo}</p>
+          </div>
+        </div>`;
+    });
+  }
+
+  function filtrar(tipo, btn) {
+    filtroAtivo = tipo;
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    renderizarFeed(todosFeedItens);
+  }
+
+  // ════════════════════════════════════════════════════════
+  //  RANKINGS
+  // ════════════════════════════════════════════════════════
   function toggleTabelona(qual) {
     const tabela=document.getElementById(`tabela-${qual}`), btn=document.getElementById(`btn-${qual}`);
     const aberto=tabela.classList.contains('aberto');
@@ -206,29 +505,29 @@
   async function calcularDesempenho() {
     if (!idLogado) return;
     try {
-      const palpites=await fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`).then(r=>r.json());
-      let cravadas=0,acertos=0,erros=0,fin=0;
-      palpites.forEach(p=>{if(p.pontos_obtidos!==null){fin++;if(p.pontos_obtidos===3)cravadas++;else if(p.pontos_obtidos===1)acertos++;else erros++;}});
-      document.getElementById('stat-cravadas').innerText=cravadas;
-      document.getElementById('stat-acertos').innerText=acertos;
-      document.getElementById('stat-erros').innerText=erros;
-      if(fin>0){
-        const taxa=Math.round(((cravadas+acertos)/fin)*100);
-        let icone='👍',frase='Bom jogador,';
+      const palpites = await fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`).then(r=>r.json());
+      let crav=0,acertos=0,erros=0,fin=0;
+      palpites.forEach(p=>{ if(p.pontos_obtidos!==null){fin++;if(p.pontos_obtidos===3)crav++;else if(p.pontos_obtidos===1)acertos++;else erros++;} });
+      document.getElementById('stat-cravadas').innerText = crav;
+      document.getElementById('stat-acertos').innerText  = acertos;
+      document.getElementById('stat-erros').innerText    = erros;
+      if (fin > 0) {
+        const taxa = Math.round(((crav+acertos)/fin)*100);
+        let icone='👍', frase='Bom jogador,';
         if(taxa>=70){icone='🔥';frase='Tá voando!,';}else if(taxa<40){icone='🦆';frase='Pato master,';}
-        document.getElementById('icone-aproveitamento').innerText=icone;
-        document.getElementById('texto-aproveitamento').innerHTML=`${frase}<br>${taxa}% de acerto`;
+        document.getElementById('icone-aproveitamento').innerText  = icone;
+        document.getElementById('texto-aproveitamento').innerHTML  = `${frase}<br>${taxa}% de acerto`;
       } else {
-        document.getElementById('icone-aproveitamento').innerText='⚽';
-        document.getElementById('texto-aproveitamento').innerHTML='Sem jogos<br>encerrados ainda';
+        document.getElementById('icone-aproveitamento').innerText  = '⚽';
+        document.getElementById('texto-aproveitamento').innerHTML  = 'Sem jogos<br>encerrados ainda';
       }
-    } catch(e){document.getElementById('texto-aproveitamento').innerHTML='Erro de conexão';}
+    } catch(e){ document.getElementById('texto-aproveitamento').innerHTML='Erro de conexão'; }
   }
 
   async function carregarRankingGlobal() {
     try {
-      const jogadores=await fetch('https://palpitoo-api.onrender.com/ranking').then(r=>r.json());
-      const ul=document.getElementById('lista-global'); ul.innerHTML='';
+      const jogadores = await fetch('https://palpitoo-api.onrender.com/ranking').then(r=>r.json());
+      const ul = document.getElementById('lista-global'); ul.innerHTML='';
       if(!jogadores.length){ul.innerHTML='<li class="rank-item" style="justify-content:center;color:var(--text-gray);">Nenhum palpite ainda. 🦆</li>';return;}
       const cores=['verde','verde','verde','amarelo','amarelo','laranja','vermelho','vermelho'];
       jogadores.slice(0,8).forEach((j,i)=>{
@@ -236,24 +535,24 @@
         ul.innerHTML+=`<li class="rank-item ${ehEu?'rank-eu':''}"><span class="quadrado ${cores[i]||'vermelho'}"></span><span style="color:var(--text-gray);min-width:22px;">${i+1}º</span><span style="flex-grow:1;color:${ehEu?'var(--accent-cyan)':'var(--text-white)'};">${nome}${ehEu?' (você)':''}</span><span style="color:var(--accent-cyan);">${j.total_pontos}pts</span></li>`;
       });
       if(idLogado){const pos=jogadores.findIndex(j=>String(j.id)===String(idLogado));document.getElementById('status-global').innerText=pos!==-1?`👑 Você está em ${pos+1}º lugar`:'👑 Status: Global League';}
-    } catch(e){document.getElementById('lista-global').innerHTML='<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao conectar.</li>';}
+    } catch(e){ document.getElementById('lista-global').innerHTML='<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao conectar.</li>'; }
   }
 
   async function carregarRankingMinhaLiga() {
     if(!idLogado){document.getElementById('titulo-minha-liga').innerText='⚜️ SEM LIGA ⚜️';document.getElementById('status-minha-liga').innerText='🦆 Faça login';return;}
     try {
-      const ligas=await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`).then(r=>r.json());
-      const ul=document.getElementById('lista-minha-liga');
+      const ligas = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idLogado}`).then(r=>r.json());
+      const ul = document.getElementById('lista-minha-liga');
       if(!ligas.length){
         ul.innerHTML=`<li class="rank-item" style="justify-content:center;flex-direction:column;gap:8px;text-align:center;color:var(--text-gray);">Você não está em nenhuma liga ainda. 🦆<a href="ligas.html" style="color:var(--accent-cyan);font-size:12px;text-decoration:underline;">Criar ou entrar em uma</a></li>`;
         document.getElementById('titulo-minha-liga').innerText='⚜️ SEM LIGA ⚜️';
         document.getElementById('status-minha-liga').innerText='🦆 Sem Liga Privada';
         return;
       }
-      const idLiga=ligas[0].id_liga;
-      const dados=await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`).then(r=>r.json());
-      document.getElementById('titulo-minha-liga').innerText=`⚜️ ${dados.nomeLiga.toUpperCase()} ⚜️`;
-      document.getElementById('link-minha-liga').href=`minhaliga.html?id=${idLiga}`;
+      const idLiga = ligas[0].id_liga;
+      const dados  = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`).then(r=>r.json());
+      document.getElementById('titulo-minha-liga').innerText = `⚜️ ${dados.nomeLiga.toUpperCase()} ⚜️`;
+      document.getElementById('link-minha-liga').href = `minhaliga.html?id=${idLiga}`;
       ul.innerHTML='';
       if(!dados.ranking.length){ul.innerHTML='<li class="rank-item" style="justify-content:center;color:var(--text-gray);">Ninguém pontuou ainda.</li>';return;}
       const cores=['verde','verde','verde','amarelo','amarelo','laranja','vermelho','vermelho'];
@@ -261,109 +560,76 @@
         const ehEu=String(j.id)===String(idLogado), nome=j.nome.split(' ')[0].toUpperCase();
         ul.innerHTML+=`<li class="rank-item ${ehEu?'rank-eu':''}"><span class="quadrado ${cores[i]||'vermelho'}"></span><span style="color:var(--text-gray);min-width:22px;">${i+1}º</span><span style="flex-grow:1;color:${ehEu?'var(--accent-cyan)':'var(--text-white)'};">${nome}${ehEu?' (você)':''}</span><span style="color:var(--accent-cyan);">${j.total_pontos}pts</span></li>`;
       });
-      const pos=dados.ranking.findIndex(j=>String(j.id)===String(idLogado));
-      document.getElementById('status-minha-liga').innerText=pos!==-1?`🔥 Você está em ${pos+1}º da liga`:'🔥 Liga Privada';
-    } catch(e){document.getElementById('lista-minha-liga').innerHTML='<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao buscar liga.</li>';}
+      const pos = dados.ranking.findIndex(j=>String(j.id)===String(idLogado));
+      document.getElementById('status-minha-liga').innerText = pos!==-1?`🔥 Você está em ${pos+1}º da liga`:'🔥 Liga Privada';
+    } catch(e){ document.getElementById('lista-minha-liga').innerHTML='<li class="rank-item" style="justify-content:center;color:#f87171;">Erro ao buscar liga.</li>'; }
   }
 
-  // FEED
-  let filtroAtivo='todos', todosFeedItens=[];
-  const nome1=nomeLogado.split(' ')[0];
-
-  function gerarDecretosPato(palpites,ranking){
-    const decretos=[], fin=palpites.filter(p=>p.pontos_obtidos!==null);
-    if(fin.length>0){
-      const cr=fin.filter(p=>p.pontos_obtidos===3).length, taxa=Math.round((cr/fin.length)*100);
-      if(taxa>=50) decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato aprova!',descricao:`"${nome1}, ${taxa}% de cravações?! Quase me envergonhando na frente da galera!"`,tempo:'Agora'});
-      else if(taxa===0) decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato está desapontado',descricao:`"${nome1}... zero cravações. ZERO. Bagre confirmado."`,tempo:'Agora'});
-      else decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato observa...',descricao:`"Olho em você, ${nome1}. Apenas ${taxa}% de cravações. Mais esforço!"`,tempo:'Agora'});
-    } else {
-      decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato convoca!',descricao:`"${nome1}! Nenhum jogo encerrado. Vai logo palpitar!"`,tempo:'Agora'});
-    }
-    if(ranking&&ranking.length){
-      const pos=ranking.findIndex(r=>String(r.id)===String(idLogado));
-      if(pos===0) decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'Decreto de Liderança!',descricao:`"ATENÇÃO: ${nome1} lidera o ranking. Tá bom... por agora."`,tempo:'Agora'});
-      else if(pos>=0&&pos<=2) decretos.push({tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'Você está no pódio!',descricao:`"${nome1} no top 3! Falta pouco pra chegar onde o Pato manda."`,tempo:'Agora'});
-    }
-    return decretos;
-  }
-
-  function gerarFeedPessoal(palpites,ranking){
-    const itens=[], fin=palpites.filter(p=>p.pontos_obtidos!==null);
-    if(fin.length>0){
-      const total=fin.reduce((s,p)=>s+p.pontos_obtidos,0), cr=fin.filter(p=>p.pontos_obtidos===3).length, er=fin.filter(p=>p.pontos_obtidos===0).length;
-      if(cr>0) itens.push({tipo:'pessoal',icone:'🎯',badge:'Pessoal',titulo:`${cr} cravação${cr>1?'ões':''}!`,descricao:`Placar exato em ${cr} jogo${cr>1?'s':''}. Cada um vale 3 pts!`,tempo:'Esta temporada'});
-      itens.push({tipo:'pessoal',icone:'📊',badge:'Pessoal',titulo:`${total} pontos acumulados`,descricao:`${fin.length} jogo${fin.length>1?'s':''} encerrado${fin.length>1?'s':''}. ${er>0?`${er} erro${er>1?'s':''} 🤫`:'Sem erros!'}`,tempo:'Esta temporada'});
-      if(ranking&&ranking.length){const pos=ranking.findIndex(r=>String(r.id)===String(idLogado));if(pos!==-1)itens.push({tipo:'pessoal',icone:pos<3?['🥇','🥈','🥉'][pos]:'📍',badge:'Pessoal',titulo:`Você está em ${pos+1}º lugar`,descricao:pos===0?'Lidera o ranking! Não relaxe.':pos<=2?'Você está no pódio!':'Hora de pressionar!',tempo:'Agora'});}
-    } else {
-      itens.push({tipo:'pessoal',icone:'⚽',badge:'Pessoal',titulo:'Nenhum jogo encerrado ainda',descricao:'Seus palpites aguardam resultados. Assim que fecharem, sua pontuação aparece aqui.',tempo:'Agora'});
-    }
-    return itens;
-  }
-
-  function gerarFeedLiga(jogos,ligaAtual){
-    const itens=[], fin=jogos.filter(j=>j.status==='finalizado'), ao=jogos.filter(j=>j.status==='em andamento');
-    const rod={}; fin.forEach(j=>{const r=j.rodada||1;if(!rod[r])rod[r]=[];rod[r].push(j);});
-    Object.keys(rod).sort((a,b)=>b-a).forEach(r=>{const jr=rod[r];itens.push({tipo:'liga',icone:'🏁',badge:'Liga',titulo:`Rodada ${r} encerrada!`,descricao:`${jr.map(j=>`${j.time_casa} ${j.gols_casa_real}x${j.gols_fora_real} ${j.time_fora}`).join(' • ')}`,tempo:`Rodada ${r}`});});
-    if(ao.length) itens.push({tipo:'liga',icone:'⚡',badge:'Liga',titulo:`Rodada ${ao[0].rodada||'?'} ao vivo`,descricao:`${ao.map(j=>`${j.time_casa} x ${j.time_fora}`).join(' • ')}`,tempo:'Agora'});
-    if(ligaAtual) itens.push({tipo:'liga',icone:'⚔️',badge:'Liga',titulo:`Sua liga: ${ligaAtual}`,descricao:'Acesse a página da sua liga para ver o ranking e os palpites da galera.',tempo:'Esta temporada'});
-    return itens;
-  }
-
-  function gerarFeedSistema(){
-    return [
-      {tipo:'sistema',icone:'🆕',badge:'Sistema',titulo:'Perfil Público disponível!',descricao:'Visite o perfil de qualquer palpiteiro pelo Social.',tempo:'Novidade'},
-      {tipo:'sistema',icone:'⏰',badge:'Sistema',titulo:'Prazos automáticos de rodada',descricao:'O mercado fecha sozinho quando o prazo do admin chega. Sem choro!',tempo:'Novidade'},
-      {tipo:'sistema',icone:'🔒',badge:'Sistema',titulo:'Rodada ao Vivo',descricao:'Quando qualquer jogo começa, todos os palpites da rodada são bloqueados.',tempo:'Disponível'}
-    ];
-  }
-
-  function renderizarFeed(itens){
-    const c=document.getElementById('feed-container');
-    const f=filtroAtivo==='todos'?itens:itens.filter(i=>i.tipo===filtroAtivo);
-    if(!f.length){c.innerHTML=`<p class="font-russo" style="color:var(--text-gray);font-size:12px;text-align:center;padding:20px 0;">Nenhuma novidade aqui. 🦆</p>`;return;}
-    c.innerHTML='';
-    f.forEach((item,idx)=>{c.innerHTML+=`<div class="feed-item tipo-${item.tipo}" style="animation-delay:${idx*.05}s;"><div class="feed-icone">${item.icone}</div><div class="feed-corpo"><span class="badge-tipo badge-${item.tipo}">${item.badge}</span><p class="feed-titulo">${item.titulo}</p><p class="feed-descricao">${item.descricao}</p><p class="feed-tempo">🕐 ${item.tempo}</p></div></div>`;});
-  }
-
-  function filtrar(tipo,btn){filtroAtivo=tipo;document.querySelectorAll('.filtro-btn').forEach(b=>b.classList.remove('ativo'));btn.classList.add('ativo');renderizarFeed(todosFeedItens);}
-
-  async function carregarFeed(){
+  // ════════════════════════════════════════════════════════
+  //  MOTOR PRINCIPAL DO FEED
+  // ════════════════════════════════════════════════════════
+  async function carregarFeed() {
     try {
-      const [jogos,palpites,ranking]=await Promise.all([
+      const [jogos, palpites, ranking] = await Promise.all([
         fetch('https://palpitoo-api.onrender.com/jogos').then(r=>r.json()),
-        idLogado?fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`).then(r=>r.json()):[],
+        idLogado ? fetch(`https://palpitoo-api.onrender.com/meus-palpites/${idLogado}`).then(r=>r.json()) : [],
         fetch('https://palpitoo-api.onrender.com/ranking').then(r=>r.json())
       ]);
-      let ligaAtual=null;
-      if(idLogado){try{const dl=await fetch(`https://palpitoo-api.onrender.com/minha-liga/${idLogado}`).then(r=>r.json());if(dl.liga)ligaAtual=dl.liga.nome;}catch(e){}}
-      todosFeedItens=[...(idLogado?gerarDecretosPato(palpites,ranking):[]),...(idLogado?gerarFeedPessoal(palpites,ranking):[]),...gerarFeedLiga(jogos,ligaAtual),...gerarFeedSistema()];
+
+      let ligaAtual = null;
+      if (idLogado) {
+        try {
+          const dl = await fetch(`https://palpitoo-api.onrender.com/minha-liga/${idLogado}`).then(r=>r.json());
+          if (dl.liga) ligaAtual = dl.liga.nome;
+        } catch(_) {}
+      }
+
+      todosFeedItens = [
+        ...(idLogado ? gerarDecretosPato(palpites, ranking) : []),
+        ...(idLogado ? gerarFeedPessoal(palpites, ranking)  : []),
+        ...gerarFeedLiga(jogos, ligaAtual),
+      ];
       renderizarFeed(todosFeedItens);
-    } catch(e){
-      todosFeedItens=[{tipo:'pato',icone:'🦆',badge:'Decreto do Pato',titulo:'O Pato está dormindo...',descricao:`"Servidor offline. Volta mais tarde!"`,tempo:'Agora'},...gerarFeedSistema()];
+    } catch(e) {
+      todosFeedItens = [{
+        tipo:'pato', icone:'🦆', badge:'Decreto do Pato',
+        titulo:'O Pato está offline...',
+        descricao: pega(FRASES.offline)(primeiro),
+        tempo:'Agora'
+      }];
       renderizarFeed(todosFeedItens);
     }
   }
 
-  // NAVBAR
-  (function(){
-    const nome=localStorage.getItem('nome_craque')||'', foto=localStorage.getItem('foto_craque');
-    const ua=document.getElementById('navbar-user-area'); if(!ua) return;
-    if(nome){
-      const init=encodeURIComponent(nome.split(' ')[0]);
-      const src=(foto&&foto!=='null'&&foto!=='undefined')?foto:`https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36`;
-      ua.innerHTML=`<a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36'"></a><button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
+  // ════════════════════════════════════════════════════════
+  //  NAVBAR
+  // ════════════════════════════════════════════════════════
+  (function() {
+    const nome = localStorage.getItem('nome_craque') || '';
+    const foto = localStorage.getItem('foto_craque');
+    const ua   = document.getElementById('navbar-user-area');
+    if (!ua) return;
+    if (nome) {
+      const init = encodeURIComponent(nome.split(' ')[0]);
+      const src  = (foto && foto!=='null' && foto!=='undefined') ? foto : `https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36`;
+      ua.innerHTML = `<a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36'"></a><button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
     } else {
-      ua.innerHTML='<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>';
+      ua.innerHTML = '<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>';
     }
   })();
-  function fazerLogout(){localStorage.clear();window.location.href='inicio.html';}
-  document.addEventListener('DOMContentLoaded',function(){const btn=document.getElementById('hamburger-btn'),nav=document.querySelector('.nav-links');if(btn&&nav)btn.addEventListener('click',()=>{btn.classList.toggle('aberto');nav.classList.toggle('aberto');});});
+
+  function fazerLogout() { localStorage.clear(); window.location.href = 'inicio.html'; }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('hamburger-btn'), nav = document.querySelector('.nav-links');
+    if (btn && nav) btn.addEventListener('click', () => { btn.classList.toggle('aberto'); nav.classList.toggle('aberto'); });
+  });
 
   calcularDesempenho();
   carregarRankingGlobal();
   carregarRankingMinhaLiga();
   carregarFeed();
 </script>
+
 </body>
 </html>
