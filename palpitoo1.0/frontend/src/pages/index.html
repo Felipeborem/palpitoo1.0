@@ -70,9 +70,94 @@
 
     @media(max-width:1100px){ .dashboard-layout{grid-template-columns:260px 1fr!important;} .coluna-feed{display:none;} }
     @media(max-width:768px){ .dashboard-layout{grid-template-columns:1fr!important;} }
+
+    /* ── SPLASH SCREEN ── */
+    #splash {
+      position:fixed;inset:0;z-index:9999;background:#0D0C12;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+      transition:opacity 0.5s ease,visibility 0.5s ease;
+    }
+    #splash.saindo { opacity:0;visibility:hidden; }
+    #splash img {
+      width:90px;height:90px;
+      animation:splash-pato 0.8s ease-in-out infinite alternate;
+      filter:drop-shadow(0 0 24px rgba(192,52,90,0.6));
+    }
+    @keyframes splash-pato {
+      from { transform:translateY(0) scale(1); }
+      to   { transform:translateY(-12px) scale(1.07); }
+    }
+    .splash-titulo {
+      font-family:'Russo One',sans-serif;font-size:2rem;letter-spacing:4px;
+      background:linear-gradient(135deg,#fff 30%,#C0345A);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .splash-sub {
+      font-family:'Barlow Condensed',sans-serif;font-size:.85rem;
+      letter-spacing:3px;text-transform:uppercase;color:#8A87A2;
+    }
+    .splash-dots { display:flex;gap:8px;margin-top:8px; }
+    .splash-dots span {
+      width:7px;height:7px;border-radius:50%;background:#C0345A;opacity:.3;
+      animation:dot-pulso 1.2s ease-in-out infinite;
+    }
+    .splash-dots span:nth-child(2){animation-delay:.2s;}
+    .splash-dots span:nth-child(3){animation-delay:.4s;}
+    @keyframes dot-pulso {
+      0%,100%{opacity:.3;transform:scale(1);}
+      50%    {opacity:1;transform:scale(1.4);}
+    }
+
+    /* ── MODAL LOGOUT ── */
+    #modal-logout {
+      position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.75);
+      backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;
+      opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease;
+    }
+    #modal-logout.visivel{opacity:1;visibility:visible;}
+    .modal-logout-box {
+      background:#1C1A26;border:1px solid #2A2837;border-radius:20px;padding:32px 28px;
+      max-width:340px;width:90%;text-align:center;
+      transform:translateY(16px);transition:transform .25s ease;
+      box-shadow:0 24px 64px rgba(0,0,0,.6),0 0 0 1px rgba(192,52,90,.1);
+    }
+    #modal-logout.visivel .modal-logout-box{transform:translateY(0);}
+    .modal-logout-pato{font-size:3rem;display:block;margin-bottom:12px;}
+    .modal-logout-titulo{font-family:'Russo One',sans-serif;font-size:1.1rem;color:#F2F1FA;margin-bottom:6px;}
+    .modal-logout-sub{font-size:.85rem;color:#8A87A2;margin-bottom:24px;line-height:1.5;}
+    .modal-logout-btns{display:flex;gap:10px;}
+    .modal-logout-btns button {
+      flex:1;padding:11px;border-radius:12px;font-family:'Russo One',sans-serif;
+      font-size:.85rem;cursor:pointer;border:none;transition:filter .2s,transform .15s;
+    }
+    .modal-logout-btns button:active{transform:scale(.97);}
+    .btn-confirmar-logout{background:#C0345A;color:#fff;}
+    .btn-confirmar-logout:hover{filter:brightness(1.15);}
+    .btn-cancelar-logout{background:transparent;color:#8A87A2;border:1.5px solid #2A2837!important;}
+    .btn-cancelar-logout:hover{border-color:#8A87A2!important;color:#F2F1FA;}
   </style>
 </head>
 <body>
+  <!-- SPLASH SCREEN -->
+  <div id="splash">
+    <img src="./img/patin.png" alt="Palpitoo">
+    <span class="splash-titulo">PALPITOO</span>
+    <span class="splash-sub">A Resenha Virou Campeonato</span>
+    <div class="splash-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- MODAL LOGOUT -->
+  <div id="modal-logout" role="dialog" aria-modal="true">
+    <div class="modal-logout-box">
+      <span class="modal-logout-pato">🦆</span>
+      <p class="modal-logout-titulo">Saindo já?</p>
+      <p class="modal-logout-sub">O Pato anota quem abandona a liga na metade.<br>Tem certeza que quer sair?</p>
+      <div class="modal-logout-btns">
+        <button class="btn-cancelar-logout" onclick="fecharModalLogout()">Ficar</button>
+        <button class="btn-confirmar-logout" onclick="confirmarLogout()">Sair</button>
+      </div>
+    </div>
+  </div>
   <script>
     if (!localStorage.getItem("craqueId")) window.location.replace("login.html");
   </script>
@@ -605,23 +690,59 @@
   }
 
   // ════════════════════════════════════════════════════════
-  //  NAVBAR
+  //  NAVBAR — monta avatar + toggle AMOLED + botão sair
   // ════════════════════════════════════════════════════════
   (function() {
     const nome = localStorage.getItem('nome_craque') || '';
     const foto = localStorage.getItem('foto_craque');
     const ua   = document.getElementById('navbar-user-area');
     if (!ua) return;
+
+    const toggleHTML = `
+      <button id="amoled-toggle" class="amoled-toggle" type="button" title="Alternar modo AMOLED"
+        style="background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:8px;">
+        <span class="amoled-toggle-label">AMOLED</span>
+        <div class="amoled-toggle-track"></div>
+        <span class="amoled-badge">ON</span>
+      </button>`;
+
     if (nome) {
       const init = encodeURIComponent(nome.split(' ')[0]);
       const src  = (foto && foto!=='null' && foto!=='undefined') ? foto : `https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36`;
-      ua.innerHTML = `<a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36'"></a><button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
+      ua.innerHTML = `${toggleHTML}<a href="perfil.html"><img src="${src}" alt="${nome}" class="navbar-avatar" title="${nome}" onerror="this.src='https://ui-avatars.com/api/?name=${init}&background=7A1E3A&color=fff&size=36'"></a><button class="btn-logout" onclick="fazerLogout()">Sair</button>`;
     } else {
-      ua.innerHTML = '<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>';
+      ua.innerHTML = `${toggleHTML}<a href="login.html" class="btn-logout" style="border-color:var(--accent-cyan);color:var(--accent-cyan);">Entrar</a>`;
     }
   })();
 
-  function fazerLogout() { localStorage.clear(); window.location.href = 'inicio.html'; }
+  function fazerLogout() {
+    document.getElementById('modal-logout').classList.add('visivel');
+  }
+  function fecharModalLogout() {
+    document.getElementById('modal-logout').classList.remove('visivel');
+  }
+  function confirmarLogout() {
+    localStorage.clear();
+    window.location.href = 'inicio.html';
+  }
+  /* Fecha modal ao clicar no fundo */
+  document.getElementById('modal-logout').addEventListener('click', function(e) {
+    if (e.target === this) fecharModalLogout();
+  });
+
+  /* ── SPLASH: some quando página estiver pronta ── */
+  function esconderSplash() {
+    const splash = document.getElementById('splash');
+    splash.classList.add('saindo');
+    splash.addEventListener('transitionend', () => splash.remove(), { once: true });
+  }
+  /* Mínimo de 1.2s para o splash não piscar em conexões rápidas */
+  const splashMinimo = new Promise(res => setTimeout(res, 1200));
+  const paginaPronta = new Promise(res => {
+    if (document.readyState === 'complete') res();
+    else window.addEventListener('load', res, { once: true });
+  });
+  Promise.all([splashMinimo, paginaPronta]).then(esconderSplash);
 
   document.addEventListener('DOMContentLoaded', function() {
     const btn = document.getElementById('hamburger-btn'), nav = document.querySelector('.nav-links');
@@ -633,6 +754,6 @@
   carregarRankingMinhaLiga();
   carregarFeed();
 </script>
-
+<script src="palpitoo-extras.js" defer></script>
 </body>
 </html>

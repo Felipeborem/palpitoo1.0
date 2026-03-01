@@ -872,3 +872,329 @@ a { color: inherit; }
   .navbar      { padding: 0 16px; }
   .login-card  { padding: 24px 18px; }
 }
+
+/* =========================================
+   AMOLED DARK MODE
+   Adicionar ao final do style.css
+   ========================================= */
+
+/* AMOLED override — ativado via classe no <body> */
+body.amoled {
+  --bg-dark:      #000000;
+  --bg-header:    #000000;
+  --card-dark:    #0A0A0A;
+  --card-light:   #0A0A0A;
+  --bg-cartao-escuro: #0A0A0A;
+  --mint-cream:   #0A0A0A;
+  --borda-divisoria: #1A1A1A;
+  --ink-black:    #000000;
+}
+
+body.amoled .navbar,
+body.amoled .cabecalho-palpitoo {
+  background-color: #000000;
+  border-bottom-color: #1A1A1A;
+}
+
+body.amoled .cartao,
+body.amoled .login-card,
+body.amoled .feature-card {
+  background: #0A0A0A;
+  border-color: #1A1A1A;
+}
+
+body.amoled .aproveitamento-box {
+  background: #000000;
+  border-color: #1A1A1A;
+}
+
+body.amoled .area-placar {
+  background: #000000;
+  border-color: #1A1A1A;
+}
+
+body.amoled .input-placar {
+  background: #0A0A0A;
+  border-color: #1A1A1A;
+}
+
+body.amoled .form-group input,
+body.amoled .form-group select,
+body.amoled .form-group textarea {
+  background: rgba(255,255,255,0.02);
+  border-color: #1A1A1A;
+}
+
+/* =========================================
+   TOGGLE BUTTON — Dark / AMOLED
+   ========================================= */
+.amoled-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.amoled-toggle-track {
+  width: 44px;
+  height: 24px;
+  background: var(--borda-divisoria);
+  border-radius: 999px;
+  position: relative;
+  transition: background 0.25s ease;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.amoled-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-gray);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease;
+}
+
+body.amoled .amoled-toggle-track {
+  background: #1A1A1A;
+  border-color: rgba(192,52,90,0.3);
+}
+
+body.amoled .amoled-toggle-track::after {
+  transform: translateX(20px);
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(192,52,90,0.6);
+}
+
+.amoled-toggle-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-gray);
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+body.amoled .amoled-toggle-label {
+  color: var(--accent-cyan);
+}
+
+/* Badge AMOLED pulsando quando ativo */
+.amoled-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(192,52,90,0.15);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(192,52,90,0.3);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+body.amoled .amoled-badge {
+  opacity: 1;
+  transform: scale(1);
+  animation: pulso-badge 2.5s ease-in-out infinite;
+}
+
+@keyframes pulso-badge {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192,52,90,0.3); }
+  50%       { box-shadow: 0 0 0 4px rgba(192,52,90,0); }
+}
+
+/* =========================================
+   BANNER PALPITE ESQUECIDO
+   ========================================= */
+#banner-palpite-esquecido {
+  position: sticky;
+  top: 64px; /* altura da navbar */
+  z-index: 90;
+  width: 100%;
+  background: linear-gradient(135deg, #1A0810 0%, #1C0C14 100%);
+  border-bottom: 1px solid rgba(192,52,90,0.35);
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: none;
+  display: none; /* escondido até ser ativado via JS */
+  overflow: hidden;
+}
+
+#banner-palpite-esquecido::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 18px,
+    rgba(192,52,90,0.03) 18px,
+    rgba(192,52,90,0.03) 36px
+  );
+  pointer-events: none;
+}
+
+#banner-palpite-esquecido.visivel {
+  display: flex;
+  animation: banner-entrar 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+#banner-palpite-esquecido.saindo {
+  animation: banner-sair 0.3s ease-in forwards;
+}
+
+@keyframes banner-entrar {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes banner-sair {
+  from { transform: translateY(0);    opacity: 1; max-height: 80px; }
+  to   { transform: translateY(-100%); opacity: 0; max-height: 0; }
+}
+
+.banner-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 11px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.banner-icone {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  animation: balanca 1.8s ease-in-out infinite;
+}
+
+@keyframes balanca {
+  0%, 100% { transform: rotate(-8deg); }
+  50%       { transform: rotate(8deg); }
+}
+
+.banner-texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.banner-titulo {
+  font-family: 'Russo One', sans-serif;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.banner-subtitulo {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.55);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Barra de urgência pulsando na borda esquerda */
+.banner-urgencia {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent-cyan);
+  border-radius: 0 2px 2px 0;
+  animation: pulso-urgencia 1.4s ease-in-out infinite;
+}
+
+@keyframes pulso-urgencia {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(192,52,90,0.6); }
+  50%       { opacity: 0.4; box-shadow: 0 0 4px rgba(192,52,90,0.2); }
+}
+
+.banner-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: var(--accent-cyan);
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: filter 0.2s, transform 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.banner-cta:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.banner-cta::after {
+  content: '→';
+}
+
+.banner-fechar {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.3);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.banner-fechar:hover {
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.06);
+}
+
+/* Contador regressivo dentro do banner */
+.banner-countdown {
+  font-family: 'Russo One', sans-serif;
+  font-size: 0.75rem;
+  color: #F59E0B;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.25);
+  border-radius: 6px;
+  padding: 3px 9px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.banner-countdown.urgente {
+  color: var(--accent-cyan);
+  background: rgba(192,52,90,0.12);
+  border-color: rgba(192,52,90,0.3);
+  animation: pulso-badge 1s ease-in-out infinite;
+}
+
+@media (max-width: 600px) {
+  .banner-countdown { display: none; }
+  .banner-subtitulo  { display: none; }
+  .banner-icone      { font-size: 1.3rem; }
+  .banner-cta        { padding: 6px 12px; font-size: 0.9rem; }
+  .banner-titulo     { font-size: 0.78rem; }
+}
