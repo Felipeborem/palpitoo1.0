@@ -37,7 +37,7 @@
     /* ── Stat boxes ── */
     .stat-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
       gap: 12px;
       margin-bottom: 24px;
     }
@@ -165,6 +165,12 @@
       border: 1px solid var(--vermelho);
     }
     .btn-seguir-topo.seguindo:hover { background: var(--vermelho); color: var(--text-white); }
+      @media (max-width: 600px) {
+      .abas-perfil { flex-wrap: wrap; }
+      .aba-btn { font-size: 11px; padding: 10px 6px; }
+      .stat-valor { font-size: 20px; }
+      .btn-seguir-topo { width: 100%; }
+    }
   </style>
   <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
   <link rel="icon" href="./img/pato.png" type="image/png">
@@ -205,7 +211,7 @@
       <h2 id="nomeUsuario" class="font-russo titulo-branco mt-15" style="font-size:26px;">Carregando...</h2>
       <p id="timeUsuario" style="color:var(--text-gray);font-size:13px;margin-top:4px;text-transform:uppercase;">— • —</p>
 
-      <div style="display:flex;justify-content:center;gap:20px;margin-top:16px;flex-wrap:wrap;">
+      <div style="display:flex;justify-content:center;gap:20px;margin-top:16px;flex-wrap:wrap;row-gap:12px;">
         <div>
           <p class="font-russo" style="font-size:11px;color:var(--text-gray);">SEGUIDORES</p>
           <p class="font-russo" id="contSeguidores" style="font-size:20px;color:var(--text-white);">—</p>
@@ -245,7 +251,7 @@
 
     <!-- ══ ABA: TEMPORADA ATUAL ══ -->
     <div id="painel-temporada" class="painel-aba ativo">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px, 100%), 1fr));gap:24px;">
 
         <!-- Desempenho atual -->
         <section class="cartao bg-escuro animacao-suave">
@@ -320,7 +326,7 @@
 
     <!-- ══ ABA: CARREIRA HISTÓRICA ══ -->
     <div id="painel-carreira" class="painel-aba">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px, 100%), 1fr));gap:24px;">
 
         <!-- Stats totais de carreira -->
         <section class="cartao bg-escuro animacao-suave">
@@ -493,14 +499,20 @@
   async function verificarSeSeguindo() {
     if (!idLogado || String(idLogado) === String(idPerfil)) return;
     try {
-      const res  = await fetch(`https://palpitoo-api.onrender.com/esta-seguindo?seguidor=${idLogado}&seguido=${idPerfil}`);
-      const data = await res.json();
-      const btn  = document.getElementById('btnSeguir');
-      if (data.seguindo) {
+      const res      = await fetch(`https://palpitoo-api.onrender.com/seguindo/${idLogado}`);
+      const lista    = await res.json();
+      const jaSeguindo = Array.isArray(lista) && lista.some(u => String(u.id) === String(idPerfil));
+      const btn      = document.getElementById('btnSeguir');
+      if (jaSeguindo) {
         btn.classList.replace('seguir', 'seguindo');
         btn.innerText = 'Seguindo';
+      } else {
+        btn.classList.replace('seguindo', 'seguir');
+        btn.innerText = '+ Seguir';
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('Erro ao verificar seguindo:', e);
+    }
   }
 
   // ── TEMPORADA ATUAL ───────────────────────────────────────

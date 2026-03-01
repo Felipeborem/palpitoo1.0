@@ -74,6 +74,9 @@
   <link rel="icon" href="./img/pato.png" type="image/png">
 </head>
 <body>
+  <script>
+    if (!localStorage.getItem("craqueId")) window.location.replace("login.html");
+  </script>
 
   <header class="navbar">
     <a href="inicio.html" class="logo-link">
@@ -102,7 +105,7 @@
       <p style="color: var(--text-gray); font-size: 15px;">Feed da liga, notificações pessoais e decretos do Pato Mestre</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 320px; gap: 30px; align-items: start;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; align-items: start;">
 
       <!-- FEED -->
       <div>

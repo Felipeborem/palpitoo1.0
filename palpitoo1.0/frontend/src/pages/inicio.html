@@ -9,6 +9,9 @@
   <link rel="icon" href="./img/pato.png" type="image/png">
 </head>
 <body>
+  <script>
+    if (localStorage.getItem('craqueId')) window.location.replace('index.html');
+  </script>
 
   <header class="navbar">
     <a href="inicio.html" class="logo-link">
@@ -20,6 +23,9 @@
             <li><a href="cadastro.html" class="ativo">Criar Conta</a></li>
         </ul>
     </nav>
+    <button class="hamburger" id="hamburger-btn" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </header>
 
   <main class="hero-section">
@@ -136,6 +142,16 @@
     <p style="color: var(--text-gray); font-size: 0.85rem; font-weight: 600; margin-bottom: 5px;">© 2026. A resenha oficial.</p>
     <p style="color: var(--accent-cyan); font-size: 0.75rem; font-weight: 700;">Desenvolvido para quem não aguenta mais calcular ponto no Excel.</p>
   </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('hamburger-btn');
+      const nav = document.querySelector('.nav-links');
+      if (btn && nav) btn.addEventListener('click', function() {
+        btn.classList.toggle('aberto');
+        nav.classList.toggle('aberto');
+      });
+    });
+  </script>
 
 </body>
 </html>

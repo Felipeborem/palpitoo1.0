@@ -80,7 +80,7 @@
             localStorage.setItem('nome_craque', resultado.usuario.nome);
             localStorage.setItem('time_craque', resultado.usuario.time);
             localStorage.setItem('email_craque', resultado.usuario.email); 
-            localStorage.setItem('foto_craque', resultado.usuario.foto);
+            localStorage.setItem('foto_craque', resultado.usuario.foto_perfil || resultado.usuario.foto || '');
             
             window.location.href = 'index.html'; 
           } else {

@@ -99,6 +99,9 @@
   </style>
 </head>
 <body>
+  <script>
+    if (!localStorage.getItem("craqueId")) window.location.replace("login.html");
+  </script>
 
   <header class="navbar">
     <a href="index.html" class="logo-link"><img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem"></a>
@@ -124,7 +127,7 @@
 
     <div class="tabs-principais animacao-suave">
       <button class="tab-principal-btn ativo" onclick="mudarAba('aba-ligas',this)" id="btn-aba-ligas">🏆 Minhas Ligas</button>
-      <button class="tab-principal-btn"        onclick="mudarAba('aba-palpites',this)" id="btn-aba-palpites">⚽ Jogos & Palpites</button>
+      <button class="tab-principal-btn"        onclick="window.location.href='palpites.html'" id="btn-aba-palpites">⚽ Jogos & Palpites</button>
     </div>
 
     <!-- ABA: MINHAS LIGAS -->

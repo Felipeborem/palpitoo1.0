@@ -73,6 +73,9 @@
   </style>
 </head>
 <body>
+  <script>
+    if (!localStorage.getItem("craqueId")) window.location.replace("login.html");
+  </script>
 
   <header class="navbar">
     <a href="inicio.html" class="logo-link"><img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem"></a>
