@@ -435,8 +435,7 @@
         alert(`❌ Erro ao conectar com o servidor. A Render está ligada?`);
       }
     }
-
-    // ── RENDERIZAR PRAZOS LENDO DIRETO DO BANCO DE DADOS (CORRIGIDO) ──
+// ── RENDERIZAR PRAZOS LENDO DIRETO DO BANCO DE DADOS (CORRIGIDO) ──
     async function renderPrazosAtuais() {
       const div = document.getElementById('prazos-atuais');
       div.innerHTML = '<p class="text-gray-500">Buscando prazos no servidor...</p>';
@@ -450,14 +449,18 @@
           return;
         }
 
-        // Monta o visual com os dados que vieram do Supabase
+        // Monta o visual com a nova coluna "status"
         div.innerHTML = '<p class="text-yellow-300 font-bold mb-1">Prazos Oficiais no Banco:</p>' +
-          rodadas.map(r => `
+          rodadas.map(r => {
+            let corStatus = r.status === 'finalizado' ? 'text-gray-400' : (r.status === 'fechado' ? 'text-red-400' : 'text-green-400');
+            let nomeStatus = r.status.toUpperCase();
+            
+            return `
             <p>Rodada ${r.rodada}: 
               <span class="text-white">${formatarDataHora(r.prazo_limite)}</span> 
-              ${r.bloqueada ? '<span class="text-red-400 font-bold">(FECHADA)</span>' : '<span class="text-green-400 font-bold">(ABERTA)</span>'}
+              <span class="${corStatus} font-bold">(${nomeStatus})</span>
             </p>
-          `).join('');
+          `}).join('');
       } catch (erro) {
         div.innerHTML = '<p class="text-red-500">Erro ao buscar os prazos oficiais.</p>';
         console.error("Erro ao puxar prazos:", erro);

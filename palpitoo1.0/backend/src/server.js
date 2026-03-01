@@ -183,7 +183,7 @@ app.post('/encerrar-jogo', async (req, res) => {
     }
 
     res.json({ mensagem: 'Jogo encerrado e pontos distribuídos com sucesso!' });
-    
+
 // ── AUTO-BLOQUEIO (substitua o bloco try/catch do auto-bloqueio por este) ──
     try {
       const jogoInfo = await pool.query('SELECT rodada FROM jogos WHERE id_jogo = $1', [id_jogo]);
@@ -983,22 +983,14 @@ app.post('/definir-prazo-rodada', async (req, res) => {
       return res.status(400).json({ erro: 'Informe a rodada e o prazo.' });
     }
 
-    // 1. Verifica se a rodada já tem um prazo salvo
-    const existe = await pool.query('SELECT rodada FROM prazos_rodadas WHERE rodada = $1', [rodada]);
-
-    if (existe.rows.length > 0) {
-      // 2. Se já existe, apenas ATUALIZA
-      await pool.query(
-        'UPDATE prazos_rodadas SET prazo_limite = $1, bloqueada = false WHERE rodada = $2',
-        [prazo_rodada, rodada]
-      );
-    } else {
-      // 3. Se não existe, INSERE a nova
-      await pool.query(
-        'INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada) VALUES ($1, $2, false)',
-        [rodada, prazo_rodada]
-      );
-    }
+    // Usando UPSERT com a nova coluna "status"
+    await pool.query(
+      `INSERT INTO prazos_rodadas (rodada, prazo_limite, status)
+       VALUES ($1, $2, 'aberto')
+       ON CONFLICT (rodada)
+       DO UPDATE SET prazo_limite = EXCLUDED.prazo_limite, status = 'aberto'`,
+      [rodada, prazo_rodada]
+    );
 
     res.json({ mensagem: `Prazo da Rodada ${rodada} definido com sucesso!` });
   } catch (err) {
@@ -1012,51 +1004,21 @@ app.post('/definir-prazo-rodada', async (req, res) => {
 // =========================================================================
 app.post('/bloquear-rodada', async (req, res) => {
   try {
-    const { rodada } = req.body;
-    if (!rodada) return res.status(400).json({ erro: 'Informe a rodada.' });
+    const { rodada, status } = req.body; 
+    if (!rodada || !status) return res.status(400).json({ erro: 'Informe a rodada e o status (fechado ou finalizado).' });
 
-    const existe = await pool.query('SELECT rodada FROM prazos_rodadas WHERE rodada = $1', [rodada]);
-
-    if (existe.rows.length > 0) {
-      await pool.query('UPDATE prazos_rodadas SET bloqueada = true WHERE rodada = $1', [rodada]);
-    } else {
-      await pool.query('INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada) VALUES ($1, NOW(), true)', [rodada]);
-    }
-    
-    res.json({ mensagem: `Rodada ${rodada} bloqueada! Ninguém mais pode palpitar.` });
-  } catch (err) {
-    console.error("Erro ao bloquear rodada:", err);
-    res.status(500).json({ erro: 'Erro ao bloquear rodada.' });
-  }
-});
-
-// =========================================================================
-// ROTA: VERIFICAR SE RODADA ESTÁ BLOQUEADA (usada pelo palpites.html)
-// Retorna bloqueada=true se: ADM bloqueou manualmente OU prazo já venceu
-// =========================================================================
-app.get('/status-rodada/:rodada', async (req, res) => {
-  try {
-    const { rodada } = req.params;
-
-    // Verifica bloqueio manual ou prazo vencido no banco
-    const resultado = await pool.query(
-      `SELECT rodada, prazo_limite, bloqueada FROM prazos_rodadas WHERE rodada = $1`,
-      [rodada]
+    await pool.query(
+      `INSERT INTO prazos_rodadas (rodada, prazo_limite, status) 
+       VALUES ($1, NOW(), $2)
+       ON CONFLICT (rodada) 
+       DO UPDATE SET status = $2`,
+      [rodada, status]
     );
-
-    if (resultado.rows.length === 0) {
-      // Sem registro = rodada aberta
-      return res.json({ rodada: Number(rodada), bloqueada: false, prazo_limite: null });
-    }
-
-    const r = resultado.rows[0];
-    const prazoVencido = r.prazo_limite && new Date(r.prazo_limite) < new Date();
-    const bloqueada    = r.bloqueada || prazoVencido;
-
-    res.json({ rodada: Number(rodada), bloqueada, prazo_limite: r.prazo_limite });
+    
+    res.json({ mensagem: `Rodada ${rodada} alterada para: ${status}!` });
   } catch (err) {
-    console.error("Erro ao verificar status da rodada:", err);
-    res.status(500).json({ erro: 'Erro ao verificar rodada.' });
+    console.error("Erro ao alterar status da rodada:", err);
+    res.status(500).json({ erro: 'Erro ao alterar status.' });
   }
 });
 
@@ -1066,7 +1028,7 @@ app.get('/status-rodada/:rodada', async (req, res) => {
 app.get('/status-rodadas', async (req, res) => {
   try {
     const resultado = await pool.query(
-      `SELECT rodada, prazo_limite, bloqueada FROM prazos_rodadas ORDER BY rodada ASC`
+      `SELECT rodada, prazo_limite, status FROM prazos_rodadas ORDER BY rodada ASC`
     );
     res.json(resultado.rows);
   } catch (err) {
