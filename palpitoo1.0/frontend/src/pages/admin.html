@@ -12,10 +12,8 @@
     .tabela-scroll::-webkit-scrollbar { width: 8px; }
     .tabela-scroll::-webkit-scrollbar-track { background: #1f2937; }
     .tabela-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-  </style>
-</head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4">
-  <style>
+    
+    /* Toast de Avisos */
     #container-avisos { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
     .aviso-toast { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 12px; font-size: 13px; color: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.4); animation: entrar-a 0.3s ease; min-width: 260px; font-weight: 700; }
     .aviso-sucesso { background: #166534; border: 1px solid #22c55e; }
@@ -26,21 +24,13 @@
     @keyframes entrar-a { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
     @keyframes sair-a   { to   { opacity:0; transform: translateY(10px); } }
   </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4">
+
   <div id="container-avisos"></div>
-  <script>
-    function mostrarAviso(msg, tipo = 'info') {
-      const cont  = document.getElementById('container-avisos');
-      const toast = document.createElement('div');
-      const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : tipo === 'aviso' ? '⚠️' : 'ℹ️';
-      toast.className = `aviso-toast aviso-${tipo}`;
-      toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
-      cont.appendChild(toast);
-      setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 4000);
-    }
-  </script>
 
   <h1 class="text-4xl font-russo text-red-500 mb-2">Painel Secreto do ADM 🕵️‍♂️</h1>
-  <p class="text-gray-400 mb-10">Controle de Jogos e Fiscalização de Ligas.</p>
+  <p class="text-gray-400 mb-10">Controle de Jogos, Prazos e Fiscalização de Ligas.</p>
 
   <div class="flex flex-col md:flex-row gap-8 w-full max-w-6xl mb-12">
     
@@ -53,7 +43,6 @@
             <label class="text-xs text-green-400 font-bold">Rodada:</label>
             <input type="number" id="inputRodada" placeholder="Ex: 1" class="w-full mt-1 p-2 rounded bg-gray-700 text-white font-bold text-center outline-none focus:ring-2 focus:ring-green-500 border border-green-800">
           </div>
-          
           <div>
             <label class="text-xs text-gray-400 font-bold">Time da Casa:</label>
             <input type="text" id="inputTimeCasa" placeholder="Ex: FLAMENGO" class="w-full mt-1 p-2 rounded bg-gray-700 text-white font-bold text-center uppercase outline-none focus:ring-2 focus:ring-green-500">
@@ -94,30 +83,45 @@
       </div>
 
       <div class="bg-gray-800 p-6 rounded-xl shadow-2xl border-t-4 border-yellow-500 h-fit">
-        <h2 class="text-xl font-russo text-white text-center mb-1">⏰ Prazo de Palpites</h2>
-        <p class="text-xs text-gray-400 text-center mb-4">Define quando o mercado fecha para uma rodada inteira.</p>
+        <h2 class="text-xl font-russo text-white text-center mb-1">⏰ Agendar Prazo</h2>
+        <p class="text-xs text-gray-400 text-center mb-4">Programa quando o mercado fecha.</p>
         <div class="flex flex-col gap-3">
           <div>
             <label class="text-xs text-yellow-400 font-bold">Rodada:</label>
-            <input type="number" id="inputPrazoRodada" placeholder="Ex: 3"
-              class="w-full mt-1 p-2 rounded bg-gray-700 text-white font-bold text-center outline-none focus:ring-2 focus:ring-yellow-500 border border-yellow-800">
+            <input type="number" id="inputPrazoRodada" placeholder="Ex: 3" class="w-full mt-1 p-2 rounded bg-gray-700 text-white font-bold text-center outline-none focus:ring-2 focus:ring-yellow-500 border border-yellow-800">
           </div>
           <div>
-            <label class="text-xs text-yellow-400 font-bold">Prazo limite para palpitar:</label>
-            <input type="datetime-local" id="inputPrazoDataHora"
-              class="w-full mt-1 p-2 rounded bg-gray-700 text-white font-bold text-center outline-none focus:ring-2 focus:ring-yellow-500 border border-yellow-800">
-            <p class="text-xs text-gray-500 mt-1">Quando bater esse horário → 🔴 AO VIVO, ninguém mais palpita.</p>
+            <label class="text-xs text-yellow-400 font-bold">Data e Hora de Fechamento:</label>
+            <input type="datetime-local" id="inputPrazoDataHora" class="w-full mt-1 p-2 rounded bg-gray-700 text-white font-bold text-center outline-none focus:ring-2 focus:ring-yellow-500 border border-yellow-800">
           </div>
-          <div id="prazos-atuais" class="text-xs text-gray-500 mt-1"></div>
           <button onclick="definirPrazoRodada()" class="mt-2 bg-yellow-600 hover:bg-yellow-700 text-white font-russo py-3 px-4 rounded transition w-full">
-            ⏰ DEFINIR PRAZO
+            ⏰ SALVAR PRAZO
+          </button>
+          
+          <div class="mt-4 border-t border-gray-600 pt-4">
+            <p class="text-yellow-300 font-bold mb-2 text-center text-sm">Cronômetros Ativos:</p>
+            <div id="prazos-atuais" class="flex flex-col gap-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-800 p-6 rounded-xl shadow-2xl border-t-4 border-orange-500 h-fit">
+        <h2 class="text-xl font-russo text-white text-center mb-1">🔒 Bloqueio Manual</h2>
+        <p class="text-xs text-gray-400 text-center mb-4">Tranca a rodada IMEDIATAMENTE antes do prazo.</p>
+        <div class="flex flex-col gap-3">
+          <div>
+            <label class="text-xs text-orange-400 font-bold">Rodada a ser bloqueada:</label>
+            <input type="number" id="inputBloqueioManual" placeholder="Ex: 3" class="w-full mt-1 p-2 rounded bg-gray-700 text-white font-bold text-center outline-none focus:ring-2 focus:ring-orange-500 border border-orange-800">
+          </div>
+          <button onclick="bloquearRodadaManual()" class="mt-2 bg-orange-600 hover:bg-orange-700 text-white font-russo py-3 px-4 rounded transition w-full">
+            🛑 TRANCAR PALPITES AGORA
           </button>
         </div>
       </div>
 
     </div>
 
-    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl border-t-4 border-blue-500 w-full md:w-2/3">
+    <div class="bg-gray-800 p-6 rounded-xl shadow-2xl border-t-4 border-blue-500 w-full md:w-2/3 h-fit">
       <h2 class="text-xl font-russo text-white text-center mb-2">Lista de Jogos</h2>
       <p class="text-xs text-gray-400 text-center mb-4">Clique em um jogo para selecionar o ID para encerramento.</p>
       
@@ -144,11 +148,9 @@
   <hr class="w-full max-w-6xl border-gray-700 mb-12">
 
   <div class="flex flex-col md:flex-row gap-8 w-full max-w-6xl">
-    
     <div class="bg-gray-800 p-6 rounded-xl shadow-2xl border-t-4 border-yellow-500 w-full md:w-1/2">
       <h2 class="text-xl font-russo text-white text-center mb-2">Ligas Criadas</h2>
       <p class="text-xs text-gray-400 text-center mb-4">Clique em uma liga para ver quem está nela.</p>
-
       <div class="tabela-scroll">
         <table class="w-full text-sm text-left text-gray-300">
           <thead class="text-xs text-gray-400 uppercase bg-gray-700 font-russo sticky top-0">
@@ -169,7 +171,6 @@
     <div class="bg-gray-800 p-6 rounded-xl shadow-2xl border-t-4 border-purple-500 w-full md:w-1/2">
       <h2 class="text-xl font-russo text-white text-center mb-2" id="tituloMembros">Membros da Liga</h2>
       <p class="text-xs text-gray-400 text-center mb-4">Selecione uma liga ao lado.</p>
-
       <div class="tabela-scroll">
         <table class="w-full text-sm text-left text-gray-300">
           <thead class="text-xs text-gray-400 uppercase bg-gray-700 font-russo sticky top-0">
@@ -185,18 +186,27 @@
         </table>
       </div>
     </div>
-
   </div>
 
   <script>
-    // ================= HELPERS =================
+    // ================= HELPERS DE TOAST =================
+    function mostrarAviso(msg, tipo = 'info') {
+      const cont  = document.getElementById('container-avisos');
+      const toast = document.createElement('div');
+      const icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : tipo === 'aviso' ? '⚠️' : 'ℹ️';
+      toast.className = `aviso-toast aviso-${tipo}`;
+      toast.innerHTML = `<span>${icone}</span><span>${msg}</span>`;
+      cont.appendChild(toast);
+      setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 4000);
+    }
+
     function formatarDataHora(iso) {
       if (!iso) return '—';
       const d = new Date(iso);
       return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
     }
 
-    // ================= FUNÇÕES DE JOGOS =================
+    // ================= JOGOS =================
     async function carregarListaDeJogos() {
       try {
         const resposta = await fetch('https://palpitoo-api.onrender.com/jogos');
@@ -206,8 +216,6 @@
 
         jogos.forEach(jogo => {
           let corStatus = jogo.status.toLowerCase() === "finalizado" ? "text-red-400" : "text-blue-400";
-          
-          // Adicionamos a coluna da rodada (jogo.rodada)
           tbody.innerHTML += `
             <tr class="border-b border-gray-700 hover:bg-gray-600 cursor-pointer transition" onclick="selecionarJogo(${jogo.id_jogo})">
               <td class="px-4 py-3 text-center font-bold text-white">${jogo.id_jogo}</td>
@@ -222,115 +230,37 @@
       } catch (erro) { console.error(erro); }
     }
 
-    // FUNÇÃO ATUALIZADA: CRIAR JOGO COM RODADA
     async function criarNovoJogo() {
       const rodada   = document.getElementById('inputRodada').value;
       const timeCasa = document.getElementById('inputTimeCasa').value.trim().toUpperCase();
       const timeFora = document.getElementById('inputTimeFora').value.trim().toUpperCase();
 
-      if (!rodada || !timeCasa || !timeFora) {
-        mostrarAviso('Preencha a rodada e o nome dos dois times!', 'erro');
-        return;
-      }
+      if (!rodada || !timeCasa || !timeFora) return mostrarAviso('Preencha a rodada e o nome dos dois times!', 'erro');
 
       try {
         const resposta = await fetch('https://palpitoo-api.onrender.com/criar-jogo', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            rodada:    parseInt(rodada),
-            time_casa: timeCasa, 
-            time_fora: timeFora
-          })
+          body: JSON.stringify({ rodada: parseInt(rodada), time_casa: timeCasa, time_fora: timeFora })
         });
-
         const resultado = await resposta.json();
-
         if (resposta.ok) {
           mostrarAviso(resultado.mensagem || 'Jogo criado!', 'sucesso');
           document.getElementById('inputTimeCasa').value = '';
           document.getElementById('inputTimeFora').value = '';
           carregarListaDeJogos();
-        } else {
-          mostrarAviso(resultado.erro || 'Erro ao criar jogo.', 'erro');
-        }
-      } catch (erro) {
-        console.error(erro);
-        mostrarAviso('Erro ao conectar com o servidor.', 'erro');
-      }
+        } else { mostrarAviso(resultado.erro, 'erro'); }
+      } catch (erro) { mostrarAviso('Erro ao conectar.', 'erro'); }
     }
 
-    // ── DEFINIR PRAZO POR RODADA ──────────────────────────────
-    async function definirPrazoRodada() {
-      const rodada  = document.getElementById('inputPrazoRodada').value;
-      const prazo   = document.getElementById('inputPrazoDataHora').value;
-
-      if (!rodada) { mostrarAviso('Informe o número da rodada!', 'erro'); return; }
-      if (!prazo)  { mostrarAviso('Defina o horário limite!', 'erro'); return; }
-
-      try {
-        const resposta = await fetch('https://palpitoo-api.onrender.com/definir-prazo-rodada', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rodada: parseInt(rodada), prazo_rodada: prazo })
-        });
-
-        const resultado = await resposta.json();
-
-        if (resposta.ok) {
-          // Salva também no localStorage como fallback visual
-          const prazos = JSON.parse(localStorage.getItem('prazos_rodadas') || '{}');
-          prazos[rodada] = prazo;
-          localStorage.setItem('prazos_rodadas', JSON.stringify(prazos));
-
-          mostrarAviso(`Prazo definido! Rodada ${rodada} fecha em ${formatarDataHora(prazo)}`, 'sucesso');
-          document.getElementById('inputPrazoRodada').value   = '';
-          document.getElementById('inputPrazoDataHora').value = '';
-          renderPrazosAtuais();
-          carregarListaDeJogos();
-        } else {
-          // Se o endpoint não existir ainda, salva só no localStorage como fallback
-          const prazos = JSON.parse(localStorage.getItem('prazos_rodadas') || '{}');
-          prazos[rodada] = prazo;
-          localStorage.setItem('prazos_rodadas', JSON.stringify(prazos));
-          mostrarAviso(`Prazo salvo localmente. Rodada ${rodada} → ${formatarDataHora(prazo)}`, 'aviso');
-          document.getElementById('inputPrazoRodada').value   = '';
-          document.getElementById('inputPrazoDataHora').value = '';
-          renderPrazosAtuais();
-        }
-      } catch (erro) {
-        // Mesmo sem servidor, salva no localStorage
-        const rodadaN = document.getElementById('inputPrazoRodada').value;
-        const prazoV  = document.getElementById('inputPrazoDataHora').value;
-        const prazos  = JSON.parse(localStorage.getItem('prazos_rodadas') || '{}');
-        prazos[rodadaN] = prazoV;
-        localStorage.setItem('prazos_rodadas', JSON.stringify(prazos));
-        mostrarAviso(`Servidor offline. Prazo salvo localmente: Rodada ${rodadaN} → ${formatarDataHora(prazoV)}`, 'aviso');
-        document.getElementById('inputPrazoRodada').value   = '';
-        document.getElementById('inputPrazoDataHora').value = '';
-        renderPrazosAtuais();
-      }
-    }
-
-    function renderPrazosAtuais() {
-      const prazos = JSON.parse(localStorage.getItem('prazos_rodadas') || '{}');
-      const div = document.getElementById('prazos-atuais');
-      const keys = Object.keys(prazos).sort((a,b) => Number(a)-Number(b));
-      if (!keys.length) { div.innerHTML = ''; return; }
-      div.innerHTML = '<p class="text-yellow-300 font-bold mb-1">Prazos definidos:</p>' +
-        keys.map(r => `<p>Rodada ${r}: <span class="text-white">${formatarDataHora(prazos[r])}</span></p>`).join('');
-    }
-
-    function selecionarJogo(id) {
-      document.getElementById('inputIdJogo').value = id;
-    }
+    function selecionarJogo(id) { document.getElementById('inputIdJogo').value = id; }
 
     async function dispararEncerramento() {
       const idJogo = document.getElementById('inputIdJogo').value;
       const golsCasa = document.getElementById('inputGolsCasa').value;
       const golsFora = document.getElementById('inputGolsFora').value;
 
-      if (!idJogo || golsCasa === "" || golsFora === "") { mostrarAviso('Preencha o placar real!', 'erro'); return; }
+      if (!idJogo || golsCasa === "" || golsFora === "") return mostrarAviso('Preencha o placar real!', 'erro');
       if (!confirm(`Confirmar fim de jogo: ID ${idJogo}?`)) return;
 
       try {
@@ -348,19 +278,155 @@
       } catch (erro) { console.error(erro); }
     }
 
-    // ================= FUNÇÕES DE LIGAS =================
+    // ================= PRAZOS E BLOQUEIOS =================
+
+    async function definirPrazoRodada() {
+      const rodada = document.getElementById('inputPrazoRodada').value;
+      const prazo  = document.getElementById('inputPrazoDataHora').value;
+
+      if (!rodada || !prazo) return mostrarAviso("Informe a rodada e defina o horário!", 'erro');
+      const dataCorrigida = new Date(prazo).toISOString();
+
+      try {
+        const resposta = await fetch('https://palpitoo-api.onrender.com/definir-prazo-rodada', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rodada: parseInt(rodada), prazo_rodada: dataCorrigida })
+        });
+        const resultado = await resposta.json();
+        if (resposta.ok) {
+          mostrarAviso(`✅ ${resultado.mensagem}`, 'sucesso');
+          document.getElementById('inputPrazoRodada').value = '';
+          document.getElementById('inputPrazoDataHora').value = '';
+          renderPrazosAtuais();
+        } else { mostrarAviso(`❌ ${resultado.erro}`, 'erro'); }
+      } catch (erro) { mostrarAviso(`❌ Erro de conexão.`, 'erro'); }
+    }
+
+    // NOVA FUNÇÃO: Bloqueio Manual
+    async function bloquearRodadaManual() {
+      const rodada = document.getElementById('inputBloqueioManual').value;
+      if (!rodada) return mostrarAviso("Informe a rodada para bloquear!", "erro");
+
+      if (!confirm(`Tem certeza que deseja FECHAR a Rodada ${rodada} agora? Ninguém mais poderá palpitar.`)) return;
+
+      try {
+        const resposta = await fetch('https://palpitoo-api.onrender.com/bloquear-rodada', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rodada: parseInt(rodada), status: 'fechado' }) // Envia status fechado
+        });
+        const resultado = await resposta.json();
+        
+        if (resposta.ok) {
+          mostrarAviso(`✅ ${resultado.mensagem}`, "sucesso");
+          document.getElementById('inputBloqueioManual').value = '';
+          renderPrazosAtuais(); // Atualiza a tela na hora
+        } else {
+          mostrarAviso(`❌ Erro: ${resultado.erro}`, "erro");
+        }
+      } catch (err) {
+        mostrarAviso("Erro ao conectar ao servidor.", "erro");
+      }
+    }
+
+    // GESTÃO DO CRONÔMETRO
+    let cronometroGlobal;
+
+    async function renderPrazosAtuais() {
+      const div = document.getElementById('prazos-atuais');
+      div.innerHTML = '<p class="text-gray-500 text-xs">Buscando...</p>';
+
+      try {
+        const resposta = await fetch('https://palpitoo-api.onrender.com/status-rodadas');
+        const rodadas = await resposta.json();
+
+        if (rodadas.length === 0) {
+          div.innerHTML = '<p class="text-gray-500 text-xs">Nenhum prazo definido.</p>';
+          return;
+        }
+
+        // Desenha os cards para cada rodada
+        div.innerHTML = rodadas.map(r => {
+          let corStatus = r.status === 'finalizado' ? 'text-gray-500' : (r.status === 'fechado' ? 'text-red-400' : 'text-green-400');
+          let nomeStatus = r.status.toUpperCase();
+          
+          return `
+            <div class="bg-gray-700 p-3 rounded flex flex-col gap-1 border border-gray-600">
+              <div class="flex justify-between items-center">
+                <span class="font-bold text-yellow-400 text-sm">Rodada ${r.rodada}</span>
+                <span class="${corStatus} text-[10px] font-bold px-2 py-1 bg-gray-800 rounded">${nomeStatus}</span>
+              </div>
+              <p class="text-[11px] text-gray-300">Data Limite: ${formatarDataHora(r.prazo_limite)}</p>
+              <div class="cronometro-display text-cyan-400 font-russo text-sm text-right mt-1" 
+                   data-prazo="${r.prazo_limite}" 
+                   data-status="${r.status}" 
+                   data-rodada="${r.rodada}">
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        iniciarCronometros(); // Ativa o relógio
+
+      } catch (erro) {
+        div.innerHTML = '<p class="text-red-500 text-xs">Erro ao buscar.</p>';
+      }
+    }
+
+    // A mágica da Contagem Regressiva
+    function iniciarCronometros() {
+      if (cronometroGlobal) clearInterval(cronometroGlobal);
+
+      cronometroGlobal = setInterval(() => {
+        document.querySelectorAll('.cronometro-display').forEach(el => {
+          const status = el.getAttribute('data-status');
+          const prazoIso = el.getAttribute('data-prazo');
+
+          // Se a rodada já fechou ou acabou, não mostra contagem
+          if (status !== 'aberto') {
+            el.innerText = '🚫 PALPITES ENCERRADOS';
+            el.className = 'text-red-500 font-russo text-xs text-right mt-1';
+            return;
+          }
+
+          if (!prazoIso) return;
+
+          const prazo = new Date(prazoIso).getTime();
+          const restante = prazo - Date.now();
+
+          // Se o tempo esgotou
+          if (restante <= 0) {
+            el.innerText = '🔴 TEMPO ESGOTADO';
+            el.className = 'text-red-500 font-russo text-sm text-right mt-1 blink';
+            // Opcional: Se você quisesse, poderia fazer o frontend avisar o backend aqui para dar o update automático para 'fechado'
+          } else {
+            // Calcula dias, horas, minutos, segundos
+            const s = Math.floor(restante / 1000);
+            const d = Math.floor(s / 86400);
+            const h = Math.floor((s % 86400) / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const seg = s % 60;
+
+            let texto = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
+            if (d > 0) texto = `${d}d ` + texto;
+
+            el.innerText = `⏳ ${texto}`;
+          }
+        });
+      }, 1000);
+    }
+
+    // ================= LIGAS =================
     async function carregarTodasLigas() {
       try {
         const resposta = await fetch('https://palpitoo-api.onrender.com/todas-ligas');
         const ligas = await resposta.json();
         const tbody = document.getElementById('tabelaLigasBody');
         tbody.innerHTML = ''; 
-
         if (ligas.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-gray-500">Nenhuma liga criada no sistema ainda.</td></tr>';
-          return;
+          tbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-gray-500">Nenhuma liga criada.</td></tr>'; return;
         }
-
         ligas.forEach(liga => {
           tbody.innerHTML += `
             <tr class="border-b border-gray-700 hover:bg-gray-600 cursor-pointer transition" onclick="carregarMembrosLiga(${liga.id_liga}, '${liga.nome}')">
@@ -377,18 +443,12 @@
     async function carregarMembrosLiga(idLiga, nomeLiga) {
       document.getElementById('tituloMembros').innerText = `Membros: ${nomeLiga}`;
       const tbody = document.getElementById('tabelaMembrosBody');
-      tbody.innerHTML = '<tr><td colspan="3" class="text-center py-6 text-yellow-500">Buscando craques...</td></tr>';
-
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center py-6 text-yellow-500">Buscando...</td></tr>';
       try {
         const resposta = await fetch(`https://palpitoo-api.onrender.com/liga-membros/${idLiga}`);
         const membros = await resposta.json();
         tbody.innerHTML = ''; 
-
-        if (membros.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3" class="text-center py-6 text-gray-500">Liga vazia.</td></tr>';
-          return;
-        }
-
+        if (membros.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="text-center py-6 text-gray-500">Vazia.</td></tr>'; return; }
         membros.forEach(membro => {
           tbody.innerHTML += `
             <tr class="border-b border-gray-700 hover:bg-gray-750">
@@ -400,75 +460,8 @@
         });
       } catch (erro) { console.error(erro); }
     }
-// ── DEFINIR PRAZO POR RODADA (CORRIGIDO) ──────────────────────────────
-    async function definirPrazoRodada() {
-      const rodada  = document.getElementById('inputPrazoRodada').value;
-      const prazo   = document.getElementById('inputPrazoDataHora').value;
 
-      if (!rodada) return alert("Informe o número da rodada!");
-      if (!prazo)  return alert("Defina o horário limite!");
-
-      // Dica de Ouro: Transforma a data do navegador no formato Universal (ISO)
-      // Assim o servidor não confunde os fusos horários do Brasil com o da Render.
-      const dataCorrigida = new Date(prazo).toISOString();
-
-      try {
-        const resposta = await fetch('https://palpitoo-api.onrender.com/definir-prazo-rodada', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rodada: parseInt(rodada), prazo_rodada: dataCorrigida })
-        });
-
-        const resultado = await resposta.json();
-
-        if (resposta.ok) {
-          alert(`✅ ${resultado.mensagem}`);
-          document.getElementById('inputPrazoRodada').value   = '';
-          document.getElementById('inputPrazoDataHora').value = '';
-          // Agora ele chama o servidor para atualizar a tela
-          renderPrazosAtuais();
-        } else {
-          alert(`❌ Erro: ${resultado.erro}`);
-        }
-      } catch (erro) {
-        console.error(erro);
-        alert(`❌ Erro ao conectar com o servidor. A Render está ligada?`);
-      }
-    }
-// ── RENDERIZAR PRAZOS LENDO DIRETO DO BANCO DE DADOS (CORRIGIDO) ──
-    async function renderPrazosAtuais() {
-      const div = document.getElementById('prazos-atuais');
-      div.innerHTML = '<p class="text-gray-500">Buscando prazos no servidor...</p>';
-
-      try {
-        const resposta = await fetch('https://palpitoo-api.onrender.com/status-rodadas');
-        const rodadas = await resposta.json();
-
-        if (rodadas.length === 0) {
-          div.innerHTML = '<p class="text-gray-500">Nenhum prazo definido no banco ainda.</p>';
-          return;
-        }
-
-        // Monta o visual com a nova coluna "status"
-        div.innerHTML = '<p class="text-yellow-300 font-bold mb-1">Prazos Oficiais no Banco:</p>' +
-          rodadas.map(r => {
-            let corStatus = r.status === 'finalizado' ? 'text-gray-400' : (r.status === 'fechado' ? 'text-red-400' : 'text-green-400');
-            let nomeStatus = r.status.toUpperCase();
-            
-            return `
-            <p>Rodada ${r.rodada}: 
-              <span class="text-white">${formatarDataHora(r.prazo_limite)}</span> 
-              <span class="${corStatus} font-bold">(${nomeStatus})</span>
-            </p>
-          `}).join('');
-      } catch (erro) {
-        div.innerHTML = '<p class="text-red-500">Erro ao buscar os prazos oficiais.</p>';
-        console.error("Erro ao puxar prazos:", erro);
-      }
-    }
-
-
-
+    // ================= INIT =================
     carregarListaDeJogos();
     carregarTodasLigas();
     renderPrazosAtuais();
