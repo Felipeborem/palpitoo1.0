@@ -537,16 +537,25 @@
         document.getElementById('t-barra').style.width = `${taxa}%`;
       }, 100);
 
-      // Posição na liga
-      if (data.posicao_liga) {
-        const medalhas = { 1:'🥇', 2:'🥈', 3:'🥉' };
-        document.getElementById('t-posicao-icone').innerText = medalhas[data.posicao_liga] || '🏅';
-        document.getElementById('t-posicao-texto').innerText = `${data.posicao_liga}º lugar`;
-        document.getElementById('t-nome-liga').innerText     = data.nome_liga || '';
-      } else {
-        document.getElementById('t-posicao-icone').innerText = '🦆';
-        document.getElementById('t-posicao-texto').innerText = 'Sem liga';
-      }
+      // Posição na liga — busca separada pois /desempenho não retorna esse dado
+try {
+  const resLiga  = await fetch(`https://palpitoo-api.onrender.com/minhas-ligas/${idPerfil}`);
+  const ligas    = await resLiga.json();
+
+  if (Array.isArray(ligas) && ligas.length > 0) {
+    const liga = ligas[0]; // liga principal do usuário
+    document.getElementById('t-posicao-icone').innerText = '🏅';
+    document.getElementById('t-posicao-texto').innerText = liga.nome;
+    document.getElementById('t-nome-liga').innerText     = '⚔️ Participante';
+  } else {
+    document.getElementById('t-posicao-icone').innerText = '🦆';
+    document.getElementById('t-posicao-texto').innerText = 'Sem liga';
+    document.getElementById('t-nome-liga').innerText     = '';
+  }
+} catch (e) {
+  document.getElementById('t-posicao-icone').innerText = '🦆';
+  document.getElementById('t-posicao-texto').innerText = 'Sem liga';
+}
 
     } catch (e) {
       document.getElementById('t-pontos').innerText = 'Erro';

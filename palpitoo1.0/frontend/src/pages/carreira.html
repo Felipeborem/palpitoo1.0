@@ -59,7 +59,7 @@
     }
 
     /* ══════════════════════════════
-       SISTEMA DE TROFÉUS COM PNG
+       SISTEMA DE TROFÉUS / PRÊMIOS
     ══════════════════════════════ */
     .sala-trofeus-grid {
       display: grid;
@@ -113,6 +113,11 @@
     .trofeu-card.ponteiro:hover   { box-shadow: 0 8px 30px rgba(167,139,250,0.2); }
     .trofeu-card.ponteiro:hover::before { opacity: 1; }
 
+    .trofeu-card.artilheiro { border-color: #f97316; }
+    .trofeu-card.artilheiro::before { background: radial-gradient(circle at 50% 0%, rgba(249,115,22,0.1), transparent 70%); }
+    .trofeu-card.artilheiro:hover   { box-shadow: 0 8px 30px rgba(249,115,22,0.2); }
+    .trofeu-card.artilheiro:hover::before { opacity: 1; }
+
     .trofeu-img {
       width: 72px; height: 72px; object-fit: contain;
       margin: 0 auto 10px; display: block;
@@ -140,18 +145,21 @@
       text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;
     }
     .trofeu-data { font-size: 9px; color: var(--text-gray); margin-top: 6px; opacity: 0.7; }
-
-    /* ── Tooltip de meta ── */
-    .trofeu-meta {
-      font-size: 9px; color: var(--text-gray);
-      margin-top: 5px; opacity: 0.6; line-height: 1.3;
-    }
+    .trofeu-meta { font-size: 9px; color: var(--text-gray); margin-top: 5px; opacity: 0.6; line-height: 1.3; }
 
     .trofeu-count-badge {
       display: inline-flex; align-items: center; gap: 5px;
       background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
       border-radius: 8px; padding: 4px 12px;
       font-family: 'Russo One', sans-serif; font-size: 11px; color: #eab308;
+    }
+
+    /* Badge de prêmios (roxo) */
+    .premio-count-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.35);
+      border-radius: 8px; padding: 4px 12px;
+      font-family: 'Russo One', sans-serif; font-size: 11px; color: #a78bfa;
     }
 
     .trofeus-empty {
@@ -161,7 +169,7 @@
     .trofeus-empty p { font-size: 13px; line-height: 1.5; }
 
     /* ══════════════════════════════
-       HISTÓRICO DE LIGAS COM DATAS
+       HISTÓRICO DE LIGAS
     ══════════════════════════════ */
     .liga-hist-card {
       background: var(--bg-dark); border: 1px solid var(--borda-divisoria);
@@ -236,7 +244,8 @@
       border-radius: 8px; height: 28px;
     }
     @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-      @media (max-width: 600px) {
+
+    @media (max-width: 600px) {
       .abas-carreira { flex-wrap: wrap; }
       .abas-carreira .aba-btn { flex: 1 1 45%; font-size: 11px; padding: 10px 6px; }
     }
@@ -326,8 +335,6 @@
             <div class="barra-container"><div class="barra-fill" id="t-barra"></div></div>
             <p id="t-frase" style="font-size:12px;color:var(--text-gray);margin-top:8px;text-align:center;font-family:'Russo One',sans-serif;">Calculando...</p>
           </div>
-
-          <!-- PROGRESSO DAS METAS DA TEMPORADA ATUAL -->
           <div id="metas-temporada" style="margin-top:16px;"></div>
         </section>
 
@@ -382,19 +389,41 @@
 
         <div style="display:flex;flex-direction:column;gap:24px;">
 
+          <!-- ══ SALA DE TROFÉUS (competitivos) ══ -->
           <section class="cartao bg-escuro animacao-suave">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;">
-              <h3 class="font-russo titulo-branco" style="font-size:18px;">🏅 Sala de Troféus</h3>
+              <h3 class="font-russo titulo-branco" style="font-size:18px;">🏆 Sala de Troféus</h3>
               <span id="trofeus-contador" class="trofeu-count-badge" style="display:none;">
                 🏆 <span id="trofeus-total">0</span>
               </span>
             </div>
             <div class="divisor-tracejado mb-20"></div>
+            <p style="font-size:11px;color:var(--text-gray);margin-bottom:12px;font-family:'Russo One',sans-serif;text-transform:uppercase;letter-spacing:0.06em;opacity:0.6;">
+              Conquistas competitivas — Campeão & Vice
+            </p>
             <div id="sala-trofeus" class="sala-trofeus-grid">
               <p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Carregando...</p>
             </div>
           </section>
 
+          <!-- ══ SALA DE PRÊMIOS (individuais) ══ -->
+          <section class="cartao bg-escuro animacao-suave" style="border-color:rgba(167,139,250,0.2);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;">
+              <h3 class="font-russo titulo-branco" style="font-size:18px;">🎖️ Sala de Prêmios</h3>
+              <span id="premios-contador" class="premio-count-badge" style="display:none;">
+                🎖️ <span id="premios-total">0</span>
+              </span>
+            </div>
+            <div class="divisor-tracejado mb-20"></div>
+            <p style="font-size:11px;color:var(--text-gray);margin-bottom:12px;font-family:'Russo One',sans-serif;text-transform:uppercase;letter-spacing:0.06em;opacity:0.6;">
+              Conquistas individuais — Cravações, Pontuação & mais
+            </p>
+            <div id="sala-premios" class="sala-trofeus-grid">
+              <p class="text-center" style="color:var(--text-gray);font-size:13px;grid-column:span 2;">Carregando...</p>
+            </div>
+          </section>
+
+          <!-- ══ HISTÓRICO DE LIGAS ══ -->
           <section class="cartao bg-escuro animacao-suave">
             <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">📜 Histórico de Ligas</h3>
             <div class="divisor-tracejado mb-20"></div>
@@ -419,26 +448,26 @@
   const fotoLogada = localStorage.getItem('foto_craque');
 
   // ════════════════════════════════════════════════════════
-  //  METAS DOS TROFÉUS ESPECIAIS
+  //  METAS
   // ════════════════════════════════════════════════════════
-  const META_CRAVACOES = 40;   // cravações numa mesma liga
-  const META_PONTOS    = 250;  // pontos numa mesma liga
+  const META_CRAVACOES = 40;
+  const META_PONTOS    = 250;
 
   // ════════════════════════════════════════════════════════
-  //  CONFIGURAÇÃO DE TROFÉUS
-  //  ⚠️ 3º lugar REMOVIDO
-  //  Critérios novos:
-  //    - cravacoes: 40 cravações na mesma liga (ao final da temporada)
-  //    - ponteiro:  250 pontos na mesma liga (ao final da temporada)
-  //    - bagre:     lanterna em 2 temporadas SEGUIDAS na mesma liga
+  //  CONFIGURAÇÃO DE TROFÉUS E PRÊMIOS
+  //  categoria: 'trofeu'  → Sala de Troféus (competitivos)
+  //  categoria: 'premio'  → Sala de Prêmios (individuais)
   // ════════════════════════════════════════════════════════
   const TROFEUS_CONFIG = {
+
+    // ── TROFÉUS competitivos ──
     campeao: {
       arquivo:   './img/trofeus/trofeu-campeao.png',
       emoji:     '🏆',
       classe:    'campeao',
       titulo:    'CAMPEÃO',
       cor:       '#eab308',
+      categoria: 'trofeu',
       meta:      null,
     },
     vice: {
@@ -447,14 +476,18 @@
       classe:    'vice',
       titulo:    'VICE-CAMPEÃO',
       cor:       '#d1d5db',
+      categoria: 'trofeu',
       meta:      null,
     },
+
+    // ── PRÊMIOS individuais ──
     cravacoes: {
       arquivo:   './img/trofeus/trofeu-cravacoes.png',
       emoji:     '🎯',
       classe:    'especial',
       titulo:    'REI DAS CRAVAÇÕES',
       cor:       'var(--accent-cyan)',
+      categoria: 'premio',
       meta:      `${META_CRAVACOES} cravações numa liga`,
     },
     ponteiro: {
@@ -463,7 +496,17 @@
       classe:    'ponteiro',
       titulo:    'PONTEIRO',
       cor:       '#a78bfa',
+      categoria: 'premio',
       meta:      `${META_PONTOS} pts numa liga`,
+    },
+    artilheiro: {
+      arquivo:   './img/trofeus/trofeu-artilheiro.png',
+      emoji:     '⚽',
+      classe:    'artilheiro',
+      titulo:    'ARTILHEIRO',
+      cor:       '#f97316',
+      categoria: 'premio',
+      meta:      'Mais cravações da liga',
     },
     bagre: {
       arquivo:   './img/trofeus/trofeu-bagre.png',
@@ -471,19 +514,18 @@
       classe:    'bagre',
       titulo:    'PATO MESTRE',
       cor:       '#6b7280',
+      categoria: 'premio',
       meta:      'Lanterna 2 temporadas seguidas',
     },
   };
 
   // ────────────────────────────────────────────────────────
-  //  Gera o HTML de um troféu (com fallback de imagem)
+  //  HTML de um card de troféu/prêmio
   // ────────────────────────────────────────────────────────
   function htmlTrofeu(tipo, descExtra, dataGanho) {
     const cfg = TROFEUS_CONFIG[tipo];
     if (!cfg) return '';
-    const dataHtml = dataGanho
-      ? `<p class="trofeu-data">📅 ${dataGanho}</p>`
-      : '';
+    const dataHtml = dataGanho ? `<p class="trofeu-data">📅 ${dataGanho}</p>` : '';
     return `
       <div class="trofeu-card ${cfg.classe}" title="${cfg.titulo}${descExtra ? ' · ' + descExtra : ''}">
         <img
@@ -500,7 +542,7 @@
   }
 
   // ────────────────────────────────────────────────────────
-  //  Badge de troféu miniatura para o topo do perfil
+  //  Badge mini para o topo do perfil
   // ────────────────────────────────────────────────────────
   function htmlTrofeuMini(tipo) {
     const cfg = TROFEUS_CONFIG[tipo];
@@ -512,11 +554,11 @@
   }
 
   // ────────────────────────────────────────────────────────
-  //  Renderiza barra de progresso de meta
+  //  Barra de progresso de meta
   // ────────────────────────────────────────────────────────
   function htmlMetaProgress(label, atual, meta, cor) {
-    const perc      = Math.min(100, Math.round((atual / meta) * 100));
-    const completo  = atual >= meta;
+    const perc     = Math.min(100, Math.round((atual / meta) * 100));
+    const completo = atual >= meta;
     return `
       <div class="meta-progress-container">
         <div class="meta-progress-label">
@@ -530,20 +572,14 @@
   }
 
   // ════════════════════════════════════════════════════════
-  //  SISTEMA DE DATAS — localStorage frontend-only
+  //  DATAS — localStorage frontend-only
   // ════════════════════════════════════════════════════════
-  function getDataEntrada(idLiga) {
-    return localStorage.getItem(`palpitoo_entrada_${idLiga}`);
-  }
-  function getDataSaida(idLiga) {
-    return localStorage.getItem(`palpitoo_saida_${idLiga}`);
-  }
+  function getDataEntrada(idLiga) { return localStorage.getItem(`palpitoo_entrada_${idLiga}`); }
+  function getDataSaida(idLiga)   { return localStorage.getItem(`palpitoo_saida_${idLiga}`); }
   function formatarData(isoStr) {
     if (!isoStr) return null;
     try {
-      return new Date(isoStr).toLocaleDateString('pt-BR', {
-        day: '2-digit', month: 'short', year: 'numeric'
-      });
+      return new Date(isoStr).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
     } catch { return null; }
   }
 
@@ -625,13 +661,12 @@
       document.getElementById('totalTemporada').innerText   = `${pontos} pts`;
       setTimeout(() => { document.getElementById('t-barra').style.width = `${taxa}%`; }, 100);
 
-      // ── Barras de progresso das metas (na liga atual) ──
-      const resLigas = await fetch(`${API}/minhas-ligas/${idLogado}`);
-      const ligas    = await resLigas.json();
+      const resLigas  = await fetch(`${API}/minhas-ligas/${idLogado}`);
+      const ligas     = await resLigas.json();
 
       if (Array.isArray(ligas) && ligas.length > 0) {
-        const liga    = ligas[0];
-        const resRank = await fetch(`${API}/ranking-liga/${liga.id_liga}`);
+        const liga      = ligas[0];
+        const resRank   = await fetch(`${API}/ranking-liga/${liga.id_liga}`);
         const dadosLiga = await resRank.json();
         const ranking   = dadosLiga.ranking || [];
 
@@ -650,13 +685,8 @@
           document.getElementById('t-posicao-texto').innerText = 'Sem pontos ainda';
         }
 
-        // Barras de progresso das metas na liga atual
-        const metasEl = document.getElementById('metas-temporada');
         const pontosLiga = pos !== -1 ? Number(ranking[pos].total_pontos ?? 0) : pontos;
-
-        // Cravações na liga atual (palpites com jogo da liga)
-        // Como não temos endpoint por liga, usamos os palpites gerais como aproximação
-        metasEl.innerHTML = `
+        document.getElementById('metas-temporada').innerHTML = `
           <p style="font-family:'Russo One',sans-serif;font-size:11px;color:var(--text-gray);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">
             🎯 Progresso das Metas (Liga Atual)
           </p>
@@ -706,19 +736,7 @@
   }
 
   // ════════════════════════════════════════════════════════
-  //  CARREIRA COMPLETA — NOVA LÓGICA DE TROFÉUS
-  //
-  //  Regras:
-  //  🏆 Campeão    → 1º lugar numa liga (ao final)
-  //  🥈 Vice       → 2º lugar numa liga (ao final)
-  //  🎯 Cravações  → 40+ cravações numa liga (verificado ao final: liga encerrada)
-  //  ⚡ Ponteiro   → 250+ pontos numa liga (verificado ao final: liga encerrada)
-  //  🦆 Pato Mestre → lanterna em 2 temporadas SEGUIDAS na mesma liga
-  //
-  //  "Liga encerrada" = todos os jogos finalizados (status='finalizado')
-  //  Como o front não sabe se a temporada foi "fechada" pelo admin,
-  //  usamos a heurística: se o jogador não está mais na liga ativa
-  //  (data de saída registrada) ou se todos os jogos finalizaram.
+  //  CARREIRA COMPLETA
   // ════════════════════════════════════════════════════════
   async function carregarCarreira() {
     if (!idLogado) return;
@@ -746,16 +764,22 @@
       const ligas    = await resLigas.json();
       document.getElementById('c-ligas').innerText = Array.isArray(ligas) ? ligas.length : 0;
 
-      const salaEl = document.getElementById('sala-trofeus');
-      const histEl = document.getElementById('historico-ligas');
-      const topoEl = document.getElementById('trofeus-topo');
-      salaEl.innerHTML = histEl.innerHTML = '';
+      const salaEl   = document.getElementById('sala-trofeus');
+      const premiosEl = document.getElementById('sala-premios');
+      const histEl   = document.getElementById('historico-ligas');
+      const topoEl   = document.getElementById('trofeus-topo');
+      salaEl.innerHTML = premiosEl.innerHTML = histEl.innerHTML = '';
 
       if (!Array.isArray(ligas) || !ligas.length) {
         salaEl.innerHTML = `
-          <div class="trofeus-empty" style="grid-column: span 3;">
-            <div class="big-emoji">🦆</div>
-            <p>Nenhum troféu ainda.<br>Entre em uma liga e comece a história!</p>
+          <div class="trofeus-empty" style="grid-column:span 3;">
+            <div class="big-emoji">🏆</div>
+            <p>Nenhum troféu ainda.<br>Vença uma liga para conquistar!</p>
+          </div>`;
+        premiosEl.innerHTML = `
+          <div class="trofeus-empty" style="grid-column:span 3;">
+            <div class="big-emoji">🎖️</div>
+            <p>Nenhum prêmio ainda.<br>Alcance as metas individuais!</p>
           </div>`;
         histEl.innerHTML = '<p class="text-center" style="color:var(--text-gray);font-size:13px;">Você ainda não participou de nenhuma liga.</p>';
         return;
@@ -770,16 +794,10 @@
           const pos     = ranking.findIndex(r => String(r.id) === String(idLogado));
           const meuPts  = pos !== -1 ? Number(ranking[pos].total_pontos ?? 0) : 0;
 
-          // Cravações nessa liga: filtramos os palpites pelo id_liga se disponível
-          // Fallback: usa total geral (mesma liga = única liga ativa)
-          const palpitesLiga = palpites.filter(p =>
-            p.liga_id === liga.id_liga || p.id_liga === liga.id_liga
-          );
-          // Se não tiver campo liga_id nos palpites, tentamos correlacionar
-          // pelos jogos (se a API retornar jogos por liga — heurística: usa todos)
+          const palpitesLiga    = palpites.filter(p => p.liga_id === liga.id_liga || p.id_liga === liga.id_liga);
           const palpitesParaMeta = palpitesLiga.length > 0 ? palpitesLiga : finalizados;
-          const cravadasLiga = palpitesParaMeta.filter(p => Number(p.pontos_obtidos) === 3).length;
-          const pontosLiga   = meuPts > 0 ? meuPts : palpitesParaMeta.reduce((s, p) => s + Number(p.pontos_obtidos ?? 0), 0);
+          const cravadasLiga    = palpitesParaMeta.filter(p => Number(p.pontos_obtidos) === 3).length;
+          const pontosLiga      = meuPts > 0 ? meuPts : palpitesParaMeta.reduce((s, p) => s + Number(p.pontos_obtidos ?? 0), 0);
 
           return { liga, ranking, pos, meuPts: pontosLiga, cravadasLiga, nomeLiga: dados.nomeLiga || liga.nome };
         } catch {
@@ -788,20 +806,14 @@
       }));
 
       // ── Detecta Pato Mestre: lanterna em 2 temporadas seguidas ──
-      // Estratégia: ordena ligas por data de entrada e verifica se ficou
-      // em último nas últimas 2 consecutivas
       function verificarPatoMestre(dadosLigas) {
         const ligasComPos = dadosLigas.filter(d => d.pos !== -1 && d.ranking.length > 2);
         if (ligasComPos.length < 2) return false;
-
-        // Ordena por data de entrada (mais antiga primeiro)
         const ordenadas = [...ligasComPos].sort((a, b) => {
           const dA = new Date(getDataEntrada(a.liga.id_liga) || 0).getTime();
           const dB = new Date(getDataEntrada(b.liga.id_liga) || 0).getTime();
           return dA - dB;
         });
-
-        // Verifica 2 consecutivas como lanterna
         for (let i = 0; i < ordenadas.length - 1; i++) {
           const aLanterna1 = ordenadas[i].pos === ordenadas[i].ranking.length - 1;
           const aLanterna2 = ordenadas[i+1].pos === ordenadas[i+1].ranking.length - 1;
@@ -810,33 +822,28 @@
         return false;
       }
 
-      // ── Constrói lista de troféus ganhos ──
+      // ── Constrói lista de conquistas ──
       const trofeusGanhos = [];
 
       dadosLigas.forEach(({ liga, ranking, pos, meuPts, cravadasLiga, nomeLiga }) => {
-        const posicao      = pos !== -1 ? pos + 1 : null;
-        const dataEntrada  = formatarData(getDataEntrada(liga.id_liga));
-        const dataSaida    = formatarData(getDataSaida(liga.id_liga));
-        const ligaAtiva    = !getDataSaida(liga.id_liga);
+        const posicao     = pos !== -1 ? pos + 1 : null;
+        const dataEntrada = formatarData(getDataEntrada(liga.id_liga));
+        const dataSaida   = formatarData(getDataSaida(liga.id_liga));
+        const ligaAtiva   = !getDataSaida(liga.id_liga);
 
         if (!getDataEntrada(liga.id_liga)) {
           localStorage.setItem(`palpitoo_entrada_${liga.id_liga}`, new Date().toISOString());
         }
 
-        // ── Troféus de posição (Campeão e Vice apenas) ──
+        // Troféus competitivos
         if (posicao === 1) {
           trofeusGanhos.push({ tipo: 'campeao', desc: nomeLiga, data: dataEntrada });
         } else if (posicao === 2) {
           trofeusGanhos.push({ tipo: 'vice', desc: nomeLiga, data: dataEntrada });
         }
-        // ⚠️ 3º lugar REMOVIDO — não gera troféu
 
-        // ── Troféus por meta (só ao final da temporada = liga encerrada) ──
-        // Consideramos "encerrada" quando o jogador tem data de saída registrada
-        // OU quando todos os jogos da liga estão finalizados (verificado via ranking vazio não — via posição)
-        // Heurística pragmática: se a liga NÃO é a atual (tem saída) → temporada encerrada
+        // Prêmios individuais (só em temporadas encerradas)
         const temporadaEncerrada = !ligaAtiva;
-
         if (temporadaEncerrada) {
           if (cravadasLiga >= META_CRAVACOES) {
             trofeusGanhos.push({ tipo: 'cravacoes', desc: `${cravadasLiga} cravações em ${nomeLiga}`, data: dataSaida });
@@ -844,9 +851,13 @@
           if (meuPts >= META_PONTOS) {
             trofeusGanhos.push({ tipo: 'ponteiro', desc: `${meuPts} pts em ${nomeLiga}`, data: dataSaida });
           }
+          // Artilheiro: maior pontuação da liga (1º lugar em temporada encerrada)
+          if (posicao === 1 && ranking.length > 1) {
+            trofeusGanhos.push({ tipo: 'artilheiro', desc: `Artilheiro de ${nomeLiga}`, data: dataSaida });
+          }
         }
 
-        // ── Histórico de ligas ──
+        // ── Card do histórico de ligas ──
         const corPos   = posicao === 1 ? '#eab308' : posicao === 2 ? '#d1d5db' : 'var(--accent-cyan)';
         const labelPos = posicao === 1 ? '🏆 Campeão' : posicao === 2 ? '🥈 Vice'
           : posicao ? `${posicao}º Lugar` : '—';
@@ -890,26 +901,42 @@
           </div>`;
       });
 
-      // ── Pato Mestre: 2 lanternas seguidas ──
+      // Pato Mestre: 2 lanternas seguidas
       if (verificarPatoMestre(dadosLigas)) {
         trofeusGanhos.push({ tipo: 'bagre', desc: '2 temporadas seguidas na lanterna', data: null });
       }
 
-      // ── Renderiza Sala de Troféus ──
-      if (!trofeusGanhos.length) {
+      // ── Separa por categoria e renderiza ──
+      const listaTrofeus = trofeusGanhos.filter(t => TROFEUS_CONFIG[t.tipo]?.categoria === 'trofeu');
+      const listaPremios = trofeusGanhos.filter(t => TROFEUS_CONFIG[t.tipo]?.categoria === 'premio');
+
+      // Sala de Troféus
+      if (!listaTrofeus.length) {
         salaEl.innerHTML = `
-          <div class="trofeus-empty" style="grid-column: span 3;">
-            <div class="big-emoji">🦆</div>
-            <p>Nenhum troféu ainda.<br>Continue lutando — a história está sendo escrita!</p>
+          <div class="trofeus-empty" style="grid-column:span 3;">
+            <div class="big-emoji">🏆</div>
+            <p>Nenhum troféu ainda.<br>Vença uma liga para conquistar o seu!</p>
           </div>`;
       } else {
-        salaEl.innerHTML = trofeusGanhos.map(t => htmlTrofeu(t.tipo, t.desc, t.data)).join('');
-        const contEl = document.getElementById('trofeus-contador');
-        document.getElementById('trofeus-total').innerText = trofeusGanhos.length;
-        contEl.style.display = 'inline-flex';
+        salaEl.innerHTML = listaTrofeus.map(t => htmlTrofeu(t.tipo, t.desc, t.data)).join('');
+        document.getElementById('trofeus-total').innerText = listaTrofeus.length;
+        document.getElementById('trofeus-contador').style.display = 'inline-flex';
       }
 
-      // ── Troféus mini no topo do perfil ──
+      // Sala de Prêmios
+      if (!listaPremios.length) {
+        premiosEl.innerHTML = `
+          <div class="trofeus-empty" style="grid-column:span 3;">
+            <div class="big-emoji">🎖️</div>
+            <p>Nenhum prêmio ainda.<br>Alcance as metas individuais para ganhar!</p>
+          </div>`;
+      } else {
+        premiosEl.innerHTML = listaPremios.map(t => htmlTrofeu(t.tipo, t.desc, t.data)).join('');
+        document.getElementById('premios-total').innerText = listaPremios.length;
+        document.getElementById('premios-contador').style.display = 'inline-flex';
+      }
+
+      // Badges mini no topo do perfil (todos juntos)
       const miniTipos = [...new Set(trofeusGanhos.map(t => t.tipo))];
       topoEl.innerHTML = miniTipos.map(t => htmlTrofeuMini(t)).join('');
 
@@ -921,7 +948,7 @@
   }
 
   // ════════════════════════════════════════════════════════
-  //  PREVIEWS (modo offline / sem login)
+  //  PREVIEWS (sem login)
   // ════════════════════════════════════════════════════════
   function carregarPreviewTemporada() {
     document.getElementById('nomeUsuario').innerText      = 'Palpiteiro Demo';
@@ -938,8 +965,6 @@
     document.getElementById('t-posicao-texto').innerText  = '2º lugar';
     document.getElementById('t-nome-liga').innerText      = 'Liga dos Bagres';
     setTimeout(() => { document.getElementById('t-barra').style.width = '75%'; }, 100);
-
-    // Preview barras de meta
     document.getElementById('metas-temporada').innerHTML = `
       <p style="font-family:'Russo One',sans-serif;font-size:11px;color:var(--text-gray);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">
         🎯 Progresso das Metas (Liga Atual)
@@ -947,7 +972,6 @@
       ${htmlMetaProgress('Rei das Cravações', 12, META_CRAVACOES, 'var(--accent-cyan)')}
       ${htmlMetaProgress('Ponteiro', 87, META_PONTOS, '#a78bfa')}
     `;
-
     const lista = document.getElementById('lista-ultimos');
     [
       { jogo:'FLA x SAN', rod:3, palpite:'2 x 1', real:'2 x 1', pts:3 },
@@ -977,11 +1001,16 @@
     document.getElementById('totalCarreira').innerText    = '337 pts';
     setTimeout(() => { document.getElementById('c-barra').style.width = '74%'; }, 200);
 
-    document.getElementById('trofeus-total').innerText    = '3';
+    // Sala de Troféus (preview)
+    document.getElementById('trofeus-total').innerText = '1';
     document.getElementById('trofeus-contador').style.display = 'inline-flex';
-
     document.getElementById('sala-trofeus').innerHTML =
-      htmlTrofeu('campeao',   'Liga dos Bagres',            'mar. de 2025') +
+      htmlTrofeu('campeao', 'Liga dos Bagres', 'mar. de 2025');
+
+    // Sala de Prêmios (preview)
+    document.getElementById('premios-total').innerText = '2';
+    document.getElementById('premios-contador').style.display = 'inline-flex';
+    document.getElementById('sala-premios').innerHTML =
       htmlTrofeu('cravacoes', '42 cravações em Liga Pelada', 'jun. de 2025') +
       htmlTrofeu('ponteiro',  '287 pts em Liga Pelada',      'jun. de 2025');
 

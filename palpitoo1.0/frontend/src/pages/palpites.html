@@ -336,7 +336,7 @@
   function statusBadge(status) {
     const s = status.toLowerCase();
     if (s === 'finalizado')  return `<span class="status-badge finalizado">🔒 Finalizado</span>`;
-    if (s === 'em andamento') return `<span class="status-badge andamento">🟡 Em andamento</span>`;
+    if (s === 'aovivo') return `<span class="status-badge andamento">🔴 Ao Vivo</span>`;
     return `<span class="status-badge aberto">🟢 Aberto</span>`;
   }
 
@@ -344,7 +344,11 @@
   function formatarDataHora(iso) {
     if (!iso) return null;
     const d = new Date(iso);
-    return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    return d.toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+      timeZone: 'America/Sao_Paulo'
+    });
   }
   function formatarCountdown(ms) {
     if (ms <= 0) return '00:00:00';
@@ -377,8 +381,8 @@
     // Todos finalizados → encerrada
     if (statuses.every(s => s === 'finalizado')) return 'encerrada';
 
-    // Qualquer jogo em andamento ou finalizado → ao vivo
-    if (statuses.some(s => s === 'em andamento' || s === 'finalizado')) return 'ao_vivo';
+    // Qualquer jogo aovivo ou finalizado → ao vivo
+    if (statuses.some(s => s === 'aovivo' || s === 'finalizado')) return 'ao_vivo';
 
     // Prazo expirou → ao vivo
     const prazo = getPrazoRodada(numeroRodada, jogosRodada);
@@ -426,7 +430,7 @@
 
       } else if (estado === 'ao_vivo') {
         banner.className = 'banner-rodada ao-vivo';
-        const vivos = jogosRodada.filter(j => j.status.toLowerCase() === 'em andamento').length;
+        const vivos = jogosRodada.filter(j => j.status.toLowerCase() === 'aovivo').length;
         banner.innerHTML = `<div><p class="banner-label"><span class="dot-vivo"></span>Rodada ao Vivo</p><p class="banner-sub">Palpites encerrados${vivos ? ` · ${vivos} jogo(s) rolando` : ''}</p></div><span class="banner-timer">AO VIVO</span>`;
         bloquearInputs();
         clearInterval(_timers[bannerId]);
@@ -456,14 +460,69 @@
     }
   }
 
+// ── PARSE SEGURO DE DATA UTC ──
+  function parseDateUTC(str) {
+    if (!str) return 0;
+    let s = str.toString().trim().replace(' ', 'T');
+    // Força o JavaScript a entender que é UTC adicionando o 'Z' no final
+    if (!s.endsWith('Z')) {
+      s += 'Z';
+    }
+    return new Date(s).getTime();
+  }
+
+// ── COUNTDOWN POR JOGO ───────────────────────────────────
+  const _timersJogo = {};
+  function renderCountdownJogo(jogoId, dataJogo) {
+    const el = document.getElementById(`countdown-jogo-${jogoId}`);
+    if (!el) return;
+    const alvo = parseDateUTC(dataJogo);
+
+    function tick() {
+      const diff = alvo - Date.now();
+      if (diff <= 0) {
+        el.innerHTML = `<span style="font-family:'Russo One',sans-serif;font-size:10px;color:#f87171;animation:pisca 1s infinite;">⚡ Iniciando agora!</span>`;
+        
+        // 🚨 TRAVA IMEDIATA ADICIONADA AQUI: Desabilita os campos no exato milissegundo!
+        const inputCasa = document.getElementById(`casa_${jogoId}`);
+        const inputFora = document.getElementById(`fora_${jogoId}`);
+        if (inputCasa) inputCasa.disabled = true;
+        if (inputFora) inputFora.disabled = true;
+
+        clearInterval(_timersJogo[jogoId]);
+        delete _timersJogo[jogoId];
+        
+        // Mantém a atualização da página após 10s para puxar o status oficial do banco
+        setTimeout(() => carregarJogos(), 10000);
+        return;
+      }
+      
+      const s     = Math.floor(diff / 1000);
+      const dias  = Math.floor(s / 86400);
+      const horas = Math.floor((s % 86400) / 3600);
+      const min   = Math.floor((s % 3600) / 60);
+      const seg   = s % 60;
+      
+      let tempo;
+      if (dias > 0)       tempo = `${dias}d ${String(horas).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+      else if (horas > 0) tempo = `${String(horas).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
+      else                tempo = `${String(min).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
+
+      const cor   = diff < 60000 ? '#f87171' : diff < 600000 ? '#facc15' : 'var(--accent-cyan)';
+      el.innerHTML = `<span style="font-size:9px;color:var(--text-gray);font-family:'Russo One',sans-serif;letter-spacing:.5px;text-transform:uppercase;">⏱ início em</span><span style="font-family:'Russo One',sans-serif;font-size:11px;color:${cor};letter-spacing:1px;">${tempo}</span>`;
+    }
+    tick();
+    if (_timersJogo[jogoId]) clearInterval(_timersJogo[jogoId]);
+    _timersJogo[jogoId] = setInterval(tick, 1000);
+  }
+
   // ── HELPER: MONTA HTML DE UM JOGO ────────────────────────
   function htmlJogo(jogo, bloqueado = false) {
     const s = jogo.status.toLowerCase();
     const finalizado   = s === 'finalizado';
-    const emAndamento  = s === 'em andamento';
-    const desabilitado = finalizado || emAndamento || bloqueado;
+    const aovivo       = s === 'aovivo';
+    const desabilitado = finalizado || aovivo || bloqueado;
 
-    // Centro: se finalizado mostra placar real; senão mostra inputs
     let centro;
     if (finalizado) {
       centro = `
@@ -475,10 +534,10 @@
             <span style="font-family:'Russo One',sans-serif;font-size:20px;color:#9ca3af;">${jogo.gols_fora_real ?? '?'}</span>
           </div>
         </div>`;
-    } else if (emAndamento) {
+    } else if (aovivo) {
       centro = `
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-          <span class="status-badge andamento">🟡 Ao Vivo</span>
+          <span class="status-badge andamento">🔴 Ao Vivo</span>
           <div class="area-placar">
             <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" disabled>
             <span class="versus">x</span>
@@ -486,11 +545,29 @@
           </div>
         </div>`;
     } else {
+      // andamento — mostra data formatada no fuso de Brasília + countdown
+      // data_jogo vem do banco já no horário de Brasília — só extrai dia/hora direto da string
+      // data_jogo está em UTC no banco — exibe em BRT (UTC-3)
+      let dataFormatada = null;
+      if (jogo.data_jogo) {
+        const tsUTC = parseDateUTC(jogo.data_jogo);
+        const brt   = new Date(tsUTC - 3 * 60 * 60 * 1000);
+        const dia   = String(brt.getUTCDate()).padStart(2, '0');
+        const mes   = String(brt.getUTCMonth() + 1).padStart(2, '0');
+        const hora  = String(brt.getUTCHours()).padStart(2, '0');
+        const min   = String(brt.getUTCMinutes()).padStart(2, '0');
+        dataFormatada = `${dia}/${mes}, ${hora}:${min}`;
+      }
+      const temCountdown = jogo.data_jogo && parseDateUTC(jogo.data_jogo) > Date.now();
       centro = `
-        <div class="area-placar">
-          <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
-          <span class="versus">x</span>
-          <input type="number" id="fora_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          ${dataFormatada ? `<span style="font-size:9px;color:var(--text-gray);font-family:'Russo One',sans-serif;letter-spacing:.5px;">${dataFormatada}</span>` : ''}
+          <div class="area-placar">
+            <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
+            <span class="versus">x</span>
+            <input type="number" id="fora_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
+          </div>
+          ${temCountdown ? `<div id="countdown-jogo-${jogo.id_jogo}" style="display:flex;align-items:center;gap:5px;margin-top:2px;"></div>` : ''}
         </div>`;
     }
 
@@ -503,13 +580,12 @@
   }
 
   // ── DETECTA RODADA ATUAL ──────────────────────────────────
-  // Prioridade: ao vivo > aberta > mais recente
   function detectarRodadaAtual(porRodada) {
     const todas = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
 
-    // 1. Alguma rodada ao vivo (tem jogo em andamento)?
+    // 1. Rodada com jogo aovivo
     for (const r of todas) {
-      if (porRodada[r].some(j => j.status.toLowerCase() === 'em andamento')) return r;
+      if (porRodada[r].some(j => j.status.toLowerCase() === 'aovivo')) return r;
     }
     // 2. Primeira rodada com jogos não finalizados
     for (const r of todas) {
@@ -554,6 +630,16 @@
       porRodada[rodadaAtual].forEach(j => { htmlJogosAtual += htmlJogo(j, bloqueadaAtual); });
       document.getElementById(`jogos-rodada-${rodadaAtual}`).innerHTML = htmlJogosAtual;
 
+      // Countdowns individuais por jogo
+      function iniciarCountdownsVisiveis(jogos) {
+          jogos.forEach(jogo => {
+            if (jogo.status.toLowerCase() === 'andamento' && jogo.data_jogo) {
+              if (parseDateUTC(jogo.data_jogo) > Date.now()) {
+                renderCountdownJogo(jogo.id_jogo, jogo.data_jogo);
+              }
+            }
+          });
+        }
       // Banner de estado (countdown / ao vivo / encerrada)
       renderBannerRodada(`jogos-rodada-${rodadaAtual}`, rodadaAtual, porRodada[rodadaAtual]);
 

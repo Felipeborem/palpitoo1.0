@@ -78,7 +78,6 @@
       font-family:'Russo One',sans-serif; font-size:12px; color:var(--accent-cyan); margin-bottom:16px;
     }
 
-    /* ── MEMBROS com data de entrada ── */
     .membro-card {
       display:flex; align-items:center; gap:14px;
       padding:14px 16px; border-radius:12px; margin-bottom:8px;
@@ -98,7 +97,6 @@
       font-weight:700; white-space:nowrap;
     }
 
-    /* ── HISTÓRICO ── */
     .historico-hero {
       background:linear-gradient(135deg,rgba(192,52,90,0.12) 0%,transparent 60%);
       border:1px solid rgba(192,52,90,0.2); border-radius:16px;
@@ -224,7 +222,6 @@
         <div class="stat-box"><div class="valor" id="statPontos">-</div><div class="label">Seus Pontos</div></div>
         <div class="stat-box"><div class="valor" id="statMembros">-</div><div class="label">Membros</div></div>
       </div>
-      <!-- Data de entrada na liga -->
       <div id="info-data-entrada" style="margin-top:14px;display:none;">
         <span style="font-size:11px;color:var(--text-gray);">📅 Membro desde <strong id="label-data-entrada" style="color:var(--text-white);"></strong></span>
       </div>
@@ -287,9 +284,6 @@
     const idLogado   = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
     const nomeLogado = localStorage.getItem('nome_craque');
 
-    // ════════════════════════════════════════════════════════
-    //  SISTEMA DE DATAS — localStorage frontend-only
-    // ════════════════════════════════════════════════════════
     function registrarEntrada(idLiga) {
       const chave = `palpitoo_entrada_${idLiga}`;
       if (!localStorage.getItem(chave)) {
@@ -357,17 +351,26 @@
       } catch { mostrarAviso('Servidor offline.', 'erro'); }
     }
 
+    // ── CORRIGIDO: envia liga_id + usuario_id e limpa localStorage ──
     async function sairDaLiga() {
       if (!confirm('Tem certeza que deseja sair da liga?')) return;
       try {
-        const res = await fetch('https://palpitoo-api.onrender.com/sair-liga', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ id_usuario: idLogado }) });
+        const res = await fetch('https://palpitoo-api.onrender.com/sair-liga', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ liga_id: _ligaAtualId, usuario_id: idLogado })
+        });
+        const r = await res.json();
         if (res.ok) {
-          // ── Registra data de saída ──
           if (_ligaAtualId) registrarSaida(_ligaAtualId);
+          localStorage.removeItem('liga_ativa_id');
+          localStorage.removeItem('liga_ativa_nome');
           mostrarAviso('Você saiu da liga.', 'info');
           setTimeout(carregarPagina, 800);
+        } else {
+          mostrarAviso(r.erro || 'Erro ao sair da liga.', 'erro');
         }
-      } catch { mostrarAviso('Erro ao sair.', 'erro'); }
+      } catch { mostrarAviso('Erro ao conectar com o servidor.', 'erro'); }
     }
 
     function copiarCodigo() {
@@ -378,7 +381,6 @@
       });
     }
 
-    // ── RANKING (membros clicáveis) ────────────────────────
     async function carregarRanking(idLiga) {
       try {
         const res     = await fetch(`https://palpitoo-api.onrender.com/ranking-liga/${idLiga}`);
@@ -418,22 +420,18 @@
       } catch { document.getElementById('lista-ranking').innerHTML = '<div class="empty-state"><div class="emoji">⚠️</div><p>Erro ao carregar ranking.</p></div>'; }
     }
 
-    // ── MEMBROS COM DATA DE ENTRADA ────────────────────────
     async function carregarMembros(idLiga, donoDaLiga) {
       try {
         const res     = await fetch(`https://palpitoo-api.onrender.com/liga-membros/${idLiga}`);
         const membros = await res.json();
         const lista   = document.getElementById('lista-membros');
-        if (!lista) return; // tab removida, usando histórico
-
+        if (!lista) return;
         lista.innerHTML = '';
         if (!membros.length) { lista.innerHTML = '<div class="empty-state"><div class="emoji">👻</div><p>Nenhum membro ainda.</p></div>'; return; }
-
         membros.forEach(m => {
           const ehEu   = String(m.id) === String(idLogado);
           const ehDono = String(m.id) === String(donoDaLiga);
           const foto   = m.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nome)}&background=random&size=46`;
-          // Data de entrada — tenta do campo da API primeiro, depois localStorage
           const dataEntradaAPI  = m.data_entrada || m.created_at || m.joined_at || null;
           const dataEntradaLocal = dataEntradaAPI
             ? formatarDataCurta(dataEntradaAPI)
@@ -441,7 +439,6 @@
           const dataHtml = dataEntradaLocal
             ? `<span class="membro-data"><span class="entrada-dot"></span>Entrou em ${dataEntradaLocal}</span>`
             : '';
-
           lista.innerHTML += `
             <div class="membro-card ${ehEu?'eu':''}">
               <img class="membro-avatar" src="${foto}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=?&background=random&size=46'">
@@ -456,7 +453,6 @@
       } catch { console.error('Erro ao carregar membros'); }
     }
 
-    // ── PALPITES COM RODADA ─────────────────────────────────
     async function carregarPalpitesGalera(idLiga, rodadaAtual) {
       const badgeEl = document.getElementById('badge-rodada-palpites');
       const labelEl = document.getElementById('label-rodada-palpites');
@@ -495,7 +491,6 @@
       } catch { document.getElementById('lista-palpites-galera').innerHTML = '<div class="empty-state"><div class="emoji">⚠️</div><p>Erro ao carregar palpites.</p></div>'; }
     }
 
-    // ── HISTÓRICO DA LIGA ───────────────────────────────────
     function renderizarHistorico(liga, membros) {
       const el          = document.getElementById('conteudo-historico');
       const nomeLiga    = liga.nome             || 'Liga Secreta';
@@ -536,7 +531,6 @@
         <p class="historico-secao-titulo" style="margin-top:24px;">⚡ Linha do Tempo</p>
         <div id="linha-tempo-hist"></div>`;
 
-      // Prêmios
       const lp = document.getElementById('lista-premios-hist');
       if (premios.length > 0) {
         premios.forEach(p => {
@@ -556,7 +550,6 @@
         lp.innerHTML = '<div class="empty-state" style="padding:16px 10px;"><div class="emoji">🏺</div><p>Nenhum prêmio encerrado ainda. A história está sendo escrita.</p></div>';
       }
 
-      // Linha do tempo
       const lt = document.getElementById('linha-tempo-hist');
       const eventos = [];
       if (dataCriacao) eventos.push({ icone:'🔥', destaque:true,  titulo:'Liga fundada', desc:`${nomeLiga} ganhou vida.`, data:dataFormatada });
@@ -583,7 +576,6 @@
       if (_ligaAtualId) { carregarRanking(_ligaAtualId); carregarPalpitesGalera(_ligaAtualId, _rodadaAtual); }
     }
 
-    // ── PREVIEW ─────────────────────────────────────────────
     function mostrarPreview() {
       document.getElementById('tela-sem-liga').style.display = 'none';
       document.getElementById('tela-com-liga').style.display  = 'block';
@@ -595,7 +587,6 @@
       document.getElementById('statMembros').innerText = '6';
       document.getElementById('label-rodada-palpites').innerText = 'Rodada 3';
       document.getElementById('badge-rodada-palpites').style.display = 'inline-flex';
-      // Data de entrada demo
       document.getElementById('label-data-entrada').innerText = '10 de mar. de 2025';
       document.getElementById('info-data-entrada').style.display = 'block';
 
@@ -647,7 +638,6 @@
       }, membrosDemo);
     }
 
-    // ── MOTOR PRINCIPAL ─────────────────────────────────────
     async function carregarPagina() {
       if (!idLogado) { mostrarPreview(); return; }
       const params = new URLSearchParams(window.location.search);
@@ -679,7 +669,6 @@
         _ligaAtualId = liga.id_liga;
         _rodadaAtual = liga.rodada_atual || 1;
 
-        // ── Registra entrada e mostra data ──────────────
         registrarEntrada(liga.id_liga);
         const dataEntradaFormatada = formatarDataCurta(getDataEntrada(liga.id_liga));
         if (dataEntradaFormatada) {
@@ -687,7 +676,6 @@
           document.getElementById('info-data-entrada').style.display = 'block';
         }
 
-        // Membros
         let membros = [];
         try {
           const resMem = await fetch(`https://palpitoo-api.onrender.com/liga-membros/${liga.id_liga}`);

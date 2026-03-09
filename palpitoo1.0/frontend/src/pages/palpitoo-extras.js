@@ -1,6 +1,6 @@
 /**
  * palpitoo-extras.js
- * Toggle AMOLED + Banner de Palpite Esquecido
+ * Toggle AMOLED + Banner de Palpite Esquecido + Navbar Inteligente
  *
  * IMPORTANTE: Todo o CSS está no style.css.
  * Este arquivo NÃO injeta nenhum estilo inline.
@@ -179,6 +179,17 @@ function exibirBanner(rodadaNum, countdownTxt, isUrgente) {
 }
 
 /* =========================================
+   3. NAVBAR INTELIGENTE — Ligas
+   ========================================= */
+function redirecionarNavbarLigas() {
+  const ligaId    = localStorage.getItem('liga_ativa_id');
+  const linkLigas = document.querySelector('.nav-links a[href="ligas.html"]');
+  if (ligaId && linkLigas) {
+    linkLigas.href = 'minhaliga.html';
+  }
+}
+
+/* =========================================
    TOAST (fallback se a página não tiver o próprio)
    ========================================= */
 function mostrarToast(msg, tipo = 'info') {
@@ -212,6 +223,7 @@ function mostrarToast(msg, tipo = 'info') {
 function init() {
   injetarToggleAmoled();
   verificarPalpiteEsquecido();
+  redirecionarNavbarLigas();
 }
 
 if (document.readyState === 'loading') {

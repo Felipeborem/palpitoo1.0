@@ -86,14 +86,25 @@ app.get('/jogos', async (req, res) => {
     res.status(500).json({ erro: 'Erro ao buscar os jogos no banco de dados.' });
   }
 });
-
 // -----------------------------------------------------------------------------
-// ROTA PARA SALVAR OU ATUALIZAR OS PALPITES
+// ROTA PARA SALVAR OU ATUALIZAR OS PALPITES (AGORA BLINDADA)
 app.post('/palpites', async (req, res) => {
   try {
     const { palpites } = req.body; 
 
     for (const p of palpites) {
+      // 1. Verifica no banco se o jogo ainda está 'andamento'
+      const jogoInfo = await pool.query('SELECT status FROM jogos WHERE id_jogo = $1', [p.id_jogo]);
+      
+      if (jogoInfo.rows.length === 0) continue; // Jogo não existe
+      
+      // Se o jogo já estiver rolando ou encerrado, ignora esse palpite específico
+      if (jogoInfo.rows[0].status !== 'andamento') {
+        console.log(`Tentativa de palpite bloqueada para o jogo ${p.id_jogo} (Status: ${jogoInfo.rows[0].status})`);
+        continue; 
+      }
+
+      // 2. Se estiver tudo certo ('andamento'), salva no banco
       await pool.query(
         `INSERT INTO palpites (usuario_id, jogo_id, gols_casa_palpite, gols_fora_palpite) 
          VALUES ($1, $2, $3, $4)
@@ -105,13 +116,12 @@ app.post('/palpites', async (req, res) => {
       );
     }
 
-    res.json({ mensagem: 'Palpites cravados com sucesso!' });
+    res.json({ mensagem: 'Palpites validados e salvos com sucesso!' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ erro: 'Erro ao salvar os palpites no banco de dados.' });
   }
 });
-
 // -----------------------------------------------------------------------------
 // ROTA PARA BUSCAR OS PALPITES SALVOS DE UM USUÁRIO
 app.get('/meus-palpites/:id_usuario', async (req, res) => {
@@ -391,21 +401,30 @@ app.get('/liga-membros/:id_liga', async (req, res) => {
 
 app.post('/criar-jogo', async (req, res) => {
   try {
-    const { time_casa, time_fora, rodada } = req.body;
+    const { time_casa, time_fora, rodada, data_jogo } = req.body;
 
     if (!time_casa || !time_fora || !rodada) {
       return res.status(400).json({ erro: 'Preencha os times e a rodada!' });
     }
 
-    // Insere no banco agora com a coluna RODADA
+    // NOVA CONVERSÃO DE DATA: Blindada contra erros de fuso horário
+    let data_jogo_utc = null;
+    if (data_jogo) {
+      // Pega o que você digitou (ex: "2026-03-09 18:33")
+      const dataLimpa = data_jogo.toString().replace(' ', 'T').trim();
+      // Avisa ao Node que esse horário é de Brasília (-03:00) 
+      // O .toISOString() cuida de converter perfeitamente para UTC
+      data_jogo_utc = new Date(`${dataLimpa}:00.000-03:00`).toISOString();
+    }
+
     const resultado = await pool.query(
-      `INSERT INTO jogos (time_casa, time_fora, status, rodada) 
-       VALUES ($1, $2, 'andamento', $3) RETURNING *`,
-      [time_casa, time_fora, rodada]
+      `INSERT INTO jogos (time_casa, time_fora, status, rodada, data_jogo) 
+       VALUES ($1, $2, 'andamento', $3, $4) RETURNING *`,
+      [time_casa, time_fora, rodada, data_jogo_utc]
     );
 
     res.status(201).json({ 
-      mensagem: `Jogo cadastrado na Rodada ${rodada}!`, 
+      mensagem: `Jogo cadastrado na Rodada ${rodada}${data_jogo ? ` com início em ${data_jogo}` : ''}!`, 
       jogo: resultado.rows[0] 
     });
   } catch (err) {
@@ -413,6 +432,7 @@ app.post('/criar-jogo', async (req, res) => {
     res.status(500).json({ erro: 'Erro ao cadastrar o jogo no banco de dados.' });
   }
 });
+
 // -----------------------------------------------------------------------------
 // ROTA PARA BUSCAR O RANKING DE UMA LIGA PRIVADA ESPECÍFICA
 app.get('/ranking-liga/:id_liga', async (req, res) => {
@@ -1036,6 +1056,48 @@ app.get('/status-rodadas', async (req, res) => {
     res.status(500).json({ erro: 'Erro ao listar rodadas.' });
   }
 });
+
+
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// JOB AUTOMÁTICO: muda status para 'aovivo' quando data_jogo for atingida
+// Roda a cada 10 segundos
+// -----------------------------------------------------------------------------
+async function iniciarJogosAutomaticamente() {
+  try {
+    // Atualiza apenas os jogos individuais que atingiram o horário
+    const query = `
+      UPDATE jogos 
+      SET status = 'aovivo' 
+      WHERE status = 'andamento' 
+        AND data_jogo IS NOT NULL 
+        AND data_jogo <= NOW()
+      RETURNING id_jogo, time_casa, time_fora, rodada;
+    `;
+
+    const resultado = await pool.query(query);
+
+    // Se algum jogo foi alterado, avisa no console
+    if (resultado.rowCount > 0) {
+      resultado.rows.forEach(jogo => {
+        console.log(`🔴 [AUTO] Bola rolando! ${jogo.time_casa} x ${jogo.time_fora} agora está AO VIVO (Palpites bloqueados para este jogo)`);
+      });
+    }
+    
+    // Removida a lógica que bloqueava a rodada inteira!
+    
+  } catch (err) {
+    console.error('Erro no job de inicio de jogos:', err.message);
+  }
+}
+
+// Dispara ao subir o servidor e a cada 10 segundos
+iniciarJogosAutomaticamente();
+setInterval(iniciarJogosAutomaticamente, 10 * 1000);
+
+
+
 
 //--------------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
