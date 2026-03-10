@@ -945,6 +945,47 @@ app.get('/rodada-atual', async (req, res) => {
 });
 
 
+
+// =============================================================================
+// ROTA: CRIAR JOGO MANUALMENTE
+// POST /criar-jogo
+// =============================================================================
+app.post('/criar-jogo', async (req, res) => {
+  try {
+    const { time_casa, time_fora, rodada, data_jogo } = req.body;
+    if (!time_casa || !time_fora || !rodada) {
+      return res.status(400).json({ erro: 'time_casa, time_fora e rodada são obrigatórios.' });
+    }
+    const resultado = await pool.query(
+      `INSERT INTO jogos (time_casa, time_fora, status, rodada, data_jogo)
+       VALUES ($1, $2, 'andamento', $3, $4) RETURNING *`,
+      [time_casa, time_fora, Number(rodada), data_jogo || null]
+    );
+    res.status(201).json({ mensagem: `${time_casa} x ${time_fora} criado!`, jogo: resultado.rows[0] });
+  } catch (err) {
+    console.error('Erro ao criar jogo:', err.message);
+    res.status(500).json({ erro: 'Erro ao criar jogo.' });
+  }
+});
+
+// =============================================================================
+// ROTA: DELETAR JOGO
+// DELETE /deletar-jogo/:id
+// =============================================================================
+app.delete('/deletar-jogo/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Remove palpites vinculados primeiro
+    await pool.query('DELETE FROM palpites WHERE jogo_id = $1', [Number(id)]);
+    const result = await pool.query('DELETE FROM jogos WHERE id_jogo = $1 RETURNING id_jogo', [Number(id)]);
+    if (result.rows.length === 0) return res.status(404).json({ erro: 'Jogo não encontrado.' });
+    res.json({ mensagem: 'Jogo removido com sucesso.' });
+  } catch (err) {
+    console.error('Erro ao deletar jogo:', err.message);
+    res.status(500).json({ erro: 'Erro ao deletar jogo.' });
+  }
+});
+
 // =============================================================================
 // ROTA: BUSCAR JOGOS DO DIA — football-data.org (proxy seguro, chave no server)
 // GET /jogos-do-dia?date=YYYY-MM-DD
@@ -956,12 +997,15 @@ app.get('/jogos-do-dia', async (req, res) => {
     return res.status(500).json({ erro: 'FOOTBALL_DATA_KEY não configurada no servidor.' });
   }
 
-  // Códigos football-data.org
+  // Códigos football-data.org — plano gratuito suporta: PL, CL, EC, WC, BL1, DED, PPL, FL1, ELC, SA, PD
+  // BSA/CPB/CLI requerem plano pago — usando competições disponíveis no free tier
   const COMPETICOES = [
-    { code: 'BSA', nome: 'Brasileirão Série A', emoji: '🇧🇷' },
-    { code: 'CPB', nome: 'Copa do Brasil',      emoji: '🏆' },
-    { code: 'CLI', nome: 'Libertadores',        emoji: '🌎' },
-    { code: 'PL',  nome: 'Premier League',      emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+    { code: 'PL',  nome: 'Premier League',   emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+    { code: 'CL',  nome: 'Champions League', emoji: '⭐' },
+    { code: 'SA',  nome: 'Serie A',          emoji: '🇮🇹' },
+    { code: 'PD',  nome: 'La Liga',          emoji: '🇪🇸' },
+    { code: 'BL1', nome: 'Bundesliga',       emoji: '🇩🇪' },
+    { code: 'FL1', nome: 'Ligue 1',          emoji: '🇫🇷' },
   ];
 
   const date = req.query.date || new Date().toISOString().split('T')[0];
