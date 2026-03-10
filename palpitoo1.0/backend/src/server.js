@@ -142,133 +142,6 @@ app.get('/meus-palpites/:id_usuario', async (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// ROTA PARA ENCERRAR O JOGO E CALCULAR OS PONTOS (VERSÃO BLINDADA)
-app.post('/encerrar-jogo', async (req, res) => {
-  try {
-    // ✅ CORREÇÃO: Converter TODOS os valores para número (req.body envia strings)
-    const id_jogo        = Number(req.body.id_jogo);
-    const gols_casa_real = Number(req.body.gols_casa_real);
-    const gols_fora_real = Number(req.body.gols_fora_real);
-
-    console.log(`🔧 Encerrando jogo ${id_jogo} | Placar real: ${gols_casa_real} x ${gols_fora_real}`);
-
-    // 1. Atualiza o status e placar real do jogo
-    const jogoUpdate = await pool.query(
-      `UPDATE jogos 
-       SET gols_casa_real = $1, gols_fora_real = $2, status = 'finalizado' 
-       WHERE id_jogo = $3`,
-      [gols_casa_real, gols_fora_real, id_jogo]
-    );
-    console.log(`✅ Jogo ${id_jogo} atualizado no banco. Rows afetadas: ${jogoUpdate.rowCount}`);
-
-    // 2. Busca todos os palpites para esse jogo
-    const resultadoPalpites = await pool.query(
-      'SELECT * FROM palpites WHERE jogo_id = $1',
-      [id_jogo]
-    );
-    console.log(`📋 Palpites encontrados para jogo ${id_jogo}: ${resultadoPalpites.rows.length}`);
-
-    // 3. Calcula os pontos
-    for (const palpite of resultadoPalpites.rows) {
-      let pontos = 0;
-      const { usuario_id, jogo_id } = palpite;
-      // ✅ CORREÇÃO: Garantir que os valores do banco também são números
-      const gols_casa_palpite = Number(palpite.gols_casa_palpite);
-      const gols_fora_palpite = Number(palpite.gols_fora_palpite);
-      console.log(`👤 usuario=${usuario_id} | palpite: ${gols_casa_palpite}x${gols_fora_palpite} | real: ${gols_casa_real}x${gols_fora_real}`);
-
-      // REGRA 1: Acertou na mosca (Placar exato) = 3 pontos
-      if (gols_casa_palpite === gols_casa_real && gols_fora_palpite === gols_fora_real) {
-        pontos = 3;
-      } 
-      // REGRA 2: Não acertou o placar, mas acertou o vencedor ou empate
-      else {
-        const saldoPalpite = gols_casa_palpite - gols_fora_palpite;
-        const saldoReal = gols_casa_real - gols_fora_real;
-
-        if (
-          (saldoPalpite > 0 && saldoReal > 0) ||   // Casa ganhou
-          (saldoPalpite < 0 && saldoReal < 0) ||   // Fora ganhou
-          (saldoPalpite === 0 && saldoReal === 0)  // Empate
-        ) {
-          pontos = 1; 
-        } else {
-          pontos = 0; 
-        }
-      }
-
-      // 4. Salva a pontuação na tabela (Usando usuario_id e jogo_id)
-      const pontosUpdate = await pool.query(
-        'UPDATE palpites SET pontos_obtidos = $1 WHERE usuario_id = $2 AND jogo_id = $3',
-        [pontos, usuario_id, jogo_id]
-      );
-      console.log(`💾 Pontos salvos: ${pontos}pts para usuario=${usuario_id} no jogo=${jogo_id} | Rows afetadas: ${pontosUpdate.rowCount}`);
-    }
-
-// ── AUTO-BLOQUEIO ──
-    try {
-      const jogoInfo = await pool.query('SELECT rodada FROM jogos WHERE id_jogo = $1', [id_jogo]);
-      if (jogoInfo.rows.length > 0) {
-        const rodada = jogoInfo.rows[0].rodada;
-        const pendentes = await pool.query(
-          `SELECT COUNT(*) AS total FROM jogos WHERE rodada = $1 AND status != 'finalizado'`,
-          [rodada]
-        );
-        if (Number(pendentes.rows[0].total) === 0) {
-          // Todos os jogos da rodada finalizados → bloqueia automaticamente
-          const rodadaExiste = await pool.query('SELECT rodada FROM prazos_rodadas WHERE rodada = $1', [rodada]);
-          if (rodadaExiste.rows.length > 0) {
-            await pool.query('UPDATE prazos_rodadas SET bloqueada = true WHERE rodada = $1', [rodada]);
-          } else {
-            await pool.query('INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada) VALUES ($1, NOW(), true)', [rodada]);
-          }
-          console.log(`✅ Rodada ${rodada} bloqueada automaticamente (todos os jogos finalizados).`);
-
-          // ── VERIFICA SE ALGUMA LIGA DEVE SER ENCERRADA AUTOMATICAMENTE ──
-          try {
-            const ligasAtivas = await pool.query(`
-              SELECT id_liga, nome, total_rodadas, rodada_inicial
-              FROM ligas
-              WHERE status = 'ativa'
-                AND total_rodadas IS NOT NULL
-            `);
-            for (const liga of ligasAtivas.rows) {
-              const rodadaInicial = liga.rodada_inicial || 1;
-              const rodadaFinal   = rodadaInicial + liga.total_rodadas - 1;
-              if (rodada >= rodadaFinal) {
-                // Verifica se todos os jogos das rodadas da liga foram finalizados
-                const jogosPendentes = await pool.query(`
-                  SELECT COUNT(*) AS total FROM jogos
-                  WHERE rodada BETWEEN $1 AND $2 AND status != 'finalizado'
-                `, [rodadaInicial, rodadaFinal]);
-                if (Number(jogosPendentes.rows[0].total) === 0) {
-                  const resumo = await gerarResumoLiga(liga.id_liga);
-                  await pool.query(
-                    `UPDATE ligas SET status = 'encerrada', data_encerramento = NOW(), resumo_encerramento = $1 WHERE id_liga = $2`,
-                    [JSON.stringify(resumo), liga.id_liga]
-                  );
-                  console.log(`🏆 Liga "${liga.nome}" (ID ${liga.id_liga}) encerrada automaticamente após rodada ${rodada}.`);
-                }
-              }
-            }
-          } catch (ligaErr) {
-            console.error('Aviso: erro na verificação automática de ligas:', ligaErr);
-          }
-        }
-      }
-    } catch (autoErr) {
-      console.error("Aviso: erro no auto-bloqueio da rodada:", autoErr);
-    }
-
-    // ✅ CORREÇÃO: res.json enviado apenas após todo o processamento terminar
-    res.json({ mensagem: 'Jogo encerrado e pontos distribuídos com sucesso!' });
-
-  } catch (err) {
-    console.error("Erro ao encerrar jogo:", err);
-    res.status(500).json({ erro: 'Erro interno ao calcular a pontuação.' });
-  }
-});
-
 // -----------------------------------------------------------------------------
 // ROTA PARA ATUALIZAR A FOTO DE PERFIL
 app.put('/atualizar-foto', async (req, res) => {
@@ -408,82 +281,8 @@ app.get('/minhas-ligas/:usuario_id', async (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// ROTA ADMIN: BUSCAR TODAS AS LIGAS DO SISTEMA
-app.get('/todas-ligas', async (req, res) => {
-  try {
-    // Busca a liga, cruza com a tabela de usuários para pegar o nome do dono, 
-    // e ainda conta quantos membros tem lá dentro!
-    const resultado = await pool.query(`
-      SELECT l.id_liga, l.nome, l.codigo_convite, u.nome AS nome_dono,
-             (SELECT COUNT(*) FROM usuarios_ligas ul WHERE ul.liga_id = l.id_liga) as total_membros
-      FROM ligas l
-      LEFT JOIN usuarios u ON l.dono_id = u.id
-      ORDER BY l.id_liga ASC
-    `);
-    res.json(resultado.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ erro: 'Erro ao buscar todas as ligas.' });
-  }
-});
 
 // -----------------------------------------------------------------------------
-// ROTA ADMIN: BUSCAR MEMBROS DE UMA LIGA ESPECÍFICA
-app.get('/liga-membros/:id_liga', async (req, res) => {
-  try {
-    const { id_liga } = req.params;
-    const resultado = await pool.query(`
-      SELECT u.id, u.nome, u.email, u.time_favorito
-      FROM usuarios u
-      JOIN usuarios_ligas ul ON u.id = ul.usuario_id
-      WHERE ul.liga_id = $1
-    `, [id_liga]); 
-
-    res.json(resultado.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ erro: 'Erro ao buscar membros da liga.' });
-  }
-});
-
-// -----------------------------------------------------------------------------
-// ROTA ADMIN: CRIAR UM NOVO JOGO// -----------------------------------------------------------------------------
-// ROTA ADMIN: CRIAR UM NOVO JOGO (AGORA COM RODADA!)
-
-app.post('/criar-jogo', async (req, res) => {
-  try {
-    const { time_casa, time_fora, rodada, data_jogo } = req.body;
-
-    if (!time_casa || !time_fora || !rodada) {
-      return res.status(400).json({ erro: 'Preencha os times e a rodada!' });
-    }
-
-    // NOVA CONVERSÃO DE DATA: Blindada contra erros de fuso horário
-    let data_jogo_utc = null;
-    if (data_jogo) {
-      // Pega o que você digitou (ex: "2026-03-09 18:33")
-      const dataLimpa = data_jogo.toString().replace(' ', 'T').trim();
-      // Avisa ao Node que esse horário é de Brasília (-03:00) 
-      // O .toISOString() cuida de converter perfeitamente para UTC
-      data_jogo_utc = new Date(`${dataLimpa}:00.000-03:00`).toISOString();
-    }
-
-    const resultado = await pool.query(
-      `INSERT INTO jogos (time_casa, time_fora, status, rodada, data_jogo) 
-       VALUES ($1, $2, 'andamento', $3, $4) RETURNING *`,
-      [time_casa, time_fora, rodada, data_jogo_utc]
-    );
-
-    res.status(201).json({ 
-      mensagem: `Jogo cadastrado na Rodada ${rodada}${data_jogo ? ` com início em ${data_jogo}` : ''}!`, 
-      jogo: resultado.rows[0] 
-    });
-  } catch (err) {
-    console.error("Erro ao criar jogo:", err);
-    res.status(500).json({ erro: 'Erro ao cadastrar o jogo no banco de dados.' });
-  }
-});
-
 // -----------------------------------------------------------------------------
 // ROTA PARA BUSCAR O RANKING DE UMA LIGA PRIVADA ESPECÍFICA
 app.get('/ranking-liga/:id_liga', async (req, res) => {
@@ -1071,70 +870,6 @@ app.post('/sair-liga', async (req, res) => {
   }
 });
 
-// =========================================================================
-// ROTA: DEFINIR PRAZO DE PALPITES POR RODADA (ADM)
-// =========================================================================
-app.post('/definir-prazo-rodada', async (req, res) => {
-  try {
-    const { rodada, prazo_rodada } = req.body;
-    if (!rodada || !prazo_rodada) {
-      return res.status(400).json({ erro: 'Informe a rodada e o prazo.' });
-    }
-
-    // Usando UPSERT com a nova coluna "status"
-    await pool.query(
-      `INSERT INTO prazos_rodadas (rodada, prazo_limite, status)
-       VALUES ($1, $2, 'aberto')
-       ON CONFLICT (rodada)
-       DO UPDATE SET prazo_limite = EXCLUDED.prazo_limite, status = 'aberto'`,
-      [rodada, prazo_rodada]
-    );
-
-    res.json({ mensagem: `Prazo da Rodada ${rodada} definido com sucesso!` });
-  } catch (err) {
-    console.error("Erro ao definir prazo:", err);
-    res.status(500).json({ erro: 'Erro ao salvar prazo no banco.' });
-  }
-});
-
-// =========================================================================
-// ROTA: BLOQUEAR RODADA MANUALMENTE (ADM)
-// =========================================================================
-app.post('/bloquear-rodada', async (req, res) => {
-  try {
-    const { rodada, status } = req.body; 
-    if (!rodada || !status) return res.status(400).json({ erro: 'Informe a rodada e o status (fechado ou finalizado).' });
-
-    await pool.query(
-      `INSERT INTO prazos_rodadas (rodada, prazo_limite, status) 
-       VALUES ($1, NOW(), $2)
-       ON CONFLICT (rodada) 
-       DO UPDATE SET status = $2`,
-      [rodada, status]
-    );
-    
-    res.json({ mensagem: `Rodada ${rodada} alterada para: ${status}!` });
-  } catch (err) {
-    console.error("Erro ao alterar status da rodada:", err);
-    res.status(500).json({ erro: 'Erro ao alterar status.' });
-  }
-});
-
-// =========================================================================
-// ROTA: LISTAR STATUS DE TODAS AS RODADAS (ADM)
-// =========================================================================
-app.get('/status-rodadas', async (req, res) => {
-  try {
-    const resultado = await pool.query(
-      `SELECT rodada, prazo_limite, status FROM prazos_rodadas ORDER BY rodada ASC`
-    );
-    res.json(resultado.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ erro: 'Erro ao listar rodadas.' });
-  }
-});
-
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // JOB AUTOMÁTICO: muda status para 'aovivo' quando data_jogo for ultrapassada
@@ -1173,6 +908,119 @@ async function iniciarJogosAutomaticamente() {
 // Dispara ao subir o servidor e a cada 30 segundos
 iniciarJogosAutomaticamente();
 setInterval(iniciarJogosAutomaticamente, 30 * 1000);
+// =============================================================================
+// JOB AUTOMÁTICO: CALCULAR PONTOS quando jogo muda para 'finalizado' no banco
+// Roda a cada 30 segundos — detecta jogos finalizados que ainda não tiveram
+// pontos calculados (pontos_obtidos IS NULL nos palpites)
+// =============================================================================
+async function calcularPontosAutomaticamente() {
+  try {
+    // Busca jogos finalizados que ainda têm palpites sem pontuação
+    const jogosParaCalcular = await pool.query(`
+      SELECT DISTINCT j.id_jogo, j.gols_casa_real, j.gols_fora_real, j.rodada,
+                      j.time_casa, j.time_fora
+      FROM jogos j
+      JOIN palpites p ON p.jogo_id = j.id_jogo
+      WHERE j.status = 'finalizado'
+        AND j.gols_casa_real IS NOT NULL
+        AND j.gols_fora_real IS NOT NULL
+        AND p.pontos_obtidos IS NULL
+    `);
+
+    if (jogosParaCalcular.rows.length === 0) return;
+
+    for (const jogo of jogosParaCalcular.rows) {
+      const { id_jogo, time_casa, time_fora, rodada } = jogo;
+      const gols_casa_real = Number(jogo.gols_casa_real);
+      const gols_fora_real = Number(jogo.gols_fora_real);
+
+      console.log(`⚽ [AUTO-PONTOS] Calculando: ${time_casa} ${gols_casa_real}x${gols_fora_real} ${time_fora} (Rodada ${rodada})`);
+
+      // Busca todos os palpites desse jogo ainda sem pontuação
+      const palpites = await pool.query(
+        'SELECT * FROM palpites WHERE jogo_id = $1 AND pontos_obtidos IS NULL',
+        [id_jogo]
+      );
+
+      for (const palpite of palpites.rows) {
+        const gols_casa_palpite = Number(palpite.gols_casa_palpite);
+        const gols_fora_palpite = Number(palpite.gols_fora_palpite);
+        let pontos = 0;
+
+        if (gols_casa_palpite === gols_casa_real && gols_fora_palpite === gols_fora_real) {
+          pontos = 3; // Placar exato
+        } else {
+          const saldoPalpite = gols_casa_palpite - gols_fora_palpite;
+          const saldoReal    = gols_casa_real    - gols_fora_real;
+          if (
+            (saldoPalpite > 0 && saldoReal > 0) ||
+            (saldoPalpite < 0 && saldoReal < 0) ||
+            (saldoPalpite === 0 && saldoReal === 0)
+          ) {
+            pontos = 1; // Acertou vencedor/empate
+          }
+        }
+
+        await pool.query(
+          'UPDATE palpites SET pontos_obtidos = $1 WHERE usuario_id = $2 AND jogo_id = $3',
+          [pontos, palpite.usuario_id, id_jogo]
+        );
+        console.log(`  ✅ usuario=${palpite.usuario_id} | palpite: ${gols_casa_palpite}x${gols_fora_palpite} → ${pontos}pts`);
+      }
+
+      // Tenta auto-bloquear rodada se todos os jogos dela foram finalizados
+      try {
+        const pendentes = await pool.query(
+          `SELECT COUNT(*) AS total FROM jogos WHERE rodada = $1 AND status != 'finalizado'`,
+          [rodada]
+        );
+        if (Number(pendentes.rows[0].total) === 0) {
+          await pool.query(
+            `INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada)
+             VALUES ($1, NOW(), true)
+             ON CONFLICT (rodada) DO UPDATE SET bloqueada = true`,
+            [rodada]
+          );
+          console.log(`🔒 Rodada ${rodada} bloqueada automaticamente.`);
+
+          // Verifica ligas para encerramento automático
+          const ligasAtivas = await pool.query(`
+            SELECT id_liga, nome, total_rodadas, rodada_inicial
+            FROM ligas WHERE status = 'ativa' AND total_rodadas IS NOT NULL
+          `);
+          for (const liga of ligasAtivas.rows) {
+            const rodadaInicial = liga.rodada_inicial || 1;
+            const rodadaFinal   = rodadaInicial + liga.total_rodadas - 1;
+            if (rodada >= rodadaFinal) {
+              const jogosPendentes = await pool.query(`
+                SELECT COUNT(*) AS total FROM jogos
+                WHERE rodada BETWEEN $1 AND $2 AND status != 'finalizado'
+              `, [rodadaInicial, rodadaFinal]);
+              if (Number(jogosPendentes.rows[0].total) === 0) {
+                const resumo = await gerarResumoLiga(liga.id_liga);
+                await pool.query(
+                  `UPDATE ligas SET status = 'encerrada', data_encerramento = NOW(), resumo_encerramento = $1 WHERE id_liga = $2`,
+                  [JSON.stringify(resumo), liga.id_liga]
+                );
+                console.log(`🏆 Liga "${liga.nome}" encerrada automaticamente.`);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Aviso: erro no auto-bloqueio:', e.message);
+      }
+    }
+  } catch (err) {
+    console.error('Erro no job de pontuação automática:', err.message);
+  }
+}
+
+// Dispara ao subir e a cada 30 segundos
+calcularPontosAutomaticamente();
+setInterval(calcularPontosAutomaticamente, 30 * 1000);
+
+
 
 
 
