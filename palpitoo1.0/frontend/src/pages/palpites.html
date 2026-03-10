@@ -230,6 +230,19 @@
     .pontos-obtidos.vencedor { background: rgba(234,179,8,0.15);  color: #eab308; }
     .pontos-obtidos.errou    { background: rgba(248,113,113,0.15);color: #f87171; }
 
+    /* ── DATA E HORA DO JOGO ── */
+    .data-hora-jogo {
+      font-family: 'Russo One', sans-serif;
+      font-size: 10px;
+      color: var(--text-gray);
+      text-align: center;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 8px;
+      margin-bottom: 4px;
+      opacity: 0.75;
+    }
+
     /* ── DIVISOR ── */
     .divisor-jogo {
       border: none;
@@ -333,10 +346,11 @@
   }
 
   // ── STATUS BADGE ─────────────────────────────────────────
+  // Valores gravados no banco: 'andamento' | 'aovivo' | 'finalizado'
   function statusBadge(status) {
     const s = status.toLowerCase();
-    if (s === 'finalizado')  return `<span class="status-badge finalizado">🔒 Finalizado</span>`;
-    if (s === 'aovivo') return `<span class="status-badge andamento">🔴 Ao Vivo</span>`;
+    if (s === 'finalizado')              return `<span class="status-badge finalizado">🔒 Finalizado</span>`;
+    if (s === 'aovivo' || s === 'ao vivo' || s === 'em andamento') return `<span class="status-badge andamento">🔴 Ao Vivo</span>`;
     return `<span class="status-badge aberto">🟢 Aberto</span>`;
   }
 
@@ -344,11 +358,7 @@
   function formatarDataHora(iso) {
     if (!iso) return null;
     const d = new Date(iso);
-    return d.toLocaleString('pt-BR', {
-      day: '2-digit', month: '2-digit',
-      hour: '2-digit', minute: '2-digit',
-      timeZone: 'America/Sao_Paulo'
-    });
+    return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
   }
   function formatarCountdown(ms) {
     if (ms <= 0) return '00:00:00';
@@ -375,16 +385,17 @@
   }
 
   // Retorna o estado atual da rodada: 'aberta' | 'ao_vivo' | 'encerrada'
+  // Status gravados no banco: 'andamento' (aberto), 'aovivo' (em curso), 'finalizado'
   function estadoRodada(numeroRodada, jogosRodada) {
     const statuses = jogosRodada.map(j => j.status.toLowerCase());
 
     // Todos finalizados → encerrada
     if (statuses.every(s => s === 'finalizado')) return 'encerrada';
 
-    // Qualquer jogo aovivo ou finalizado → ao vivo
+    // Qualquer jogo 'aovivo' ou 'finalizado' → rodada ao vivo (palpites bloqueados)
     if (statuses.some(s => s === 'aovivo' || s === 'finalizado')) return 'ao_vivo';
 
-    // Prazo expirou → ao vivo
+    // Prazo expirou → ao vivo (proteção extra no front)
     const prazo = getPrazoRodada(numeroRodada, jogosRodada);
     if (prazo && Date.now() >= prazo) return 'ao_vivo';
 
@@ -460,69 +471,15 @@
     }
   }
 
-// ── PARSE SEGURO DE DATA UTC ──
-  function parseDateUTC(str) {
-    if (!str) return 0;
-    let s = str.toString().trim().replace(' ', 'T');
-    // Força o JavaScript a entender que é UTC adicionando o 'Z' no final
-    if (!s.endsWith('Z')) {
-      s += 'Z';
-    }
-    return new Date(s).getTime();
-  }
-
-// ── COUNTDOWN POR JOGO ───────────────────────────────────
-  const _timersJogo = {};
-  function renderCountdownJogo(jogoId, dataJogo) {
-    const el = document.getElementById(`countdown-jogo-${jogoId}`);
-    if (!el) return;
-    const alvo = parseDateUTC(dataJogo);
-
-    function tick() {
-      const diff = alvo - Date.now();
-      if (diff <= 0) {
-        el.innerHTML = `<span style="font-family:'Russo One',sans-serif;font-size:10px;color:#f87171;animation:pisca 1s infinite;">⚡ Iniciando agora!</span>`;
-        
-        // 🚨 TRAVA IMEDIATA ADICIONADA AQUI: Desabilita os campos no exato milissegundo!
-        const inputCasa = document.getElementById(`casa_${jogoId}`);
-        const inputFora = document.getElementById(`fora_${jogoId}`);
-        if (inputCasa) inputCasa.disabled = true;
-        if (inputFora) inputFora.disabled = true;
-
-        clearInterval(_timersJogo[jogoId]);
-        delete _timersJogo[jogoId];
-        
-        // Mantém a atualização da página após 10s para puxar o status oficial do banco
-        setTimeout(() => carregarJogos(), 10000);
-        return;
-      }
-      
-      const s     = Math.floor(diff / 1000);
-      const dias  = Math.floor(s / 86400);
-      const horas = Math.floor((s % 86400) / 3600);
-      const min   = Math.floor((s % 3600) / 60);
-      const seg   = s % 60;
-      
-      let tempo;
-      if (dias > 0)       tempo = `${dias}d ${String(horas).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
-      else if (horas > 0) tempo = `${String(horas).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
-      else                tempo = `${String(min).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
-
-      const cor   = diff < 60000 ? '#f87171' : diff < 600000 ? '#facc15' : 'var(--accent-cyan)';
-      el.innerHTML = `<span style="font-size:9px;color:var(--text-gray);font-family:'Russo One',sans-serif;letter-spacing:.5px;text-transform:uppercase;">⏱ início em</span><span style="font-family:'Russo One',sans-serif;font-size:11px;color:${cor};letter-spacing:1px;">${tempo}</span>`;
-    }
-    tick();
-    if (_timersJogo[jogoId]) clearInterval(_timersJogo[jogoId]);
-    _timersJogo[jogoId] = setInterval(tick, 1000);
-  }
-
   // ── HELPER: MONTA HTML DE UM JOGO ────────────────────────
   function htmlJogo(jogo, bloqueado = false) {
     const s = jogo.status.toLowerCase();
     const finalizado   = s === 'finalizado';
-    const aovivo       = s === 'aovivo';
-    const desabilitado = finalizado || aovivo || bloqueado;
+    // Banco grava 'aovivo' quando o timestamp é ultrapassado
+    const emAndamento  = s === 'aovivo';
+    const desabilitado = finalizado || emAndamento || bloqueado;
 
+    // Centro: se finalizado mostra placar real; se ao vivo mostra inputs bloqueados; senão inputs livres
     let centro;
     if (finalizado) {
       centro = `
@@ -534,7 +491,7 @@
             <span style="font-family:'Russo One',sans-serif;font-size:20px;color:#9ca3af;">${jogo.gols_fora_real ?? '?'}</span>
           </div>
         </div>`;
-    } else if (aovivo) {
+    } else if (emAndamento) {
       centro = `
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
           <span class="status-badge andamento">🔴 Ao Vivo</span>
@@ -545,33 +502,23 @@
           </div>
         </div>`;
     } else {
-      // andamento — mostra data formatada no fuso de Brasília + countdown
-      // data_jogo vem do banco já no horário de Brasília — só extrai dia/hora direto da string
-      // data_jogo está em UTC no banco — exibe em BRT (UTC-3)
-      let dataFormatada = null;
-      if (jogo.data_jogo) {
-        const tsUTC = parseDateUTC(jogo.data_jogo);
-        const brt   = new Date(tsUTC - 3 * 60 * 60 * 1000);
-        const dia   = String(brt.getUTCDate()).padStart(2, '0');
-        const mes   = String(brt.getUTCMonth() + 1).padStart(2, '0');
-        const hora  = String(brt.getUTCHours()).padStart(2, '0');
-        const min   = String(brt.getUTCMinutes()).padStart(2, '0');
-        dataFormatada = `${dia}/${mes}, ${hora}:${min}`;
-      }
-      const temCountdown = jogo.data_jogo && parseDateUTC(jogo.data_jogo) > Date.now();
       centro = `
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-          ${dataFormatada ? `<span style="font-size:9px;color:var(--text-gray);font-family:'Russo One',sans-serif;letter-spacing:.5px;">${dataFormatada}</span>` : ''}
-          <div class="area-placar">
-            <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
-            <span class="versus">x</span>
-            <input type="number" id="fora_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
-          </div>
-          ${temCountdown ? `<div id="countdown-jogo-${jogo.id_jogo}" style="display:flex;align-items:center;gap:5px;margin-top:2px;"></div>` : ''}
+        <div class="area-placar">
+          <input type="number" id="casa_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
+          <span class="versus">x</span>
+          <input type="number" id="fora_${jogo.id_jogo}" class="input-placar font-russo" placeholder="0" min="0" ${desabilitado ? 'disabled' : ''}>
         </div>`;
     }
 
+    const dataHora = jogo.data_jogo ? (() => {
+      const d = new Date(jogo.data_jogo);
+      const dia  = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+      const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      return `${dia.replace('.','').replace(/^\w/, c => c.toUpperCase())} · ${hora}`;
+    })() : null;
+
     return `
+      ${dataHora ? `<div class="data-hora-jogo">📅 ${dataHora}</div>` : ''}
       <div class="linha-jogo ${finalizado ? 'finalizado' : ''}">
         <span class="nome-time time-casa">${jogo.time_casa}</span>
         ${centro}
@@ -580,10 +527,11 @@
   }
 
   // ── DETECTA RODADA ATUAL ──────────────────────────────────
+  // Prioridade: ao vivo > aberta > mais recente
   function detectarRodadaAtual(porRodada) {
     const todas = Object.keys(porRodada).map(Number).sort((a, b) => a - b);
 
-    // 1. Rodada com jogo aovivo
+    // 1. Alguma rodada ao vivo (tem jogo com status 'aovivo')?
     for (const r of todas) {
       if (porRodada[r].some(j => j.status.toLowerCase() === 'aovivo')) return r;
     }
@@ -630,16 +578,6 @@
       porRodada[rodadaAtual].forEach(j => { htmlJogosAtual += htmlJogo(j, bloqueadaAtual); });
       document.getElementById(`jogos-rodada-${rodadaAtual}`).innerHTML = htmlJogosAtual;
 
-      // Countdowns individuais por jogo
-      function iniciarCountdownsVisiveis(jogos) {
-          jogos.forEach(jogo => {
-            if (jogo.status.toLowerCase() === 'andamento' && jogo.data_jogo) {
-              if (parseDateUTC(jogo.data_jogo) > Date.now()) {
-                renderCountdownJogo(jogo.id_jogo, jogo.data_jogo);
-              }
-            }
-          });
-        }
       // Banner de estado (countdown / ao vivo / encerrada)
       renderBannerRodada(`jogos-rodada-${rodadaAtual}`, rodadaAtual, porRodada[rodadaAtual]);
 

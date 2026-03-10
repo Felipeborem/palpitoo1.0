@@ -1057,44 +1057,46 @@ app.get('/status-rodadas', async (req, res) => {
   }
 });
 
-
-
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
-// JOB AUTOMÁTICO: muda status para 'aovivo' quando data_jogo for atingida
-// Roda a cada 10 segundos
+// JOB AUTOMÁTICO: muda status para 'aovivo' quando data_jogo for ultrapassada
+// Roda a cada 30 segundos
+// REGRA: 
+//   - 'andamento'  → palpites ABERTOS (jogo ainda não começou)
+//   - 'aovivo'     → palpites BLOQUEADOS (data_jogo foi atingida / jogo em curso)
+//   - 'finalizado' → jogo encerrado com placar real registrado
 // -----------------------------------------------------------------------------
 async function iniciarJogosAutomaticamente() {
   try {
-    // Atualiza apenas os jogos individuais que atingiram o horário
+    // Muda para 'aovivo' SOMENTE quando o timestamp do jogo for ultrapassado
+    // e o jogo ainda estiver em 'andamento' (aguardando início)
     const query = `
       UPDATE jogos 
       SET status = 'aovivo' 
       WHERE status = 'andamento' 
         AND data_jogo IS NOT NULL 
         AND data_jogo <= NOW()
-      RETURNING id_jogo, time_casa, time_fora, rodada;
+      RETURNING id_jogo, time_casa, time_fora, rodada, data_jogo;
     `;
 
     const resultado = await pool.query(query);
 
-    // Se algum jogo foi alterado, avisa no console
     if (resultado.rowCount > 0) {
       resultado.rows.forEach(jogo => {
-        console.log(`🔴 [AUTO] Bola rolando! ${jogo.time_casa} x ${jogo.time_fora} agora está AO VIVO (Palpites bloqueados para este jogo)`);
+        console.log(`🔴 [AUTO] Palpites bloqueados! ${jogo.time_casa} x ${jogo.time_fora} (Rodada ${jogo.rodada}) — jogo iniciado em ${new Date(jogo.data_jogo).toLocaleString('pt-BR')}`);
       });
     }
-    
-    // Removida a lógica que bloqueava a rodada inteira!
-    
+
   } catch (err) {
     console.error('Erro no job de inicio de jogos:', err.message);
   }
 }
 
-// Dispara ao subir o servidor e a cada 10 segundos
+// Dispara ao subir o servidor e a cada 30 segundos
 iniciarJogosAutomaticamente();
-setInterval(iniciarJogosAutomaticamente, 10 * 1000);
+setInterval(iniciarJogosAutomaticamente, 30 * 1000);
+
+
 
 
 
@@ -1103,7 +1105,5 @@ setInterval(iniciarJogosAutomaticamente, 10 * 1000);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando bem demais na porta ${PORT}`);
-
-
 
 });
