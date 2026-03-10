@@ -434,13 +434,13 @@
     <!-- AVISO CHAVE -->
     <div class="aviso-key" id="aviso-key" style="display:none;">
       ⚠️ <div>
-        <strong>RAPIDAPI_KEY não configurada.</strong><br>
-        Adicione a variável de ambiente <code style="background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;">RAPIDAPI_KEY=sua_chave_aqui</code> no Render
+        <strong>FOOTBALL_DATA_KEY não configurada.</strong><br>
+        Adicione a variável de ambiente <code style="background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;">FOOTBALL_DATA_KEY=sua_chave_aqui</code> no Render
         em <strong>Environment → Add Variable</strong> e faça redeploy.
         <br><br>
         <strong>Como obter a chave:</strong> acesse
-        <a href="https://rapidapi.com/api-sports/api/api-football" target="_blank" style="color:#fde68a;">rapidapi.com → API-Football → Subscribe (Free)</a>.
-        Sua chave aparece no campo <em>x-rapidapi-key</em>.
+        <a href="https://www.football-data.org/client/register" target="_blank" style="color:#fde68a;">football-data.org → Register Free</a>.
+        Sua chave chega no email.
       </div>
     </div>
 
@@ -485,10 +485,10 @@
 
   // IDs de ligas API-Football
   const LIGAS_INFO = {
-    71:  { nome: 'Brasileirão Série A', emoji: '🇧🇷' },
-    73:  { nome: 'Copa do Brasil',      emoji: '🏆' },
-    13:  { nome: 'Libertadores',        emoji: '🌎' },
-    39:  { nome: 'Premier League',      emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+    'BSA': { nome: 'Brasileirão Série A', emoji: '🇧🇷' },
+    'CPB': { nome: 'Copa do Brasil',      emoji: '🏆' },
+    'CLI': { nome: 'Libertadores',        emoji: '🌎' },
+    'PL':  { nome: 'Premier League',      emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
   };
 
   let _jogos = [];          // todos os jogos da busca
@@ -527,7 +527,7 @@
 
       if (!res.ok) {
         // Verifica se é erro de chave não configurada
-        if (data.erro && data.erro.includes('RAPIDAPI_KEY')) {
+        if (data.erro && (data.erro.includes('FOOTBALL_DATA_KEY') || data.erro.includes('não configurada'))) {
           document.getElementById('aviso-key').style.display = 'flex';
         }
         area.innerHTML = `<div class="estado"><div class="emoji">⚠️</div><p>${data.erro || 'Erro ao buscar.'}</p></div>`;
@@ -573,8 +573,9 @@
         ${ligasPresentes.map(lid => {
           const info = LIGAS_INFO[lid] || { nome: `Liga ${lid}`, emoji: '⚽' };
           const logo = _jogos.find(j => j.liga_id === lid)?.liga_logo || '';
-          return `<button class="filtro-btn ${_filtroAtivo === lid ? 'ativo' : ''}" onclick="setFiltro(${lid}, '${rodada}')">
-            ${logo ? `<img src="${logo}" onerror="this.style.display='none'">` : info.emoji}
+          const emoji = _jogos.find(j => j.liga_id === lid)?.liga_emoji || info?.emoji || '⚽';
+          return `<button class="filtro-btn ${_filtroAtivo === lid ? 'ativo' : ''}" onclick="setFiltro('${lid}', '${rodada}')">
+            ${logo ? `<img src="${logo}" onerror="this.style.display='none'">` : emoji}
             ${info.nome} (${porLiga[lid].length})
           </button>`;
         }).join('')}
@@ -608,12 +609,13 @@
     Object.entries(porLigaFiltrado).forEach(([ligaId, jogos]) => {
       const info = LIGAS_INFO[Number(ligaId)] || { nome: `Liga ${ligaId}`, emoji: '⚽' };
       const logo = jogos[0]?.liga_logo || '';
+      const emoji = jogos[0]?.liga_emoji || info?.emoji || '⚽';
 
       const secao = document.createElement('div');
       secao.className = 'secao-liga';
       secao.innerHTML = `
         <div class="secao-liga-header">
-          ${logo ? `<img src="${logo}" onerror="this.style.display='none'">` : `<span style="font-size:22px;">${info.emoji}</span>`}
+          ${logo ? `<img src="${logo}" onerror="this.style.display='none'">` : `<span style="font-size:22px;">${emoji}</span>`}
           <span class="secao-liga-nome">${info.nome}</span>
           <span class="secao-liga-count">${jogos.length} jogo${jogos.length !== 1 ? 's' : ''}</span>
         </div>`;

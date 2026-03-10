@@ -944,6 +944,122 @@ app.get('/rodada-atual', async (req, res) => {
   }
 });
 
+
+// =============================================================================
+// ROTA: BUSCAR JOGOS DO DIA — football-data.org (proxy seguro, chave no server)
+// GET /jogos-do-dia?date=YYYY-MM-DD
+// Competições: Brasileirão(BSA), Copa do Brasil(CPB), Libertadores(CLI), Premier League(PL)
+// =============================================================================
+app.get('/jogos-do-dia', async (req, res) => {
+  const apiKey = process.env.FOOTBALL_DATA_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ erro: 'FOOTBALL_DATA_KEY não configurada no servidor.' });
+  }
+
+  // Códigos football-data.org
+  const COMPETICOES = [
+    { code: 'BSA', nome: 'Brasileirão Série A', emoji: '🇧🇷' },
+    { code: 'CPB', nome: 'Copa do Brasil',      emoji: '🏆' },
+    { code: 'CLI', nome: 'Libertadores',        emoji: '🌎' },
+    { code: 'PL',  nome: 'Premier League',      emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  ];
+
+  const date = req.query.date || new Date().toISOString().split('T')[0];
+
+  try {
+    const resultados = [];
+
+    for (const comp of COMPETICOES) {
+      const url = `https://api.football-data.org/v4/competitions/${comp.code}/matches?dateFrom=${date}&dateTo=${date}`;
+      let response;
+      try {
+        response = await fetch(url, { headers: { 'X-Auth-Token': apiKey } });
+      } catch(e) { continue; }
+
+      if (!response.ok) {
+        console.log(`[football-data] ${comp.code} retornou ${response.status}`);
+        continue;
+      }
+
+      const data = await response.json();
+      if (!data.matches) continue;
+
+      for (const match of data.matches) {
+        resultados.push({
+          fixture_id: match.id,
+          liga_nome:  comp.nome,
+          liga_id:    comp.code,
+          liga_logo:  null,
+          liga_emoji: comp.emoji,
+          time_casa:  match.homeTeam.shortName || match.homeTeam.name,
+          time_fora:  match.awayTeam.shortName || match.awayTeam.name,
+          logo_casa:  match.homeTeam.crest || null,
+          logo_fora:  match.awayTeam.crest || null,
+          data_jogo:  match.utcDate,
+          // TIMED/SCHEDULED = não iniciado, FINISHED = finalizado, IN_PLAY = ao vivo
+          status:     match.status === 'FINISHED' ? 'FT'
+                    : match.status === 'IN_PLAY'  ? 'LIVE'
+                    : 'NS',
+          rodada_api: match.matchday ? `Rodada ${match.matchday}` : null,
+          placar_casa: match.score?.fullTime?.home ?? null,
+          placar_fora: match.score?.fullTime?.away ?? null,
+        });
+      }
+    }
+
+    res.json(resultados);
+  } catch (err) {
+    console.error('Erro ao buscar jogos (football-data):', err.message);
+    res.status(500).json({ erro: 'Erro ao buscar jogos externos.' });
+  }
+});
+
+// =============================================================================
+// ROTA: IMPORTAR JOGO SELECIONADO PARA O BANCO
+// POST /importar-jogo
+// Body: { time_casa, time_fora, data_jogo, rodada, fixture_id }
+// =============================================================================
+app.post('/importar-jogo', async (req, res) => {
+  try {
+    const { time_casa, time_fora, data_jogo, rodada, fixture_id } = req.body;
+
+    if (!time_casa || !time_fora || !rodada) {
+      return res.status(400).json({ erro: 'time_casa, time_fora e rodada são obrigatórios.' });
+    }
+
+    // Evita duplicata pelo fixture_id externo
+    if (fixture_id) {
+      const jaExiste = await pool.query(
+        'SELECT id_jogo FROM jogos WHERE fixture_id_externo = $1',
+        [fixture_id]
+      );
+      if (jaExiste.rows.length > 0) {
+        return res.status(409).json({ erro: 'Este jogo já foi importado.', id_jogo: jaExiste.rows[0].id_jogo });
+      }
+    }
+
+    // Converte data para UTC mantendo horário de Brasília
+    let data_jogo_utc = null;
+    if (data_jogo) {
+      data_jogo_utc = new Date(data_jogo).toISOString();
+    }
+
+    const resultado = await pool.query(
+      `INSERT INTO jogos (time_casa, time_fora, status, rodada, data_jogo, fixture_id_externo)
+       VALUES ($1, $2, 'andamento', $3, $4, $5) RETURNING *`,
+      [time_casa, time_fora, Number(rodada), data_jogo_utc, fixture_id || null]
+    );
+
+    res.status(201).json({
+      mensagem: `${time_casa} x ${time_fora} importado com sucesso!`,
+      jogo: resultado.rows[0]
+    });
+  } catch (err) {
+    console.error('Erro ao importar jogo:', err.message);
+    res.status(500).json({ erro: 'Erro ao importar jogo para o banco.' });
+  }
+});
+
 // =============================================================================
 // JOB AUTOMÁTICO: CALCULAR PONTOS quando jogo muda para 'finalizado' no banco
 // Roda a cada 30 segundos — detecta jogos finalizados que ainda não tiveram
