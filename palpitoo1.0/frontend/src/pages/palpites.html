@@ -371,40 +371,17 @@
     return `${String(horas).padStart(2,'0')}:${String(min).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
   }
 
-  // Busca o prazo de uma rodada:
-  // 1. Do campo prazo_rodada retornado pela API (ideal)
-  // 2. Fallback: localStorage (salvo pelo admin)
-  function getPrazoRodada(numeroRodada, jogosRodada) {
-    // Tenta pegar do primeiro jogo que tenha prazo_rodada
-    const comPrazo = jogosRodada.find(j => j.prazo_rodada);
-    if (comPrazo) return new Date(comPrazo.prazo_rodada).getTime();
-    // Fallback: localStorage (definido pelo painel admin)
-    const prazos = JSON.parse(localStorage.getItem('prazos_rodadas') || '{}');
-    const prazoStr = prazos[String(numeroRodada)];
-    return prazoStr ? new Date(prazoStr).getTime() : null;
-  }
-
-  // Retorna o estado atual da rodada: 'aberta' | 'ao_vivo' | 'encerrada'
-  // Status gravados no banco: 'andamento' (aberto), 'aovivo' (em curso), 'finalizado'
+  // Estado da rodada apenas para o banner informativo
+  // Bloqueio real é por jogo individual (status do banco)
   function estadoRodada(numeroRodada, jogosRodada) {
     const statuses = jogosRodada.map(j => j.status.toLowerCase());
-
-    // Todos finalizados → encerrada
     if (statuses.every(s => s === 'finalizado')) return 'encerrada';
-
-    // Qualquer jogo 'aovivo' ou 'finalizado' → rodada ao vivo (palpites bloqueados)
-    if (statuses.some(s => s === 'aovivo' || s === 'finalizado')) return 'ao_vivo';
-
-    // Prazo expirou → ao vivo (proteção extra no front)
-    const prazo = getPrazoRodada(numeroRodada, jogosRodada);
-    if (prazo && Date.now() >= prazo) return 'ao_vivo';
-
+    if (statuses.some(s => s === 'aovivo'))      return 'ao_vivo';
     return 'aberta';
   }
 
-  function rodadaBloqueada(numeroRodada, jogosRodada) {
-    return estadoRodada(numeroRodada, jogosRodada) !== 'aberta';
-  }
+  // Rodada nunca bloqueia inputs — cada jogo controla seu proprio estado
+  function rodadaBloqueada() { return false; }
 
   // ── BANNER DE ESTADO DA RODADA ────────────────────────────
   const _timers = {};
@@ -420,41 +397,22 @@
     const banner = document.createElement('div');
     banner.id = bannerId;
 
-    function bloquearInputs() {
-      jogosRodada.forEach(j => {
-        const iC = document.getElementById(`casa_${j.id_jogo}`);
-        const iF = document.getElementById(`fora_${j.id_jogo}`);
-        if (iC) iC.disabled = true;
-        if (iF) iF.disabled = true;
-      });
-    }
-
     function atualizar() {
       const estado = estadoRodada(numeroRodada, jogosRodada);
-      const prazo  = getPrazoRodada(numeroRodada, jogosRodada);
 
       if (estado === 'encerrada') {
         banner.className = 'banner-rodada encerrada';
         banner.innerHTML = `<div><p class="banner-label">🏁 Rodada Encerrada</p><p class="banner-sub">Todos os jogos foram finalizados.</p></div><span class="banner-timer">FIM</span>`;
-        bloquearInputs();
         clearInterval(_timers[bannerId]);
 
       } else if (estado === 'ao_vivo') {
         banner.className = 'banner-rodada ao-vivo';
         const vivos = jogosRodada.filter(j => j.status.toLowerCase() === 'aovivo').length;
-        banner.innerHTML = `<div><p class="banner-label"><span class="dot-vivo"></span>Rodada ao Vivo</p><p class="banner-sub">Palpites encerrados${vivos ? ` · ${vivos} jogo(s) rolando` : ''}</p></div><span class="banner-timer">AO VIVO</span>`;
-        bloquearInputs();
+        banner.innerHTML = `<div><p class="banner-label"><span class="dot-vivo"></span>Rodada ao Vivo</p><p class="banner-sub">${vivos ? `${vivos} jogo(s) rolando` : 'Jogos em andamento'}</p></div><span class="banner-timer">AO VIVO</span>`;
         clearInterval(_timers[bannerId]);
 
-      } else if (prazo) {
-        // aberta com prazo definido → countdown
-        const restante = prazo - Date.now();
-        if (restante <= 0) { atualizar(); return; }
-        banner.className = 'banner-rodada aberta';
-        banner.innerHTML = `<div><p class="banner-label">⏰ Mercado fecha em</p><p class="banner-sub">Após este tempo, nenhum palpite é aceito</p></div><span class="banner-timer">${formatarCountdown(restante)}</span>`;
-
       } else {
-        // aberta sem prazo → não mostra banner
+        // aberta → não mostra banner
         banner.remove();
         return;
       }
