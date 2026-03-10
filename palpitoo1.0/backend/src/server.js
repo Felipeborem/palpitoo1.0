@@ -112,7 +112,8 @@ app.post('/palpites', async (req, res) => {
          DO UPDATE SET 
             gols_casa_palpite = EXCLUDED.gols_casa_palpite, 
             gols_fora_palpite = EXCLUDED.gols_fora_palpite`,
-        [p.id_usuario, p.id_jogo, p.gols_casa, p.gols_fora]
+        // ✅ CORREÇÃO: Garantir que id_usuario é número (localStorage envia string)
+        [Number(p.id_usuario), p.id_jogo, p.gols_casa, p.gols_fora]
       );
     }
 
@@ -144,7 +145,10 @@ app.get('/meus-palpites/:id_usuario', async (req, res) => {
 // ROTA PARA ENCERRAR O JOGO E CALCULAR OS PONTOS (VERSÃO BLINDADA)
 app.post('/encerrar-jogo', async (req, res) => {
   try {
-    const { id_jogo, gols_casa_real, gols_fora_real } = req.body;
+    const { id_jogo } = req.body;
+    // ✅ CORREÇÃO: Converter para número para evitar comparação string vs integer
+    const gols_casa_real = Number(req.body.gols_casa_real);
+    const gols_fora_real = Number(req.body.gols_fora_real);
 
     // 1. Atualiza o status e placar real do jogo
     await pool.query(
@@ -163,7 +167,10 @@ app.post('/encerrar-jogo', async (req, res) => {
     // 3. Calcula os pontos
     for (const palpite of resultadoPalpites.rows) {
       let pontos = 0;
-      const { usuario_id, jogo_id, gols_casa_palpite, gols_fora_palpite } = palpite;
+      const { usuario_id, jogo_id } = palpite;
+      // ✅ CORREÇÃO: Garantir que os valores do banco também são números
+      const gols_casa_palpite = Number(palpite.gols_casa_palpite);
+      const gols_fora_palpite = Number(palpite.gols_fora_palpite);
 
       // REGRA 1: Acertou na mosca (Placar exato) = 3 pontos
       if (gols_casa_palpite === gols_casa_real && gols_fora_palpite === gols_fora_real) {
@@ -192,9 +199,7 @@ app.post('/encerrar-jogo', async (req, res) => {
       );
     }
 
-    res.json({ mensagem: 'Jogo encerrado e pontos distribuídos com sucesso!' });
-
-// ── AUTO-BLOQUEIO (substitua o bloco try/catch do auto-bloqueio por este) ──
+// ── AUTO-BLOQUEIO ──
     try {
       const jogoInfo = await pool.query('SELECT rodada FROM jogos WHERE id_jogo = $1', [id_jogo]);
       if (jogoInfo.rows.length > 0) {
@@ -248,6 +253,9 @@ app.post('/encerrar-jogo', async (req, res) => {
     } catch (autoErr) {
       console.error("Aviso: erro no auto-bloqueio da rodada:", autoErr);
     }
+
+    // ✅ CORREÇÃO: res.json enviado apenas após todo o processamento terminar
+    res.json({ mensagem: 'Jogo encerrado e pontos distribuídos com sucesso!' });
 
   } catch (err) {
     console.error("Erro ao encerrar jogo:", err);
@@ -477,6 +485,12 @@ app.get('/ranking-liga/:id_liga', async (req, res) => {
     const { id_liga } = req.params;
     
     // 1. Busca os pontos só da galera que tá nessa liga
+    // ✅ CORREÇÃO: filtra por rodadas da liga (rodada_inicial até rodada_inicial + total_rodadas - 1)
+    const ligaMeta = await pool.query('SELECT rodada_inicial, total_rodadas FROM ligas WHERE id_liga = $1', [id_liga]);
+    const meta = ligaMeta.rows[0] || {};
+    const rodadaIni = meta.rodada_inicial || 1;
+    const rodadaFim = meta.total_rodadas ? rodadaIni + meta.total_rodadas - 1 : 99999;
+
     const resultado = await pool.query(`
       SELECT 
         u.id,
@@ -486,10 +500,12 @@ app.get('/ranking-liga/:id_liga', async (req, res) => {
       FROM usuarios u
       JOIN usuarios_ligas ul ON u.id = ul.usuario_id
       LEFT JOIN palpites p ON u.id = p.usuario_id
+      LEFT JOIN jogos j ON j.id_jogo = p.jogo_id
+        AND j.rodada BETWEEN $2 AND $3
       WHERE ul.liga_id = $1
       GROUP BY u.id, u.nome, u.time_favorito
       ORDER BY total_pontos DESC
-    `, [id_liga]);
+    `, [id_liga, rodadaIni, rodadaFim]);
     
     // 2. Busca também o nome da Liga para a gente colocar no título do site
     const ligaInfo = await pool.query('SELECT nome FROM ligas WHERE id_liga = $1', [id_liga]);
@@ -1280,6 +1296,12 @@ app.get('/resumo-liga/:liga_id', async (req, res) => {
 // FUNÇÃO AUXILIAR: GERAR RESUMO ESTATÍSTICO DA LIGA
 // =========================================================================
 async function gerarResumoLiga(liga_id) {
+  // ✅ CORREÇÃO: busca metadados da liga para filtrar por rodadas
+  const metaRes = await pool.query('SELECT rodada_inicial, total_rodadas FROM ligas WHERE id_liga = $1', [liga_id]);
+  const meta = metaRes.rows[0] || {};
+  const rodadaIni = meta.rodada_inicial || 1;
+  const rodadaFim = meta.total_rodadas ? rodadaIni + meta.total_rodadas - 1 : 99999;
+
   // Ranking com pontos totais, acertos exatos e acertos de resultado
   const rankingRes = await pool.query(`
     SELECT
@@ -1296,10 +1318,12 @@ async function gerarResumoLiga(liga_id) {
     FROM usuarios u
     JOIN usuarios_ligas ul ON ul.usuario_id = u.id
     LEFT JOIN palpites p ON p.usuario_id = u.id
+    LEFT JOIN jogos j ON j.id_jogo = p.jogo_id
+      AND j.rodada BETWEEN $2 AND $3
     WHERE ul.liga_id = $1
     GROUP BY u.id, u.nome, u.time_favorito, u.foto_perfil
     ORDER BY total_pontos DESC
-  `, [liga_id]);
+  `, [liga_id, rodadaIni, rodadaFim]);
 
   const ranking = rankingRes.rows;
 
