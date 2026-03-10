@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo — Importar Jogos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a0f;
+      --card:      #111118;
+      --card2:     #18181f;
+      --border:    #ffffff0f;
+      --border2:   #ffffff18;
+      --cyan:      #c0345a;
+      --cyan-glow: rgba(192,52,90,0.18);
+      --green:     #22c55e;
+      --yellow:    #eab308;
+      --red:       #ef4444;
+      --gray:      #6b7280;
+      --white:     #f3f4f6;
+      --russo:     'Russo One', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border2);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .header-logo {
+      font-family: var(--russo);
+      font-size: 20px;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-logo span { color: var(--white); font-size: 13px; opacity: .5; }
+    .header-back {
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 7px 14px;
+      color: var(--gray);
+      font-size: 12px;
+      font-family: var(--russo);
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .header-back:hover { border-color: var(--cyan); color: var(--white); }
+
+    /* ── MAIN ── */
+    .main { max-width: 860px; margin: 0 auto; padding: 32px 20px; }
+
+    /* ── SEÇÃO CONFIGURAÇÃO ── */
+    .config-card {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .config-title {
+      font-family: var(--russo);
+      font-size: 15px;
+      color: var(--white);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    @media (max-width: 600px) {
+      .config-grid { grid-template-columns: 1fr; }
+    }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      background: var(--card2);
+      border: 1.5px solid var(--border2);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: var(--white);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-input:focus { border-color: var(--cyan); }
+    .form-input::placeholder { color: var(--gray); }
+
+    .btn-buscar {
+      background: var(--cyan);
+      border: none;
+      border-radius: 10px;
+      padding: 11px 24px;
+      color: #fff;
+      font-family: var(--russo);
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-buscar:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn-buscar:disabled { opacity: .5; cursor: not-allowed; transform: none; filter: none; }
+
+    /* ── AVISO KEY ── */
+    .aviso-key {
+      background: rgba(234,179,8,.08);
+      border: 1px solid rgba(234,179,8,.25);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 12px;
+      color: var(--yellow);
+      margin-bottom: 24px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      line-height: 1.6;
+    }
+    .aviso-key strong { color: #fde68a; }
+
+    /* ── FILTROS DE LIGA ── */
+    .filtros {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .filtro-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1.5px solid var(--border2);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .filtro-btn:hover { border-color: var(--cyan); color: var(--white); }
+    .filtro-btn.ativo { background: var(--cyan-glow); border-color: var(--cyan); color: var(--white); }
+    .filtro-btn img { width: 18px; height: 18px; object-fit: contain; border-radius: 3px; }
+
+    /* ── RODADA INPUT ── */
+    .rodada-selector {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .rodada-selector label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    .rodada-input {
+      width: 80px;
+      background: var(--card2);
+      border: 1.5px solid var(--border2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--white);
+      font-family: var(--russo);
+      font-size: 16px;
+      text-align: center;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .rodada-input:focus { border-color: var(--cyan); }
+    .rodada-hint { font-size: 11px; color: var(--gray); }
+    .rodada-hint strong { color: var(--cyan); }
+
+    /* ── CARDS DE JOGO ── */
+    .secao-liga {
+      margin-bottom: 28px;
+    }
+    .secao-liga-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .secao-liga-header img { width: 26px; height: 26px; object-fit: contain; }
+    .secao-liga-nome {
+      font-family: var(--russo);
+      font-size: 14px;
+      color: var(--white);
+    }
+    .secao-liga-count {
+      font-size: 11px;
+      color: var(--gray);
+      background: var(--card2);
+      border-radius: 10px;
+      padding: 2px 8px;
+      margin-left: auto;
+    }
+
+    .jogo-card {
+      background: var(--card);
+      border: 1.5px solid var(--border2);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .jogo-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--cyan-glow), transparent);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .jogo-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .jogo-card:hover::before { opacity: 1; }
+    .jogo-card.importado { border-color: rgba(34,197,94,.3); background: rgba(34,197,94,.04); }
+    .jogo-card.importado::before { display: none; }
+
+    .time-bloco {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .time-bloco.fora { flex-direction: row-reverse; }
+    .time-logo {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .time-nome {
+      font-family: var(--russo);
+      font-size: 13px;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .time-bloco.fora .time-nome { text-align: right; }
+
+    .jogo-centro {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .jogo-vs {
+      font-family: var(--russo);
+      font-size: 11px;
+      color: var(--gray);
+    }
+    .jogo-hora {
+      font-family: var(--russo);
+      font-size: 15px;
+      color: var(--white);
+      white-space: nowrap;
+    }
+    .jogo-status-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      white-space: nowrap;
+    }
+    .badge-ns  { background: rgba(74,222,128,.1); color: #4ade80; border: 1px solid rgba(74,222,128,.25); }
+    .badge-ft  { background: rgba(107,114,128,.1); color: var(--gray); border: 1px solid rgba(107,114,128,.2); }
+    .badge-live{ background: rgba(239,68,68,.12); color: var(--red); border: 1px solid rgba(239,68,68,.3); animation: pisca 1.2s infinite; }
+    @keyframes pisca { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .btn-importar {
+      background: var(--cyan);
+      border: none;
+      border-radius: 9px;
+      padding: 9px 16px;
+      color: #fff;
+      font-family: var(--russo);
+      font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .2s;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-importar:hover { filter: brightness(1.15); }
+    .btn-importar:disabled { opacity: .5; cursor: not-allowed; filter: none; }
+    .btn-importar.ok {
+      background: rgba(34,197,94,.15);
+      border: 1px solid rgba(34,197,94,.3);
+      color: var(--green);
+      cursor: default;
+    }
+
+    /* ── ESTADOS ── */
+    .estado {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--gray);
+    }
+    .estado .emoji { font-size: 48px; margin-bottom: 12px; }
+    .estado p { font-size: 14px; line-height: 1.6; }
+    .estado strong { color: var(--white); }
+
+    /* ── TOAST ── */
+    #toasts {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: slideIn .25s ease;
+      pointer-events: all;
+      max-width: 320px;
+    }
+    .toast.sucesso { border-color: rgba(34,197,94,.4); }
+    .toast.erro    { border-color: rgba(239,68,68,.4); }
+    @keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes slideOut { to{opacity:0;transform:translateX(20px)} }
+
+    /* ── CONTADOR DE IMPORTADOS ── */
+    .contador-bar {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .contador-info { font-size: 13px; color: var(--gray); }
+    .contador-info strong { color: var(--green); font-size: 18px; font-family: var(--russo); }
+    .btn-importar-todos {
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 9px;
+      padding: 8px 16px;
+      color: var(--gray);
+      font-family: var(--russo);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-importar-todos:hover { border-color: var(--cyan); color: var(--white); }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-logo">
+      ⚙️ Palpitoo <span>/ Importar Jogos</span>
+    </div>
+    <a href="palpites.html" class="header-back">← Voltar</a>
+  </header>
+
+  <main class="main">
+
+    <!-- AVISO CHAVE -->
+    <div class="aviso-key" id="aviso-key" style="display:none;">
+      ⚠️ <div>
+        <strong>RAPIDAPI_KEY não configurada.</strong><br>
+        Adicione a variável de ambiente <code style="background:rgba(255,255,255,.07);padding:1px 6px;border-radius:4px;">RAPIDAPI_KEY=sua_chave_aqui</code> no Render
+        em <strong>Environment → Add Variable</strong> e faça redeploy.
+        <br><br>
+        <strong>Como obter a chave:</strong> acesse
+        <a href="https://rapidapi.com/api-sports/api/api-football" target="_blank" style="color:#fde68a;">rapidapi.com → API-Football → Subscribe (Free)</a>.
+        Sua chave aparece no campo <em>x-rapidapi-key</em>.
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="config-card">
+      <p class="config-title">🗓️ Buscar jogos do dia</p>
+      <div class="config-grid">
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="inputData" class="form-input">
+        </div>
+        <div class="form-group">
+          <label>Rodada no Palpitoo</label>
+          <input type="number" id="inputRodada" class="form-input" placeholder="Ex: 7" min="1" max="38">
+        </div>
+        <button class="btn-buscar" id="btnBuscar" onclick="buscarJogos()">
+          <span id="btnBuscarIcon">🔍</span> Buscar
+        </button>
+      </div>
+    </div>
+
+    <!-- ÁREA DE RESULTADOS -->
+    <div id="area-resultados">
+      <div class="estado">
+        <div class="emoji">⚽</div>
+        <p>Selecione uma data e rodada,<br>depois clique em <strong>Buscar</strong>.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="toasts"></div>
+
+<script>
+  const API = 'https://palpitoo-api.onrender.com';
+
+  // Preenche data de hoje como padrão
+  const hoje = new Date();
+  const hojeBR = hoje.toLocaleDateString('pt-BR');
+  const hojeISO = hoje.toISOString().split('T')[0];
+  document.getElementById('inputData').value = hojeISO;
+
+  // IDs de ligas API-Football
+  const LIGAS_INFO = {
+    71:  { nome: 'Brasileirão Série A', emoji: '🇧🇷' },
+    73:  { nome: 'Copa do Brasil',      emoji: '🏆' },
+    13:  { nome: 'Libertadores',        emoji: '🌎' },
+    39:  { nome: 'Premier League',      emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  };
+
+  let _jogos = [];          // todos os jogos da busca
+  let _filtroAtivo = 'todos'; // liga_id ativo no filtro
+  let _importados = new Set(); // fixture_ids já importados
+
+  function toast(msg, tipo = 'info') {
+    const el = document.createElement('div');
+    el.className = `toast ${tipo}`;
+    el.innerHTML = `<span>${tipo==='sucesso'?'✅':tipo==='erro'?'❌':'ℹ️'}</span><span>${msg}</span>`;
+    document.getElementById('toasts').appendChild(el);
+    setTimeout(() => {
+      el.style.animation = 'slideOut .25s ease forwards';
+      setTimeout(() => el.remove(), 250);
+    }, 3000);
+  }
+
+  async function buscarJogos() {
+    const date   = document.getElementById('inputData').value;
+    const rodada = document.getElementById('inputRodada').value.trim();
+
+    if (!date)   { toast('Selecione uma data.', 'erro'); return; }
+    if (!rodada) { toast('Informe a rodada do Palpitoo.', 'erro'); return; }
+
+    const btn = document.getElementById('btnBuscar');
+    const icon = document.getElementById('btnBuscarIcon');
+    btn.disabled = true;
+    icon.textContent = '⏳';
+
+    const area = document.getElementById('area-resultados');
+    area.innerHTML = '<div class="estado"><div class="emoji">⏳</div><p>Buscando jogos...</p></div>';
+
+    try {
+      const res  = await fetch(`${API}/jogos-do-dia?date=${date}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Verifica se é erro de chave não configurada
+        if (data.erro && data.erro.includes('RAPIDAPI_KEY')) {
+          document.getElementById('aviso-key').style.display = 'flex';
+        }
+        area.innerHTML = `<div class="estado"><div class="emoji">⚠️</div><p>${data.erro || 'Erro ao buscar.'}</p></div>`;
+        return;
+      }
+
+      document.getElementById('aviso-key').style.display = 'none';
+      _jogos = data;
+
+      if (!_jogos.length) {
+        area.innerHTML = '<div class="estado"><div class="emoji">🏜️</div><p>Nenhum jogo encontrado nesta data<br>para os campeonatos selecionados.</p></div>';
+        return;
+      }
+
+      renderizarJogos(rodada);
+
+    } catch(e) {
+      area.innerHTML = '<div class="estado"><div class="emoji">⚠️</div><p>Não foi possível conectar ao servidor.</p></div>';
+    } finally {
+      btn.disabled = false;
+      icon.textContent = '🔍';
+    }
+  }
+
+  function renderizarJogos(rodada) {
+    const area = document.getElementById('area-resultados');
+    area.innerHTML = '';
+
+    // Grupos por liga
+    const porLiga = {};
+    _jogos.forEach(j => {
+      if (!porLiga[j.liga_id]) porLiga[j.liga_id] = [];
+      porLiga[j.liga_id].push(j);
+    });
+
+    // Filtros
+    const ligasPresentes = Object.keys(porLiga).map(Number);
+    const filtrosHtml = `
+      <div class="filtros" id="filtros">
+        <button class="filtro-btn ${_filtroAtivo === 'todos' ? 'ativo' : ''}" onclick="setFiltro('todos', '${rodada}')">
+          🌐 Todos (${_jogos.length})
+        </button>
+        ${ligasPresentes.map(lid => {
+          const info = LIGAS_INFO[lid] || { nome: `Liga ${lid}`, emoji: '⚽' };
+          const logo = _jogos.find(j => j.liga_id === lid)?.liga_logo || '';
+          return `<button class="filtro-btn ${_filtroAtivo === lid ? 'ativo' : ''}" onclick="setFiltro(${lid}, '${rodada}')">
+            ${logo ? `<img src="${logo}" onerror="this.style.display='none'">` : info.emoji}
+            ${info.nome} (${porLiga[lid].length})
+          </button>`;
+        }).join('')}
+      </div>`;
+
+    // Contador e botão importar todos
+    const countNaoImportados = _jogos.filter(j => !_importados.has(j.fixture_id)).length;
+    const contadorHtml = `
+      <div class="contador-bar">
+        <div class="contador-info">
+          <strong>${_importados.size}</strong> jogo${_importados.size !== 1 ? 's' : ''} importado${_importados.size !== 1 ? 's' : ''}
+          <span style="margin-left:8px;">· ${countNaoImportados} restante${countNaoImportados !== 1 ? 's' : ''}</span>
+        </div>
+        ${countNaoImportados > 0 ? `<button class="btn-importar-todos" onclick="importarTodos('${rodada}')">⬆️ Importar todos (${countNaoImportados})</button>` : ''}
+      </div>`;
+
+    area.innerHTML = filtrosHtml + contadorHtml;
+
+    // Renderiza jogos filtrados
+    const jogosFiltrados = _filtroAtivo === 'todos'
+      ? _jogos
+      : _jogos.filter(j => j.liga_id === _filtroAtivo);
+
+    // Agrupa por liga novamente respeitando filtro
+    const porLigaFiltrado = {};
+    jogosFiltrados.forEach(j => {
+      if (!porLigaFiltrado[j.liga_id]) porLigaFiltrado[j.liga_id] = [];
+      porLigaFiltrado[j.liga_id].push(j);
+    });
+
+    Object.entries(porLigaFiltrado).forEach(([ligaId, jogos]) => {
+      const info = LIGAS_INFO[Number(ligaId)] || { nome: `Liga ${ligaId}`, emoji: '⚽' };
+      const logo = jogos[0]?.liga_logo || '';
+
+      const secao = document.createElement('div');
+      secao.className = 'secao-liga';
+      secao.innerHTML = `
+        <div class="secao-liga-header">
+          ${logo ? `<img src="${logo}" onerror="this.style.display='none'">` : `<span style="font-size:22px;">${info.emoji}</span>`}
+          <span class="secao-liga-nome">${info.nome}</span>
+          <span class="secao-liga-count">${jogos.length} jogo${jogos.length !== 1 ? 's' : ''}</span>
+        </div>`;
+
+      jogos.forEach(jogo => {
+        secao.appendChild(criarCardJogo(jogo, rodada));
+      });
+
+      area.appendChild(secao);
+    });
+  }
+
+  function criarCardJogo(jogo, rodada) {
+    const jaImportado = _importados.has(jogo.fixture_id);
+    const hora = new Date(jogo.data_jogo).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    // Status badge
+    let badgeHtml = '';
+    const s = jogo.status;
+    if (s === 'NS')       badgeHtml = '<span class="jogo-status-badge badge-ns">Não iniciado</span>';
+    else if (s === 'FT')  badgeHtml = '<span class="jogo-status-badge badge-ft">Finalizado</span>';
+    else                  badgeHtml = '<span class="jogo-status-badge badge-live">🔴 Ao Vivo</span>';
+
+    const card = document.createElement('div');
+    card.className = `jogo-card${jaImportado ? ' importado' : ''}`;
+    card.id = `card-${jogo.fixture_id}`;
+    card.innerHTML = `
+      <div class="time-bloco">
+        <img class="time-logo" src="${jogo.logo_casa}" alt="" onerror="this.src='https://via.placeholder.com/38x38/111/fff?text=⚽'">
+        <span class="time-nome">${jogo.time_casa}</span>
+      </div>
+
+      <div class="jogo-centro">
+        ${badgeHtml}
+        <span class="jogo-hora">${hora}</span>
+        <span class="jogo-vs">vs</span>
+      </div>
+
+      <div class="time-bloco fora">
+        <img class="time-logo" src="${jogo.logo_fora}" alt="" onerror="this.src='https://via.placeholder.com/38x38/111/fff?text=⚽'">
+        <span class="time-nome">${jogo.time_fora}</span>
+      </div>
+
+      <button
+        class="btn-importar${jaImportado ? ' ok' : ''}"
+        id="btn-${jogo.fixture_id}"
+        onclick="importarJogo(${JSON.stringify(jogo).replace(/"/g, '&quot;')}, '${rodada}', this)"
+        ${jaImportado ? 'disabled' : ''}>
+        ${jaImportado ? '✅ Importado' : '⬆️ Importar'}
+      </button>`;
+
+    return card;
+  }
+
+  function setFiltro(ligaId, rodada) {
+    _filtroAtivo = ligaId;
+    renderizarJogos(rodada);
+  }
+
+  async function importarJogo(jogo, rodada, btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳';
+
+    try {
+      const res = await fetch(`${API}/importar-jogo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          time_casa:  jogo.time_casa,
+          time_fora:  jogo.time_fora,
+          data_jogo:  jogo.data_jogo,
+          rodada:     Number(rodada),
+          fixture_id: jogo.fixture_id,
+        })
+      });
+      const data = await res.json();
+
+      if (res.ok || res.status === 409) {
+        _importados.add(jogo.fixture_id);
+        btn.textContent = '✅ Importado';
+        btn.className = 'btn-importar ok';
+        const card = document.getElementById(`card-${jogo.fixture_id}`);
+        if (card) card.classList.add('importado');
+        toast(res.status === 409 ? 'Jogo já existia no banco.' : data.mensagem, 'sucesso');
+        // Atualiza contador
+        renderizarJogos(rodada);
+      } else {
+        btn.disabled = false;
+        btn.textContent = '⬆️ Importar';
+        toast(data.erro || 'Erro ao importar.', 'erro');
+      }
+    } catch {
+      btn.disabled = false;
+      btn.textContent = '⬆️ Importar';
+      toast('Servidor offline.', 'erro');
+    }
+  }
+
+  async function importarTodos(rodada) {
+    const pendentes = _jogos.filter(j => !_importados.has(j.fixture_id));
+    if (!pendentes.length) { toast('Todos já importados!', 'info'); return; }
+
+    for (const jogo of pendentes) {
+      const btn = document.getElementById(`btn-${jogo.fixture_id}`);
+      if (btn && !btn.disabled) await importarJogo(jogo, rodada, btn);
+    }
+  }
+</script>
+
+</body>
+</html>
