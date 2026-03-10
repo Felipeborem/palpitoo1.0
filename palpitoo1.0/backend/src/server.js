@@ -987,73 +987,56 @@ app.delete('/deletar-jogo/:id', async (req, res) => {
 });
 
 // =============================================================================
-// ROTA: BUSCAR JOGOS DO DIA — football-data.org (proxy seguro, chave no server)
+// ROTA: BUSCAR JOGOS DO DIA — SportAPI (RapidAPI)
 // GET /jogos-do-dia?date=YYYY-MM-DD
-// Competições: Brasileirão(BSA), Copa do Brasil(CPB), Libertadores(CLI), Premier League(PL)
+// Retorna TODOS os jogos de futebol do dia, incluindo Brasileirão e Libertadores
 // =============================================================================
 app.get('/jogos-do-dia', async (req, res) => {
-  const apiKey = process.env.FOOTBALL_DATA_KEY;
+  const apiKey = process.env.RAPIDAPI_KEY;
   if (!apiKey) {
-    return res.status(500).json({ erro: 'FOOTBALL_DATA_KEY não configurada no servidor.' });
+    return res.status(500).json({ erro: 'RAPIDAPI_KEY não configurada no servidor.' });
   }
-
-  // Códigos football-data.org — plano gratuito suporta: PL, CL, EC, WC, BL1, DED, PPL, FL1, ELC, SA, PD
-  // BSA/CPB/CLI requerem plano pago — usando competições disponíveis no free tier
-  const COMPETICOES = [
-    { code: 'PL',  nome: 'Premier League',   emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
-    { code: 'CL',  nome: 'Champions League', emoji: '⭐' },
-    { code: 'SA',  nome: 'Serie A',          emoji: '🇮🇹' },
-    { code: 'PD',  nome: 'La Liga',          emoji: '🇪🇸' },
-    { code: 'BL1', nome: 'Bundesliga',       emoji: '🇩🇪' },
-    { code: 'FL1', nome: 'Ligue 1',          emoji: '🇫🇷' },
-  ];
 
   const date = req.query.date || new Date().toISOString().split('T')[0];
 
   try {
-    const resultados = [];
-
-    for (const comp of COMPETICOES) {
-      const url = `https://api.football-data.org/v4/competitions/${comp.code}/matches?dateFrom=${date}&dateTo=${date}`;
-      let response;
-      try {
-        response = await fetch(url, { headers: { 'X-Auth-Token': apiKey } });
-      } catch(e) { continue; }
-
-      if (!response.ok) {
-        console.log(`[football-data] ${comp.code} retornou ${response.status}`);
-        continue;
+    const url = `https://sportapi7.p.rapidapi.com/api/v1/sport/football/scheduled-events/${date}`;
+    const response = await fetch(url, {
+      headers: {
+        'x-rapidapi-key':  apiKey,
+        'x-rapidapi-host': 'sportapi7.p.rapidapi.com'
       }
+    });
 
-      const data = await response.json();
-      if (!data.matches) continue;
-
-      for (const match of data.matches) {
-        resultados.push({
-          fixture_id: match.id,
-          liga_nome:  comp.nome,
-          liga_id:    comp.code,
-          liga_logo:  null,
-          liga_emoji: comp.emoji,
-          time_casa:  match.homeTeam.shortName || match.homeTeam.name,
-          time_fora:  match.awayTeam.shortName || match.awayTeam.name,
-          logo_casa:  match.homeTeam.crest || null,
-          logo_fora:  match.awayTeam.crest || null,
-          data_jogo:  match.utcDate,
-          // TIMED/SCHEDULED = não iniciado, FINISHED = finalizado, IN_PLAY = ao vivo
-          status:     match.status === 'FINISHED' ? 'FT'
-                    : match.status === 'IN_PLAY'  ? 'LIVE'
-                    : 'NS',
-          rodada_api: match.matchday ? `Rodada ${match.matchday}` : null,
-          placar_casa: match.score?.fullTime?.home ?? null,
-          placar_fora: match.score?.fullTime?.away ?? null,
-        });
-      }
+    if (!response.ok) {
+      console.log(`[SportAPI] retornou ${response.status}`);
+      return res.status(502).json({ erro: `Erro na API externa (${response.status}).` });
     }
+
+    const data = await response.json();
+    const events = data.events || [];
+
+    const resultados = events.map(ev => ({
+      fixture_id: ev.id,
+      liga_nome:  ev.tournament?.name || ev.tournament?.uniqueTournament?.name || 'Desconhecido',
+      liga_id:    String(ev.tournament?.uniqueTournament?.id || ev.tournament?.id || 0),
+      liga_logo:  null,
+      liga_emoji: '⚽',
+      time_casa:  ev.homeTeam?.shortName || ev.homeTeam?.name || '?',
+      time_fora:  ev.awayTeam?.shortName || ev.awayTeam?.name || '?',
+      logo_casa:  ev.homeTeam?.id ? `https://api.sofascore.app/api/v1/team/${ev.homeTeam.id}/image` : null,
+      logo_fora:  ev.awayTeam?.id ? `https://api.sofascore.app/api/v1/team/${ev.awayTeam.id}/image` : null,
+      data_jogo:  ev.startTimestamp ? new Date(ev.startTimestamp * 1000).toISOString() : null,
+      status:     ev.status?.type === 'finished'   ? 'FT'
+                : ev.status?.type === 'inprogress' ? 'LIVE'
+                : 'NS',
+      rodada_api: ev.roundInfo?.round ? `Rodada ${ev.roundInfo.round}` : null,
+      pais:       ev.tournament?.category?.name || null,
+    }));
 
     res.json(resultados);
   } catch (err) {
-    console.error('Erro ao buscar jogos (football-data):', err.message);
+    console.error('Erro ao buscar jogos (SportAPI):', err.message);
     res.status(500).json({ erro: 'Erro ao buscar jogos externos.' });
   }
 });

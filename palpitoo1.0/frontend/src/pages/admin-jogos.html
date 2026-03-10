@@ -313,14 +313,14 @@ async function salvarManual() {
 }
 
 // ── API ───────────────────────────────────────────────────
-const LIGAS = {
-  'PL': {nome:'Premier League',  emoji:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},
-  'CL': {nome:'Champions League',emoji:'⭐'},
-  'SA': {nome:'Serie A',         emoji:'🇮🇹'},
-  'PD': {nome:'La Liga',         emoji:'🇪🇸'},
-  'BL1':{nome:'Bundesliga',      emoji:'🇩🇪'},
-  'FL1':{nome:'Ligue 1',         emoji:'🇫🇷'},
-};
+// SportAPI retorna todos os jogos — filtramos por país no front
+  const PAISES_EMOJI = {
+    'Brazil':'🇧🇷','England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Spain':'🇪🇸',
+    'Italy':'🇮🇹','Germany':'🇩🇪','France':'🇫🇷',
+    'Portugal':'🇵🇹','Argentina':'🇦🇷','Uruguay':'🇺🇾',
+    'USA':'🇺🇸','International':'🌎',
+  };
+  function emojiPais(p) { return PAISES_EMOJI[p] || '⚽'; }
 let _jogosAPI=[], _importados=new Set(), _filtroLiga='todos';
 
 async function buscarAPI() {
@@ -349,26 +349,26 @@ async function buscarAPI() {
 function renderLigaChips(rodada) {
   const cont = document.getElementById('liga-chips');
   cont.style.display='flex';
-  const ligas = [...new Set(_jogosAPI.map(j=>j.liga_id))];
+  // Agrupa por país
+  const paises = [...new Set(_jogosAPI.map(j=>j.pais||'Outros'))].sort();
   cont.innerHTML = `<span class="lchip ${_filtroLiga==='todos'?'on':''}" onclick="setLiga('todos','${rodada}')">🌐 Todos (${_jogosAPI.length})</span>`;
-  ligas.forEach(lid => {
-    const info = LIGAS[lid]||{nome:lid,emoji:'⚽'};
-    const n = _jogosAPI.filter(j=>j.liga_id===lid).length;
-    cont.innerHTML += `<span class="lchip ${_filtroLiga===lid?'on':''}" onclick="setLiga('${lid}','${rodada}')">${info.emoji} ${info.nome} (${n})</span>`;
+  paises.forEach(p => {
+    const n = _jogosAPI.filter(j=>(j.pais||'Outros')===p).length;
+    const emoji = emojiPais(p);
+    cont.innerHTML += `<span class="lchip ${_filtroLiga===p?'on':''}" onclick="setLiga('${p}','${rodada}')">${emoji} ${p} (${n})</span>`;
   });
 }
 
-function setLiga(lid,rodada) { _filtroLiga=lid; renderLigaChips(rodada); renderJogosAPI(rodada); }
+function setLiga(p,rodada) { _filtroLiga=p; renderLigaChips(rodada); renderJogosAPI(rodada); }
 
 function renderJogosAPI(rodada) {
   const cont = document.getElementById('api-res');
-  const jogos = _filtroLiga==='todos' ? _jogosAPI : _jogosAPI.filter(j=>j.liga_id===_filtroLiga);
+  const jogos = _filtroLiga==='todos' ? _jogosAPI : _jogosAPI.filter(j=>(j.pais||'Outros')===_filtroLiga);
   if (!jogos.length) { cont.innerHTML='<div class="empty"><div class="ico">🔍</div><p>Nenhum jogo.</p></div>'; return; }
   cont.innerHTML='';
   jogos.forEach(j => {
     const imp = _importados.has(j.fixture_id);
     const hora = new Date(j.data_jogo).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const liga = LIGAS[j.liga_id]||{nome:j.liga_nome,emoji:'⚽'};
     const el = document.createElement('div');
     el.className=`japi${imp?' ok':''}`;
     el.id=`japi-${j.fixture_id}`;
