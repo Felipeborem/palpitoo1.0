@@ -145,24 +145,28 @@ app.get('/meus-palpites/:id_usuario', async (req, res) => {
 // ROTA PARA ENCERRAR O JOGO E CALCULAR OS PONTOS (VERSÃO BLINDADA)
 app.post('/encerrar-jogo', async (req, res) => {
   try {
-    const { id_jogo } = req.body;
-    // ✅ CORREÇÃO: Converter para número para evitar comparação string vs integer
+    // ✅ CORREÇÃO: Converter TODOS os valores para número (req.body envia strings)
+    const id_jogo        = Number(req.body.id_jogo);
     const gols_casa_real = Number(req.body.gols_casa_real);
     const gols_fora_real = Number(req.body.gols_fora_real);
 
+    console.log(`🔧 Encerrando jogo ${id_jogo} | Placar real: ${gols_casa_real} x ${gols_fora_real}`);
+
     // 1. Atualiza o status e placar real do jogo
-    await pool.query(
+    const jogoUpdate = await pool.query(
       `UPDATE jogos 
        SET gols_casa_real = $1, gols_fora_real = $2, status = 'finalizado' 
        WHERE id_jogo = $3`,
       [gols_casa_real, gols_fora_real, id_jogo]
     );
+    console.log(`✅ Jogo ${id_jogo} atualizado no banco. Rows afetadas: ${jogoUpdate.rowCount}`);
 
     // 2. Busca todos os palpites para esse jogo
     const resultadoPalpites = await pool.query(
       'SELECT * FROM palpites WHERE jogo_id = $1',
       [id_jogo]
     );
+    console.log(`📋 Palpites encontrados para jogo ${id_jogo}: ${resultadoPalpites.rows.length}`);
 
     // 3. Calcula os pontos
     for (const palpite of resultadoPalpites.rows) {
@@ -171,6 +175,7 @@ app.post('/encerrar-jogo', async (req, res) => {
       // ✅ CORREÇÃO: Garantir que os valores do banco também são números
       const gols_casa_palpite = Number(palpite.gols_casa_palpite);
       const gols_fora_palpite = Number(palpite.gols_fora_palpite);
+      console.log(`👤 usuario=${usuario_id} | palpite: ${gols_casa_palpite}x${gols_fora_palpite} | real: ${gols_casa_real}x${gols_fora_real}`);
 
       // REGRA 1: Acertou na mosca (Placar exato) = 3 pontos
       if (gols_casa_palpite === gols_casa_real && gols_fora_palpite === gols_fora_real) {
@@ -193,10 +198,11 @@ app.post('/encerrar-jogo', async (req, res) => {
       }
 
       // 4. Salva a pontuação na tabela (Usando usuario_id e jogo_id)
-      await pool.query(
+      const pontosUpdate = await pool.query(
         'UPDATE palpites SET pontos_obtidos = $1 WHERE usuario_id = $2 AND jogo_id = $3',
         [pontos, usuario_id, jogo_id]
       );
+      console.log(`💾 Pontos salvos: ${pontos}pts para usuario=${usuario_id} no jogo=${jogo_id} | Rows afetadas: ${pontosUpdate.rowCount}`);
     }
 
 // ── AUTO-BLOQUEIO ──
