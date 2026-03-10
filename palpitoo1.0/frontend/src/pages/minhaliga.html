@@ -52,6 +52,8 @@
     .liga-tab-btn.ativo { background:var(--accent-cyan); color:#fff; }
     .liga-painel        { display:none; }
     .liga-painel.ativo  { display:block; }
+    #lpainel-resumo     { display:none; }
+    #lpainel-resumo.ativo { display:block; }
 
     .input-liga {
       width:100%; padding:12px 16px; background:var(--bg-dark);
@@ -153,8 +155,155 @@
     .empty-state .emoji { font-size:36px; margin-bottom:8px; }
     .empty-state p { font-size:13px; }
 
+    /* ── Painel Desempenho por Rodada ── */
+    .rodada-card {
+      border:1px solid var(--borda-divisoria); border-radius:14px;
+      margin-bottom:14px; overflow:hidden; transition:all .2s;
+    }
+    .rodada-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:12px 16px; cursor:pointer; user-select:none;
+      background:var(--bg-dark); transition:background .2s;
+    }
+    .rodada-header:hover { background:rgba(192,52,90,0.06); }
+    .rodada-header-left  { display:flex; align-items:center; gap:10px; }
+    .rodada-num   { font-family:'Russo One',sans-serif; font-size:15px; color:var(--text-white); }
+    .rodada-status-badge {
+      font-size:10px; font-weight:700; padding:2px 8px; border-radius:6px;
+      text-transform:uppercase; letter-spacing:.04em;
+    }
+    .rodada-status-badge.finalizada { background:rgba(34,197,94,.12); color:#22c55e; border:1px solid rgba(34,197,94,.3); }
+    .rodada-status-badge.andamento  { background:rgba(234,179,8,.12);  color:#eab308; border:1px solid rgba(234,179,8,.3); animation:pisca 2s infinite; }
+    .rodada-lider { font-size:11px; color:var(--text-gray); }
+    .rodada-lider strong { color:var(--accent-cyan); }
+    .rodada-chevron { font-size:13px; color:var(--text-gray); transition:transform .25s; }
+    .rodada-chevron.aberto { transform:rotate(180deg); }
+    .rodada-body { display:none; padding:0 12px 12px; }
+    .rodada-body.aberto { display:block; }
+
+    .desempenho-row {
+      display:flex; align-items:center; gap:10px;
+      padding:9px 10px; border-radius:10px; margin-bottom:6px;
+      background:rgba(255,255,255,.02); border:1px solid transparent;
+      transition:border-color .2s;
+    }
+    .desempenho-row:hover { border-color:var(--borda-divisoria); }
+    .desempenho-row.eu { background:rgba(192,52,90,.07); border-color:rgba(192,52,90,.25); }
+    .desempenho-pos { font-family:'Russo One',sans-serif; font-size:13px; min-width:24px; text-align:center; color:var(--text-gray); }
+    .desempenho-nome { flex-grow:1; font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .desempenho-pts  { font-family:'Russo One',sans-serif; font-size:16px; color:var(--accent-cyan); white-space:nowrap; }
+    .desempenho-mini { display:flex; gap:5px; margin-top:2px; flex-wrap:wrap; }
+    .dmini { font-size:10px; padding:1px 6px; border-radius:5px; font-weight:700; }
+    .dmini.exato   { background:rgba(34,197,94,.12);  color:#22c55e; }
+    .dmini.result  { background:rgba(234,179,8,.12);  color:#eab308; }
+    .dmini.erro    { background:rgba(239,68,68,.1);   color:#ef4444; }
+    .dmini.pendente{ background:rgba(156,163,175,.1); color:var(--text-gray); }
+
+    /* mini barra de pontos */
+    .pts-bar-wrap { width:100%; height:4px; background:var(--borda-divisoria); border-radius:99px; margin-top:6px; overflow:hidden; }
+    .pts-bar      { height:100%; background:var(--accent-cyan); border-radius:99px; transition:width .4s ease; }
+
     #tela-sem-liga { display:block; }
     #tela-com-liga  { display:none; }
+
+    /* ── Tela Sem Liga — Tabs ── */
+    .entrada-tabs {
+      display:flex; gap:8px; margin-bottom:24px;
+      background:var(--bg-dark); border-radius:14px; padding:6px;
+      border:1px solid var(--borda-divisoria);
+    }
+    .entrada-tab-btn {
+      flex:1; padding:10px 6px; font-family:'Russo One',sans-serif; font-size:11px;
+      text-transform:uppercase; border:none; border-radius:10px; cursor:pointer;
+      background:transparent; color:var(--text-gray); transition:all .2s; letter-spacing:.5px;
+    }
+    .entrada-tab-btn.ativo { background:var(--accent-cyan); color:#fff; }
+    .entrada-painel { display:none; }
+    .entrada-painel.ativo { display:block; }
+
+    /* ── Cards de Liga para Explorar ── */
+    .liga-explore-card {
+      background:var(--bg-dark); border:1px solid var(--borda-divisoria);
+      border-radius:16px; padding:18px; margin-bottom:12px;
+      transition:all .25s; position:relative; overflow:hidden;
+    }
+    .liga-explore-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg,var(--accent-cyan),transparent);
+      opacity:0; transition:opacity .25s;
+    }
+    .liga-explore-card:hover { border-color:var(--accent-cyan); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.3); }
+    .liga-explore-card:hover::before { opacity:1; }
+
+    .liga-explore-nome { font-family:'Russo One',sans-serif; font-size:16px; color:var(--text-white); margin-bottom:10px; }
+    .liga-explore-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+    .liga-tag {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:700; padding:3px 10px; border-radius:8px;
+    }
+    .liga-tag.jogadores { background:rgba(192,52,90,.12); color:var(--accent-cyan); border:1px solid rgba(192,52,90,.25); }
+    .liga-tag.rodadas   { background:rgba(234,179,8,.1);  color:#eab308; border:1px solid rgba(234,179,8,.25); }
+    .liga-tag.status    { background:rgba(34,197,94,.1);  color:#22c55e; border:1px solid rgba(34,197,94,.25); }
+    .liga-tag.encerrada { background:rgba(156,163,175,.1);color:var(--text-gray); border:1px solid rgba(156,163,175,.2); }
+
+    .liga-explore-footer { display:flex; align-items:center; justify-content:space-between; }
+    .liga-explore-dono { font-size:11px; color:var(--text-gray); }
+    .liga-explore-dono strong { color:var(--text-white); }
+
+    .btn-entrar-liga {
+      font-family:'Russo One',sans-serif; font-size:12px; padding:8px 20px;
+      background:var(--accent-cyan); color:#fff; border:none; border-radius:10px;
+      cursor:pointer; transition:all .2s; text-transform:uppercase; letter-spacing:.05em;
+    }
+    .btn-entrar-liga:hover { filter:brightness(1.15); transform:scale(1.03); }
+    .btn-entrar-liga:disabled { opacity:.5; cursor:default; transform:none; filter:none; }
+
+    .liga-explore-popularidade {
+      position:absolute; top:16px; right:16px;
+      display:flex; flex-direction:column; align-items:center;
+    }
+    .pop-ring {
+      width:42px; height:42px; border-radius:50%;
+      border:2px solid var(--borda-divisoria);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Russo One',sans-serif; font-size:13px; color:var(--text-white);
+      background:var(--card-dark);
+    }
+    .pop-ring.top1 { border-color:#eab308; color:#eab308; box-shadow:0 0 10px rgba(234,179,8,.2); }
+    .pop-ring.top2 { border-color:#d1d5db; color:#d1d5db; }
+    .pop-ring.top3 { border-color:#b45309; color:#b45309; }
+
+    .explore-search {
+      width:100%; padding:11px 14px; background:var(--bg-dark);
+      border:1.5px solid var(--borda-divisoria); border-radius:12px;
+      font-size:13px; color:var(--text-white); outline:none; font-family:var(--font-main);
+      transition:border-color .25s; margin-bottom:16px;
+    }
+    .explore-search:focus { border-color:var(--accent-cyan); }
+    .explore-search::placeholder { color:var(--text-gray); }
+
+    .explore-empty { text-align:center; padding:40px 20px; }
+    .explore-empty .emoji { font-size:44px; margin-bottom:10px; }
+    .explore-empty p { font-size:13px; color:var(--text-gray); }
+
+    /* Modal Entrar com Código flutuante */
+    .modal-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,.7);
+      z-index:1000; align-items:center; justify-content:center;
+      backdrop-filter:blur(4px);
+    }
+    .modal-overlay.aberto { display:flex; }
+    .modal-box {
+      background:var(--card-dark); border:1px solid var(--borda-divisoria);
+      border-radius:20px; padding:28px 24px; width:90%; max-width:380px;
+      position:relative; animation:modalIn .2s ease;
+    }
+    @keyframes modalIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .modal-close {
+      position:absolute; top:14px; right:16px; background:none; border:none;
+      color:var(--text-gray); font-size:20px; cursor:pointer; transition:color .2s;
+    }
+    .modal-close:hover { color:var(--text-white); }
   </style>
   <meta name="description" content="Palpitoo — A Resenha Virou Campeonato.">
   <link rel="icon" href="./img/pato.png" type="image/png">
@@ -180,35 +329,77 @@
     <div class="navbar-user" id="navbar-user-area"></div>
   </header>
 
+  <!-- MODAL ENTRAR COM CÓDIGO -->
+  <div class="modal-overlay" id="modal-codigo">
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModalCodigo()">✕</button>
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="font-size:36px;margin-bottom:6px;">🔑</div>
+        <h3 class="font-russo titulo-branco" style="font-size:20px;">Entrar com Código</h3>
+        <p style="color:var(--text-gray);font-size:12px;margin-top:4px;">Cole o código que seu amigo te mandou</p>
+      </div>
+      <div class="divisor-tracejado mb-20"></div>
+      <label style="font-size:11px;color:var(--text-gray);text-transform:uppercase;font-weight:700;display:block;text-align:center;margin-bottom:8px;">Código da Liga</label>
+      <input type="text" id="inputCodigoEntrar" class="input-liga" placeholder="XXXXXX" maxlength="6" style="margin-bottom:16px;">
+      <button class="btn-primary" onclick="entrarLiga()" style="width:100%;">Entrar na Liga</button>
+    </div>
+  </div>
+
   <!-- TELA SEM LIGA -->
-  <main id="tela-sem-liga" class="container-principal" style="max-width:560px;margin-top:60px;">
-    <div class="text-center mb-20 animacao-suave">
-      <div style="font-size:60px;margin-bottom:10px;">🦆</div>
-      <h2 class="font-russo titulo-branco" style="font-size:28px;">Você ainda não está em uma Liga</h2>
-      <p style="color:var(--text-gray);margin-top:8px;">Crie uma nova ou entre numa liga de amigos usando o código.</p>
+  <main id="tela-sem-liga" class="container-principal animacao-suave" style="max-width:600px;margin-top:50px;">
+
+    <div class="text-center mb-24 animacao-suave">
+      <div style="font-size:64px;margin-bottom:12px;">🦆</div>
+      <h2 class="font-russo titulo-branco" style="font-size:26px;">Você ainda não está em uma Liga</h2>
+      <p style="color:var(--text-gray);margin-top:8px;font-size:14px;">Crie a sua, entre com código ou explore as ligas abertas.</p>
     </div>
-    <div style="display:flex;gap:12px;margin-bottom:30px;">
-      <button class="tab-btn ativo" id="btn-tab-criar" onclick="trocarTab('criar')">➕ Criar Liga</button>
-      <button class="tab-btn" id="btn-tab-entrar" onclick="trocarTab('entrar')">🔑 Entrar com Código</button>
+
+    <!-- Tabs de navegação -->
+    <div class="entrada-tabs">
+      <button class="entrada-tab-btn ativo" id="etab-criar"    onclick="trocarEntradaTab('criar')">➕ Criar Liga</button>
+      <button class="entrada-tab-btn"       id="etab-explorar" onclick="trocarEntradaTab('explorar')">🔭 Explorar</button>
     </div>
-    <div id="painel-criar" class="cartao bg-escuro animacao-suave painel-tab ativo">
+
+    <!-- PAINEL CRIAR -->
+    <div id="epainel-criar" class="entrada-painel ativo cartao bg-escuro animacao-suave">
       <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">Nova Liga</h3>
       <div class="divisor-tracejado mb-20"></div>
       <div class="form-group">
         <label>Nome da Liga</label>
         <input type="text" id="inputNomeLiga" placeholder="Ex: Liga dos Bagres" style="width:100%;padding:12px 16px;background:var(--bg-dark);border:2px solid var(--borda-divisoria);border-radius:12px;font-size:1rem;font-weight:700;color:var(--text-white);outline:none;transition:border-color .3s;font-family:var(--font-main);">
       </div>
-      <button class="btn-primary" onclick="criarLiga()" style="margin-top:10px;">Criar Liga</button>
-    </div>
-    <div id="painel-entrar" class="cartao bg-escuro animacao-suave painel-tab">
-      <h3 class="font-russo titulo-branco mb-15" style="font-size:18px;">Entrar com Código</h3>
-      <div class="divisor-tracejado mb-20"></div>
-      <div class="form-group">
-        <label style="text-align:center;display:block;">Código da Liga</label>
-        <input type="text" id="inputCodigoEntrar" class="input-liga" placeholder="XXXXXX" maxlength="6">
+      <div class="form-group" style="margin-top:14px;">
+        <label>Número de Rodadas <span style="color:var(--text-gray);font-weight:400;font-size:11px;">(deixe em branco para ilimitado)</span></label>
+        <input type="number" id="inputTotalRodadas" placeholder="Ex: 10" min="1" max="38" style="width:100%;padding:12px 16px;background:var(--bg-dark);border:2px solid var(--borda-divisoria);border-radius:12px;font-size:1rem;font-weight:700;color:var(--text-white);outline:none;transition:border-color .3s;font-family:var(--font-main);">
       </div>
-      <button class="btn-primary" onclick="entrarLiga()" style="margin-top:10px;">Entrar na Liga</button>
+      <div class="form-group" id="grupo-rodada-inicial" style="margin-top:14px;display:none;">
+        <label>Rodada Inicial <span style="color:var(--text-gray);font-weight:400;font-size:11px;">(a liga começa a contar a partir desta rodada)</span></label>
+        <input type="number" id="inputRodadaInicial" placeholder="Ex: 1" min="1" max="38" value="1" style="width:100%;padding:12px 16px;background:var(--bg-dark);border:2px solid var(--borda-divisoria);border-radius:12px;font-size:1rem;font-weight:700;color:var(--text-white);outline:none;transition:border-color .3s;font-family:var(--font-main);">
+      </div>
+      <button class="btn-primary" onclick="criarLiga()" style="margin-top:10px;width:100%;">Criar Liga</button>
+      <div style="margin-top:16px;text-align:center;padding-top:16px;border-top:1px solid var(--borda-divisoria);">
+        <p style="font-size:12px;color:var(--text-gray);margin-bottom:10px;">Já tem um código de convite?</p>
+        <button onclick="abrirModalCodigo()" style="background:none;border:1px solid var(--borda-divisoria);border-radius:10px;padding:8px 20px;color:var(--text-white);font-family:'Russo One',sans-serif;font-size:12px;cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.borderColor='var(--borda-divisoria)'">🔑 Entrar com Código</button>
+      </div>
     </div>
+
+    <!-- PAINEL EXPLORAR -->
+    <div id="epainel-explorar" class="entrada-painel cartao bg-escuro animacao-suave">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <h3 class="font-russo titulo-branco" style="font-size:18px;">🔭 Explorar Ligas</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button onclick="abrirModalCodigo()" title="Entrar com código" style="background:none;border:1px solid var(--borda-divisoria);border-radius:8px;padding:6px 12px;color:var(--text-gray);font-size:11px;font-family:'Russo One',sans-serif;cursor:pointer;transition:all .2s;text-transform:uppercase;" onmouseover="this.style.borderColor='var(--accent-cyan)';this.style.color='var(--accent-cyan)'" onmouseout="this.style.borderColor='var(--borda-divisoria)';this.style.color='var(--text-gray)'">🔑 Código</button>
+          <button onclick="carregarExplorar()" style="background:none;border:none;cursor:pointer;color:var(--text-gray);font-size:17px;" title="Atualizar">🔄</button>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-gray);margin-bottom:14px;">Ordenadas por popularidade — clique em <strong style="color:var(--text-white);">Entrar</strong> para participar em um clique.</p>
+      <div class="divisor-tracejado mb-20"></div>
+      <input type="text" class="explore-search" id="explore-busca" placeholder="🔍  Buscar liga pelo nome..." oninput="filtrarExplorar(this.value)">
+      <div id="lista-explorar">
+        <div class="explore-empty"><div class="emoji">⏳</div><p>Carregando ligas...</p></div>
+      </div>
+    </div>
+
   </main>
 
   <!-- TELA COM LIGA -->
@@ -232,14 +423,24 @@
       </div>
       <div style="margin-top:16px;">
         <button class="btn btn-cancelar font-russo" onclick="sairDaLiga()" style="font-size:12px;padding:8px 20px;">Sair da Liga</button>
+        <!-- Botão encerrar liga — só aparece para o dono -->
+        <button id="btn-encerrar-liga" class="btn font-russo" onclick="encerrarLiga()" style="display:none;font-size:12px;padding:8px 20px;margin-left:8px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:10px;cursor:pointer;">🔒 Encerrar Liga</button>
       </div>
     </section>
+
+    <!-- BANNER LIGA ENCERRADA -->
+    <div id="banner-encerrada" style="display:none;background:linear-gradient(135deg,rgba(234,179,8,0.12),transparent);border:1px solid rgba(234,179,8,0.35);border-radius:16px;padding:18px 22px;margin-bottom:20px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:6px;">🏆</div>
+      <p class="font-russo" style="color:#eab308;font-size:16px;">Liga Encerrada!</p>
+      <p style="color:var(--text-gray);font-size:12px;margin-top:4px;" id="label-data-encerramento"></p>
+    </div>
 
     <!-- TABS -->
     <div class="liga-tabs">
       <button class="liga-tab-btn ativo" id="ltab-ranking"   onclick="trocarLigaTab('ranking')">🏆 Ranking</button>
-      <button class="liga-tab-btn"        id="ltab-palpites"  onclick="trocarLigaTab('palpites')">👀 Palpites</button>
+      <button class="liga-tab-btn"        id="ltab-rodadas"   onclick="trocarLigaTab('rodadas')">📊 Rodadas</button>
       <button class="liga-tab-btn"        id="ltab-historico" onclick="trocarLigaTab('historico')">📖 Histórico</button>
+      <button class="liga-tab-btn"        id="ltab-resumo"    onclick="trocarLigaTab('resumo')" style="display:none;">🎯 Resumo</button>
     </div>
 
     <!-- PAINEL RANKING -->
@@ -253,17 +454,15 @@
       <div id="lista-ranking"><p class="text-center font-russo" style="color:var(--text-gray);">Carregando ranking...</p></div>
     </div>
 
-    <!-- PAINEL PALPITES -->
-    <div id="lpainel-palpites" class="liga-painel cartao bg-escuro animacao-suave">
+    <!-- PAINEL DESEMPENHO POR RODADA -->
+    <div id="lpainel-rodadas" class="liga-painel cartao bg-escuro animacao-suave">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <h3 class="font-russo titulo-branco" style="font-size:17px;">👀 Palpites da Galera</h3>
+        <h3 class="font-russo titulo-branco" style="font-size:17px;">📊 Desempenho por Rodada</h3>
+        <button onclick="carregarDesempenhoRodadas(_ligaAtualId)" style="background:none;border:none;cursor:pointer;color:var(--text-gray);font-size:18px;" title="Atualizar">🔄</button>
       </div>
-      <div id="badge-rodada-palpites" class="badge-rodada" style="display:none;">
-        📅 <span id="label-rodada-palpites">Rodada —</span>
-      </div>
-      <p style="font-size:11px;color:var(--text-gray);margin-bottom:15px;">🔒 Palpites ficam ocultos até o jogo começar.</p>
+      <p style="font-size:11px;color:var(--text-gray);margin-bottom:16px;">Clique em uma rodada para expandir os resultados.</p>
       <div class="divisor-tracejado mb-20"></div>
-      <div id="lista-palpites-galera"><p class="text-center font-russo" style="color:var(--text-gray);">Carregando palpites...</p></div>
+      <div id="lista-desempenho-rodadas"><p class="text-center font-russo" style="color:var(--text-gray);">Carregando...</p></div>
     </div>
 
     <!-- PAINEL HISTÓRICO -->
@@ -274,6 +473,16 @@
       </div>
       <div class="divisor-tracejado mb-20"></div>
       <div id="conteudo-historico"><p class="text-center font-russo" style="color:var(--text-gray);">Carregando...</p></div>
+    </div>
+
+    <!-- PAINEL RESUMO (só aparece quando liga encerrada) -->
+    <div id="lpainel-resumo" class="liga-painel cartao bg-escuro animacao-suave" style="display:none;">
+      <div style="margin-bottom:20px;">
+        <h3 class="font-russo titulo-branco" style="font-size:17px;">🎯 Resumo Final da Liga</h3>
+        <p style="font-size:12px;color:var(--text-gray);margin-top:4px;">As estatísticas completas da temporada.</p>
+      </div>
+      <div class="divisor-tracejado mb-20"></div>
+      <div id="conteudo-resumo"><p class="text-center font-russo" style="color:var(--text-gray);">Carregando resumo...</p></div>
     </div>
 
   </main>
@@ -302,17 +511,153 @@
       catch { return null; }
     }
 
-    function trocarTab(qual) {
-      ['criar','entrar'].forEach(t => {
-        document.getElementById(`painel-${t}`).classList.toggle('ativo', t === qual);
-        document.getElementById(`btn-tab-${t}`).classList.toggle('ativo', t === qual);
+    function trocarTab(qual) { trocarEntradaTab(qual); } // retrocompat
+    function trocarEntradaTab(qual) {
+      ['criar','explorar'].forEach(t => {
+        const btn = document.getElementById(`etab-${t}`);
+        const pan = document.getElementById(`epainel-${t}`);
+        if (btn) btn.classList.toggle('ativo', t === qual);
+        if (pan) pan.classList.toggle('ativo', t === qual);
+      });
+      if (qual === 'explorar' && !_explorarCarregado) carregarExplorar();
+    }
+
+    // ── Modal Código ──
+    function abrirModalCodigo() {
+      document.getElementById('modal-codigo').classList.add('aberto');
+      setTimeout(() => { const i = document.getElementById('inputCodigoEntrar'); if(i) i.focus(); }, 100);
+    }
+    function fecharModalCodigo() {
+      document.getElementById('modal-codigo').classList.remove('aberto');
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModalCodigo(); });
+    document.getElementById('modal-codigo').addEventListener('click', function(e) {
+      if (e.target === this) fecharModalCodigo();
+    });
+
+    // ── Explorar Ligas ──
+    let _explorarCarregado = false;
+    let _todasLigasExplorar = [];
+
+    async function carregarExplorar() {
+      _explorarCarregado = true;
+      const lista = document.getElementById('lista-explorar');
+      lista.innerHTML = '<div class="explore-empty"><div class="emoji">⏳</div><p>Carregando ligas...</p></div>';
+      try {
+        const res  = await fetch(`https://palpitoo-api.onrender.com/ligas-disponiveis/${idLogado}`);
+        const data = await res.json();
+        // Ordena por total de membros DESC
+        _todasLigasExplorar = Array.isArray(data)
+          ? data.sort((a, b) => (Number(b.total_membros)||0) - (Number(a.total_membros)||0))
+          : [];
+        renderizarExplorar(_todasLigasExplorar);
+      } catch {
+        lista.innerHTML = '<div class="explore-empty"><div class="emoji">⚠️</div><p>Não foi possível carregar as ligas.</p></div>';
+      }
+    }
+
+    function filtrarExplorar(termo) {
+      if (!_todasLigasExplorar.length) return;
+      const t = termo.trim().toLowerCase();
+      const filtradas = t ? _todasLigasExplorar.filter(l => l.nome.toLowerCase().includes(t)) : _todasLigasExplorar;
+      renderizarExplorar(filtradas);
+    }
+
+    function renderizarExplorar(ligas) {
+      const lista = document.getElementById('lista-explorar');
+      if (!ligas.length) {
+        lista.innerHTML = '<div class="explore-empty"><div class="emoji">🔍</div><p>Nenhuma liga encontrada.</p></div>';
+        return;
+      }
+      lista.innerHTML = '';
+      ligas.forEach((liga, idx) => {
+        const membros      = Number(liga.total_membros) || Number(liga.total_participantes) || 0;
+        const totalRodadas = liga.total_rodadas ? `${liga.total_rodadas} rodadas` : 'Ilimitada';
+        const encerrada    = liga.status === 'encerrada';
+        const nomeDono     = liga.nome_dono || liga.dono_nome || '—';
+
+        const popClass = idx === 0 ? 'top1' : idx === 1 ? 'top2' : idx === 2 ? 'top3' : '';
+        const popLabel = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
+
+        // Barra de "lotação" visual (max de referência = maior liga)
+        const maxMembros = Number(_todasLigasExplorar[0]?.total_membros) || 1;
+        const lotacaoPerc = Math.max(10, Math.round((membros / Math.max(maxMembros, 1)) * 100));
+
+        lista.innerHTML += `
+          <div class="liga-explore-card">
+            <div class="liga-explore-popularidade">
+              <div class="pop-ring ${popClass}">${popLabel}</div>
+            </div>
+
+            <p class="liga-explore-nome" style="padding-right:56px;">${liga.nome}</p>
+
+            <div class="liga-explore-tags">
+              <span class="liga-tag jogadores">👥 ${membros} jogador${membros !== 1 ? 'es' : ''}</span>
+              <span class="liga-tag rodadas">⚽ ${totalRodadas}</span>
+              ${encerrada
+                ? `<span class="liga-tag encerrada">🔒 Encerrada</span>`
+                : `<span class="liga-tag status">🟢 Ativa</span>`}
+            </div>
+
+            <!-- Barra de popularidade -->
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:10px;color:var(--text-gray);text-transform:uppercase;font-weight:700;letter-spacing:.05em;">Popularidade</span>
+                <span style="font-size:10px;color:var(--text-gray);">${membros} membro${membros !== 1 ? 's' : ''}</span>
+              </div>
+              <div style="width:100%;height:5px;background:var(--borda-divisoria);border-radius:99px;overflow:hidden;">
+                <div style="width:${lotacaoPerc}%;height:100%;background:${encerrada?'var(--text-gray)':'var(--accent-cyan)'};border-radius:99px;transition:width .6s ease;"></div>
+              </div>
+            </div>
+
+            <div class="liga-explore-footer">
+              <span class="liga-explore-dono">👑 Dono: <strong>${nomeDono}</strong></span>
+              ${encerrada
+                ? `<button class="btn-entrar-liga" disabled>Encerrada</button>`
+                : `<button class="btn-entrar-liga" onclick="entrarLigaClique(${liga.id_liga}, '${liga.nome.replace(/'/g,"\\'")}', this)">Entrar ›</button>`}
+            </div>
+          </div>`;
       });
     }
+
+    async function entrarLigaClique(ligaId, nomeLiga, btn) {
+      if (!idLogado) { mostrarAviso('Você precisa estar logado!', 'erro'); return; }
+      btn.disabled = true;
+      btn.innerText = '⏳';
+      try {
+        const res  = await fetch('https://palpitoo-api.onrender.com/entrar-liga-clique', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ liga_id: ligaId, usuario_id: idLogado })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          btn.innerText = '✅';
+          btn.style.background = '#22c55e';
+          mostrarAviso(`Bem-vindo à ${nomeLiga}! 🎉`, 'sucesso');
+          setTimeout(carregarPagina, 1000);
+        } else {
+          btn.disabled = false;
+          btn.innerText = 'Entrar ›';
+          mostrarAviso(data.erro || 'Erro ao entrar.', 'erro');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.innerText = 'Entrar ›';
+        mostrarAviso('Servidor offline.', 'erro');
+      }
+    }
     function trocarLigaTab(qual) {
-      ['ranking','palpites','historico'].forEach(t => {
-        document.getElementById(`ltab-${t}`).classList.toggle('ativo', t === qual);
-        document.getElementById(`lpainel-${t}`).classList.toggle('ativo', t === qual);
+      ['ranking','rodadas','historico','resumo'].forEach(t => {
+        const btn = document.getElementById(`ltab-${t}`);
+        if (btn) btn.classList.toggle('ativo', t === qual);
+        const painel = document.getElementById(`lpainel-${t}`);
+        if (painel) painel.classList.toggle('ativo', t === qual);
       });
+      // Carrega rodadas sob demanda ao abrir a aba pela primeira vez
+      if (qual === 'rodadas' && _ligaAtualId && !_rodadasCarregadas) {
+        carregarDesempenhoRodadas(_ligaAtualId);
+        _rodadasCarregadas = true;
+      }
     }
     function mostrarAviso(msg, tipo = 'info') {
       const cont  = document.getElementById('container-avisos');
@@ -323,12 +668,30 @@
       setTimeout(() => { toast.classList.add('aviso-saindo'); setTimeout(() => toast.remove(), 300); }, 3000);
     }
 
+    // Mostrar/ocultar campo de rodada inicial ao digitar total de rodadas
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputTotal = document.getElementById('inputTotalRodadas');
+      if (inputTotal) {
+        inputTotal.addEventListener('input', function() {
+          const grupoInicial = document.getElementById('grupo-rodada-inicial');
+          if (grupoInicial) grupoInicial.style.display = this.value ? 'block' : 'none';
+        });
+      }
+    });
+
     async function criarLiga() {
       if (!idLogado) { mostrarAviso('Você precisa estar logado!', 'erro'); return; }
       const nome = document.getElementById('inputNomeLiga').value.trim();
       if (!nome) { mostrarAviso('Digite um nome para a liga!', 'erro'); return; }
+      const totalRodadas   = document.getElementById('inputTotalRodadas').value.trim();
+      const rodadaInicial  = document.getElementById('inputRodadaInicial').value.trim() || '1';
       try {
-        const res  = await fetch('https://palpitoo-api.onrender.com/criar-liga', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ nome_liga: nome, id_dono: idLogado }) });
+        const payload = { nome_liga: nome, id_dono: idLogado };
+        if (totalRodadas) {
+          payload.total_rodadas  = parseInt(totalRodadas);
+          payload.rodada_inicial = parseInt(rodadaInicial);
+        }
+        const res  = await fetch('https://palpitoo-api.onrender.com/criar-liga', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
         const data = await res.json();
         if (res.ok) {
           mostrarAviso('Liga criada!', 'sucesso');
@@ -453,60 +816,130 @@
       } catch { console.error('Erro ao carregar membros'); }
     }
 
-    async function carregarPalpitesGalera(idLiga, rodadaAtual) {
-      const badgeEl = document.getElementById('badge-rodada-palpites');
-      const labelEl = document.getElementById('label-rodada-palpites');
-      if (rodadaAtual) { labelEl.innerText = `Rodada ${rodadaAtual}`; badgeEl.style.display = 'inline-flex'; }
+    async function carregarDesempenhoRodadas(idLiga) {
+      const container = document.getElementById('lista-desempenho-rodadas');
+      container.innerHTML = '<p class="text-center font-russo" style="color:var(--text-gray);padding:20px 0;">Carregando...</p>';
       try {
-        const res   = await fetch(`https://palpitoo-api.onrender.com/palpites-liga/${idLiga}`);
+        const res   = await fetch(`https://palpitoo-api.onrender.com/desempenho-rodadas/${idLiga}`);
         const dados = await res.json();
-        const lista = document.getElementById('lista-palpites-galera');
-        lista.innerHTML = '';
-        if (!dados.length) { lista.innerHTML = '<div class="empty-state"><div class="emoji">🤫</div><p>Nenhum palpite registrado ainda.</p></div>'; return; }
-        const porJogo = {};
-        dados.forEach(item => { const chave = item.jogo||item.id_jogo||'Jogo'; if(!porJogo[chave])porJogo[chave]=[]; porJogo[chave].push(item); });
-        Object.entries(porJogo).forEach(([jogo, palpites]) => {
-          const rodItem = palpites[0]?.rodada || palpites[0]?.numero_rodada || rodadaAtual || null;
-          const rodLabel = rodItem ? ` <span style="font-size:10px;color:var(--text-gray);font-weight:400;text-transform:none;">(Rodada ${rodItem})</span>` : '';
-          lista.innerHTML += `<p class="palpite-jogo-titulo">⚽ ${jogo}${rodLabel}</p>`;
-          palpites.forEach(item => {
-            const ehEu   = String(item.id_usuario) === String(idLogado);
-            const oculto = item.status === 'aberto' && !ehEu;
-            const ph     = oculto ? '<span style="color:var(--text-gray);font-size:13px;">🔒 Oculto</span>' : `<span class="font-russo" style="color:var(--accent-cyan);font-size:15px;">${item.gols_casa} x ${item.gols_fora}</span>`;
-            const nomeFotoPal = encodeURIComponent(item.nome || '?');
-            const foto   = item.foto_perfil || item.foto || item.avatar || item.foto_url || `https://ui-avatars.com/api/?name=${nomeFotoPal}&background=7A1E3A&color=fff&size=36`;
-            let ptHtml = '';
-            if (item.pontos_obtidos != null) { const cor = item.pontos_obtidos>=3?'#22c55e':item.pontos_obtidos>=1?'#eab308':'var(--text-gray)'; ptHtml=`<span style="font-size:11px;color:${cor};font-weight:700;margin-left:4px;">+${item.pontos_obtidos}pts</span>`; }
-            lista.innerHTML += `
-              <div class="ranking-item ${ehEu?'eu':''}">
-                <img src="${foto}" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--borda-divisoria);" onerror="this.src='https://ui-avatars.com/api/?name=${nomeFotoPal}&background=7A1E3A&color=fff&size=36'">
+        const rodadas = dados.rodadas || [];
+
+        if (!rodadas.length) {
+          container.innerHTML = '<div class="empty-state"><div class="emoji">🏜️</div><p>Nenhuma rodada com palpites ainda.</p></div>';
+          return;
+        }
+
+        container.innerHTML = '';
+
+        // Para cada rodada, monta um card colapsável
+        rodadas.forEach((rod, idx) => {
+          const finalizada = rod.finalizada;
+          const membros    = rod.membros || [];
+          const lider      = membros[0];
+          const maxPts     = lider ? Math.max(lider.pontos_rodada, 1) : 1;
+
+          // Abre a rodada mais recente automaticamente
+          const abrirPorPadrao = idx === rodadas.length - 1;
+
+          const cardId   = `rod-body-${rod.rodada}`;
+          const chevId   = `rod-chev-${rod.rodada}`;
+
+          const statusBadge = finalizada
+            ? `<span class="rodada-status-badge finalizada">✅ Finalizada</span>`
+            : `<span class="rodada-status-badge andamento">🔴 Em andamento</span>`;
+
+          const liderHtml = lider
+            ? `<span class="rodada-lider">Líder: <strong>${lider.nome}</strong> — ${lider.pontos_rodada} pts</span>`
+            : '';
+
+          const linhasHtml = membros.map((m, i) => {
+            const ehEu   = String(m.usuario_id) === String(idLogado);
+            const foto   = m.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nome||'?')}&background=7A1E3A&color=fff&size=28`;
+            const barPerc = finalizada ? Math.round((m.pontos_rodada / maxPts) * 100) : 0;
+
+            const medalhas = ['🥇','🥈','🥉'];
+            const posHtml  = i < 3
+              ? `<span class="desempenho-pos" style="color:${['#eab308','#d1d5db','#b45309'][i]}">${medalhas[i]}</span>`
+              : `<span class="desempenho-pos">${i+1}º</span>`;
+
+            const miniStats = finalizada
+              ? `<div class="desempenho-mini">
+                  ${m.acertos_exatos    > 0 ? `<span class="dmini exato">✅ ${m.acertos_exatos}x exato</span>`    : ''}
+                  ${m.acertos_resultado > 0 ? `<span class="dmini result">👍 ${m.acertos_resultado}x resultado</span>` : ''}
+                  ${m.erros             > 0 ? `<span class="dmini erro">❌ ${m.erros}x errou</span>`              : ''}
+                  ${m.total_palpites === 0   ? `<span class="dmini pendente">Sem palpites</span>`                 : ''}
+                </div>`
+              : `<div class="desempenho-mini">
+                  <span class="dmini pendente">⏳ ${m.jogos_finalizados} de ${m.total_palpites} finalizados</span>
+                  ${m.acertos_exatos    > 0 ? `<span class="dmini exato">✅ ${m.acertos_exatos}x exato</span>`    : ''}
+                  ${m.acertos_resultado > 0 ? `<span class="dmini result">👍 ${m.acertos_resultado}x resultado</span>` : ''}
+                </div>`;
+
+            return `
+              <div class="desempenho-row ${ehEu?'eu':''}">
+                ${posHtml}
+                <img src="${foto}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid var(--borda-divisoria);flex-shrink:0;"
+                     onerror="this.src='https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=28'">
                 <div style="flex-grow:1;min-width:0;">
-                  <p class="font-russo" style="font-size:14px;color:var(--text-white);">${item.nome} ${ehEu?'<span style="font-size:10px;color:var(--accent-cyan);">(você)</span>':''} ${ptHtml}</p>
-                  <p style="font-size:11px;color:var(--text-gray);">Palpite · Rodada ${rodItem||rodadaAtual||'—'}</p>
+                  <p class="desempenho-nome">${m.nome}${ehEu?' <span style="font-size:10px;color:var(--accent-cyan);">(você)</span>':''}</p>
+                  ${miniStats}
+                  ${finalizada ? `<div class="pts-bar-wrap"><div class="pts-bar" style="width:${barPerc}%"></div></div>` : ''}
                 </div>
-                ${ph}
+                <span class="desempenho-pts">${m.pontos_rodada}<span style="font-size:10px;color:var(--text-gray);"> pts</span></span>
               </div>`;
-          });
+          }).join('');
+
+          container.innerHTML += `
+            <div class="rodada-card">
+              <div class="rodada-header" onclick="toggleRodada('${cardId}','${chevId}')">
+                <div class="rodada-header-left">
+                  <span class="rodada-num">Rodada ${rod.rodada}</span>
+                  ${statusBadge}
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  ${liderHtml}
+                  <span class="rodada-chevron ${abrirPorPadrao?'aberto':''}" id="${chevId}">▼</span>
+                </div>
+              </div>
+              <div class="rodada-body ${abrirPorPadrao?'aberto':''}" id="${cardId}">
+                ${linhasHtml || '<p style="color:var(--text-gray);font-size:12px;padding:8px 4px;">Nenhum palpite nesta rodada.</p>'}
+              </div>
+            </div>`;
         });
-      } catch { document.getElementById('lista-palpites-galera').innerHTML = '<div class="empty-state"><div class="emoji">⚠️</div><p>Erro ao carregar palpites.</p></div>'; }
+
+      } catch(e) {
+        container.innerHTML = '<div class="empty-state"><div class="emoji">⚠️</div><p>Erro ao carregar desempenho.</p></div>';
+      }
+    }
+
+    function toggleRodada(bodyId, chevId) {
+      const body = document.getElementById(bodyId);
+      const chev = document.getElementById(chevId);
+      if (!body) return;
+      body.classList.toggle('aberto');
+      if (chev) chev.classList.toggle('aberto');
     }
 
     function renderizarHistorico(liga, membros) {
       const el          = document.getElementById('conteudo-historico');
       const nomeLiga    = liga.nome             || 'Liga Secreta';
-      const dataCriacao = liga.data_criacao     || liga.created_at || null;
+      // Tenta múltiplos campos possíveis para a data de criação
+      const dataCriacao = liga.data_criacao || liga.created_at || liga.criado_em || liga.criada_em || null;
       const rodadaAtual = liga.rodada_atual     || 1;
-      const totalRodadas= liga.total_rodadas    || rodadaAtual;
+      const totalRodadas= liga.total_rodadas    || null;
       const temporada   = liga.temporada        || 1;
       const frase       = liga.frase_marcante   || liga.descricao || '"Cada rodada é uma nova chance de provar quem manda."';
       const premios     = liga.premios          || liga.historico_premios || [];
-      let dataFormatada = '—';
-      if (dataCriacao) dataFormatada = new Date(dataCriacao).toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
-      const perc = totalRodadas > 0 ? Math.round((rodadaAtual / totalRodadas) * 100) : 0;
+      let dataFormatada = null;
+      if (dataCriacao) {
+        try { dataFormatada = new Date(dataCriacao).toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'}); }
+        catch { dataFormatada = null; }
+      }
+      const perc = (totalRodadas && totalRodadas > 0) ? Math.round((rodadaAtual / totalRodadas) * 100) : 0;
 
       el.innerHTML = `
         <div class="historico-hero">
-          <p class="historico-fundacao">⚽ Fundada em ${dataFormatada}</p>
+          <p class="historico-fundacao">⚽ ${dataFormatada ? `Fundada em ${dataFormatada}` : `Liga ativa`}</p>
           <h3 class="historico-nome-liga">${nomeLiga}</h3>
           <p class="historico-frase">${frase}</p>
           <div class="temporada-badge"><span class="dot"></span> Temporada ${temporada} em andamento</div>
@@ -516,7 +949,7 @@
           <div class="hstat-box"><div class="hval">${rodadaAtual}</div><div class="hlabel">Rodada Atual</div></div>
           <div class="hstat-box"><div class="hval green">${premios.length||0}</div><div class="hlabel">Prêmios</div></div>
         </div>
-        ${totalRodadas > 1 ? `
+        ${totalRodadas ? `
         <div style="margin-bottom:20px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             <p class="historico-secao-titulo" style="margin-bottom:0;">📅 Temporada ${temporada}</p>
@@ -552,11 +985,65 @@
 
       const lt = document.getElementById('linha-tempo-hist');
       const eventos = [];
-      if (dataCriacao) eventos.push({ icone:'🔥', destaque:true,  titulo:'Liga fundada', desc:`${nomeLiga} ganhou vida.`, data:dataFormatada });
-      if (membros && membros.length) eventos.push({ icone:'👥', destaque:false, titulo:`${membros.length} membros na arena`, desc:'A galera está reunida.', data:`Temporada ${temporada}` });
-      if (rodadaAtual > 1) eventos.push({ icone:'⚽', destaque:false, titulo:`${rodadaAtual-1} rodadas concluídas`, desc:'Pontos marcados, bagres identificados.', data:`Rodada ${rodadaAtual-1} encerrada` });
-      if (premios.length > 0) { const ult=premios[premios.length-1]; eventos.push({ icone:'🏆', destaque:true, titulo:`Campeão: ${ult.vencedor||'—'}`, desc:`${ult.titulo||`Temporada ${ult.temporada||'?'}`} encerrada.`, data:ult.data||`Temporada ${ult.temporada||'?'}` }); }
-      eventos.push({ icone:'📍', destaque:true, titulo:`Rodada ${rodadaAtual} em andamento`, desc:'Os palpites estão abertos.', data:'Agora' });
+
+      // Evento de fundação (só se tiver data)
+      if (dataFormatada) {
+        eventos.push({ icone:'🔥', destaque:true, titulo:'Liga fundada', desc:`${nomeLiga} ganhou vida.`, data: dataFormatada });
+      }
+
+      // Membros individuais na linha do tempo
+      if (membros && membros.length > 0) {
+        membros.forEach((m, i) => {
+          // Dono primeiro, com destaque especial
+          const ehDono = String(m.id) === String(liga.dono_id);
+          if (ehDono) {
+            eventos.push({
+              icone: '👑', destaque: true,
+              titulo: `${m.nome} criou a liga`,
+              desc: `O fundador abriu as portas da ${nomeLiga}.`,
+              data: dataFormatada || 'Início da temporada'
+            });
+          } else {
+            eventos.push({
+              icone: '⚽', destaque: false,
+              titulo: `${m.nome} entrou na liga`,
+              desc: `Mais um craque na disputa${m.time_favorito ? ` — ${m.time_favorito}` : ''}.`,
+              data: `Temporada ${temporada}`
+            });
+          }
+        });
+      }
+
+      // Rodadas concluídas
+      if (rodadaAtual > 1) {
+        eventos.push({
+          icone:'📋', destaque:false,
+          titulo:`${rodadaAtual - 1} rodada${rodadaAtual > 2 ? 's' : ''} concluída${rodadaAtual > 2 ? 's' : ''}`,
+          desc:'Pontos marcados, bagres identificados.',
+          data:`Rodada ${rodadaAtual - 1} encerrada`
+        });
+      }
+
+      // Campeão de prêmio anterior
+      if (premios.length > 0) {
+        const ult = premios[premios.length - 1];
+        eventos.push({
+          icone:'🏆', destaque:true,
+          titulo:`Campeão: ${ult.vencedor||'—'}`,
+          desc:`${ult.titulo||`Temporada ${ult.temporada||'?'}`} encerrada.`,
+          data: ult.data || `Temporada ${ult.temporada||'?'}`
+        });
+      }
+
+      // Evento atual
+      eventos.push({
+        icone:'📍', destaque:true,
+        titulo:`Rodada ${rodadaAtual} em andamento`,
+        desc:'Os palpites estão abertos. Hora de cravar!',
+        data:'Agora'
+      });
+
+      // Reverte para mostrar mais recente primeiro
       eventos.reverse().forEach(ev => {
         lt.innerHTML += `
           <div class="timeline-item">
@@ -570,10 +1057,10 @@
       });
     }
 
-    let _ligaAtualId = null, _rodadaAtual = 1;
+    let _ligaAtualId = null, _rodadaAtual = 1, _rodadasCarregadas = false;
 
     function recarregarDados() {
-      if (_ligaAtualId) { carregarRanking(_ligaAtualId); carregarPalpitesGalera(_ligaAtualId, _rodadaAtual); }
+      if (_ligaAtualId) { carregarRanking(_ligaAtualId); _rodadasCarregadas = false; }
     }
 
     function mostrarPreview() {
@@ -638,6 +1125,86 @@
       }, membrosDemo);
     }
 
+    async function encerrarLiga() {
+      if (!_ligaAtualId) return;
+      if (!confirm('Tem certeza que deseja ENCERRAR esta liga? O resumo final será gerado e a liga ficará encerrada para todos os membros.')) return;
+      try {
+        const res  = await fetch('https://palpitoo-api.onrender.com/encerrar-liga', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ liga_id: _ligaAtualId, usuario_id: idLogado }) });
+        const data = await res.json();
+        if (res.ok) {
+          mostrarAviso('Liga encerrada! Resumo gerado com sucesso.', 'sucesso');
+          setTimeout(carregarPagina, 1000);
+        } else { mostrarAviso(data.erro || 'Erro ao encerrar.', 'erro'); }
+      } catch { mostrarAviso('Erro ao conectar com o servidor.', 'erro'); }
+    }
+
+    function renderizarResumo(resumo, nomeLiga) {
+      const el = document.getElementById('conteudo-resumo');
+      if (!resumo) { el.innerHTML = '<div class="empty-state"><div class="emoji">⚠️</div><p>Resumo não disponível.</p></div>'; return; }
+      const r = typeof resumo === 'string' ? JSON.parse(resumo) : resumo;
+      const campeao = r.campeao;
+      const vice    = r.vice_campeao;
+      const terceiro= r.terceiro_lugar;
+      const stats   = r.stats || {};
+      const ranking = r.ranking || [];
+
+      const pódio = (p, medalha, cor) => !p ? '' : `
+        <div style="text-align:center;flex:1;">
+          <div style="font-size:28px;">${medalha}</div>
+          <img src="${p.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome)}&background=7A1E3A&color=fff&size=50`}" 
+               style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:6px auto;display:block;"
+               onerror="this.src='https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=50'">
+          <p class="font-russo" style="font-size:12px;color:${cor};">${p.nome}</p>
+          <p style="font-size:18px;font-family:'Russo One',sans-serif;color:var(--text-white);">${p.total_pontos} <span style="font-size:11px;color:var(--text-gray);">pts</span></p>
+        </div>`;
+
+      el.innerHTML = `
+        <!-- Pódio -->
+        <div style="background:linear-gradient(135deg,rgba(234,179,8,.08),transparent);border:1px solid rgba(234,179,8,.25);border-radius:14px;padding:20px;margin-bottom:20px;">
+          <p style="font-size:11px;color:var(--text-gray);text-transform:uppercase;font-weight:700;text-align:center;margin-bottom:14px;">🏆 Pódio Final</p>
+          <div style="display:flex;gap:12px;justify-content:center;align-items:flex-end;">
+            ${pódio(vice, '🥈', '#d1d5db')}
+            ${pódio(campeao, '🥇', '#eab308')}
+            ${pódio(terceiro, '🥉', '#b45309')}
+          </div>
+        </div>
+
+        <!-- Stats gerais -->
+        <p style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--text-white);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:8px;">📊 Estatísticas Gerais <span style="flex:1;height:1px;background:var(--borda-divisoria);display:inline-block;"></span></p>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;">
+          <div class="stat-box"><div class="valor">${r.total_participantes || 0}</div><div class="label">Participantes</div></div>
+          <div class="stat-box"><div class="valor">${stats.maior_pontuacao || 0}</div><div class="label">Maior Pontuação</div></div>
+          <div class="stat-box"><div class="valor">${stats.total_palpites || 0}</div><div class="label">Total de Palpites</div></div>
+          <div class="stat-box"><div class="valor">${stats.total_acertos_exatos || 0}</div><div class="label">Acertos Exatos</div></div>
+        </div>
+        ${stats.rodada_mais_disputada ? `
+        <div style="background:var(--bg-dark);border:1px solid var(--borda-divisoria);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:13px;color:var(--text-gray);">🔥 Rodada mais disputada</span>
+          <span class="font-russo" style="color:var(--accent-cyan);">Rodada ${stats.rodada_mais_disputada.rodada} — ${stats.rodada_mais_disputada.pontos} pts</span>
+        </div>` : ''}
+
+        <!-- Ranking completo -->
+        <p style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--text-white);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:8px;">🏅 Ranking Final <span style="flex:1;height:1px;background:var(--borda-divisoria);display:inline-block;"></span></p>
+        <div>
+          ${ranking.map((m, i) => {
+            const medalhas = ['🥇','🥈','🥉'];
+            const cls = ['ouro','prata','bronze'];
+            const badge = i < 3 ? `<span class="posicao-badge ${cls[i]}">${medalhas[i]}</span>` : `<span class="posicao-badge">${i+1}º</span>`;
+            const ehEu  = String(m.id) === String(idLogado);
+            const foto  = m.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nome||'?')}&background=7A1E3A&color=fff&size=36`;
+            return `<div class="ranking-item ${ehEu?'eu':''}">
+              ${badge}
+              <img src="${foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--borda-divisoria);" onerror="this.src='https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=36'">
+              <div style="flex-grow:1;min-width:0;">
+                <p class="font-russo" style="font-size:13px;color:var(--text-white);">${m.nome} ${ehEu?'<span style="font-size:10px;color:var(--accent-cyan);">(você)</span>':''}</p>
+                <p style="font-size:10px;color:var(--text-gray);">✅ ${m.acertos_exatos||0} exatos · 👍 ${m.acertos_resultado||0} resultado · ❌ ${m.erros||0} erros</p>
+              </div>
+              <span class="pontos-badge">${m.total_pontos} pts</span>
+            </div>`;
+          }).join('')}
+        </div>`;
+    }
+
     async function carregarPagina() {
       if (!idLogado) { mostrarPreview(); return; }
       const params = new URLSearchParams(window.location.search);
@@ -664,10 +1231,49 @@
         document.getElementById('tela-com-liga').style.display  = 'block';
         document.getElementById('nomeLigaTitulo').innerText  = liga.nome;
         document.getElementById('codigoLigaExibir').innerText = liga.codigo_convite;
-        document.getElementById('rodadaAtualLabel').innerText = `Rodada ${liga.rodada_atual||1} em andamento`;
+
+        // ── Progresso de rodadas ──
+        const rodadaInicial  = liga.rodada_inicial || 1;
+        const totalRodadas   = liga.total_rodadas;
+        const rodadaAtualCalc= liga.rodada_atual || rodadaInicial;
+        if (totalRodadas) {
+          const rodadaFinal = rodadaInicial + totalRodadas - 1;
+          document.getElementById('rodadaAtualLabel').innerText = `Rodadas ${rodadaInicial}–${rodadaFinal} · Liga de ${totalRodadas} rodadas`;
+        } else {
+          document.getElementById('rodadaAtualLabel').innerText = `Rodada ${rodadaAtualCalc} em andamento`;
+        }
 
         _ligaAtualId = liga.id_liga;
-        _rodadaAtual = liga.rodada_atual || 1;
+        _rodadaAtual = rodadaAtualCalc;
+
+        // ── Liga encerrada? ──
+        const encerrada = liga.status === 'encerrada';
+        const bannerEnc = document.getElementById('banner-encerrada');
+        const tabResumo = document.getElementById('ltab-resumo');
+        const painelResumo = document.getElementById('lpainel-resumo');
+        const btnEncerrar = document.getElementById('btn-encerrar-liga');
+
+        if (encerrada) {
+          bannerEnc.style.display = 'block';
+          tabResumo.style.display = '';
+          painelResumo.style.display = '';
+          if (liga.data_encerramento) {
+            document.getElementById('label-data-encerramento').innerText =
+              'Encerrada em ' + new Date(liga.data_encerramento).toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
+          }
+          // Renderiza resumo
+          const resumoData = liga.resumo_encerramento;
+          renderizarResumo(resumoData, liga.nome);
+          // Abre tab resumo automaticamente
+          trocarLigaTab('resumo');
+        } else {
+          bannerEnc.style.display = 'none';
+          tabResumo.style.display = 'none';
+          // Botão encerrar apenas para dono e liga ativa
+          if (String(liga.dono_id) === String(idLogado)) {
+            btnEncerrar.style.display = 'inline-block';
+          }
+        }
 
         registrarEntrada(liga.id_liga);
         const dataEntradaFormatada = formatarDataCurta(getDataEntrada(liga.id_liga));
@@ -683,7 +1289,6 @@
         } catch(_) {}
 
         carregarRanking(liga.id_liga);
-        carregarPalpitesGalera(liga.id_liga, _rodadaAtual);
         renderizarHistorico(liga, membros);
 
       } catch(e) { mostrarPreview(); mostrarAviso('Servidor offline — exibindo prévia.', 'info'); }

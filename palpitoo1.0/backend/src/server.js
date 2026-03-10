@@ -212,6 +212,37 @@ app.post('/encerrar-jogo', async (req, res) => {
             await pool.query('INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada) VALUES ($1, NOW(), true)', [rodada]);
           }
           console.log(`✅ Rodada ${rodada} bloqueada automaticamente (todos os jogos finalizados).`);
+
+          // ── VERIFICA SE ALGUMA LIGA DEVE SER ENCERRADA AUTOMATICAMENTE ──
+          try {
+            const ligasAtivas = await pool.query(`
+              SELECT id_liga, nome, total_rodadas, rodada_inicial
+              FROM ligas
+              WHERE status = 'ativa'
+                AND total_rodadas IS NOT NULL
+            `);
+            for (const liga of ligasAtivas.rows) {
+              const rodadaInicial = liga.rodada_inicial || 1;
+              const rodadaFinal   = rodadaInicial + liga.total_rodadas - 1;
+              if (rodada >= rodadaFinal) {
+                // Verifica se todos os jogos das rodadas da liga foram finalizados
+                const jogosPendentes = await pool.query(`
+                  SELECT COUNT(*) AS total FROM jogos
+                  WHERE rodada BETWEEN $1 AND $2 AND status != 'finalizado'
+                `, [rodadaInicial, rodadaFinal]);
+                if (Number(jogosPendentes.rows[0].total) === 0) {
+                  const resumo = await gerarResumoLiga(liga.id_liga);
+                  await pool.query(
+                    `UPDATE ligas SET status = 'encerrada', data_encerramento = NOW(), resumo_encerramento = $1 WHERE id_liga = $2`,
+                    [JSON.stringify(resumo), liga.id_liga]
+                  );
+                  console.log(`🏆 Liga "${liga.nome}" (ID ${liga.id_liga}) encerrada automaticamente após rodada ${rodada}.`);
+                }
+              }
+            }
+          } catch (ligaErr) {
+            console.error('Aviso: erro na verificação automática de ligas:', ligaErr);
+          }
         }
       }
     } catch (autoErr) {
@@ -271,16 +302,21 @@ app.get('/ranking', async (req, res) => {
 // ROTA PARA CRIAR UMA NOVA LIGA
 app.post('/criar-liga', async (req, res) => {
   try {
-    const { nome_liga, dono_id, id_dono } = req.body;
+    const { nome_liga, dono_id, id_dono, total_rodadas, rodada_inicial } = req.body;
     const donoCerto = dono_id || id_dono;
 
     // Gera um código aleatório de 6 letras/números (Ex: X7B9KQ)
     const codigo_convite = Math.random().toString(36).substring(2, 8).toUpperCase();
 
-    // 1. Salva a liga nova no banco
+    // Número de rodadas (padrão: ilimitado = null)
+    const totalRodadasVal = total_rodadas ? parseInt(total_rodadas) : null;
+    const rodadaInicialVal = rodada_inicial ? parseInt(rodada_inicial) : 1;
+
+    // 1. Salva a liga nova no banco com total_rodadas e rodada_inicial
     const novaLiga = await pool.query(
-      'INSERT INTO ligas (nome, codigo_convite, dono_id) VALUES ($1, $2, $3) RETURNING *',
-      [nome_liga, codigo_convite, donoCerto]
+      `INSERT INTO ligas (nome, codigo_convite, dono_id, total_rodadas, rodada_inicial, status)
+       VALUES ($1, $2, $3, $4, $5, 'ativa') RETURNING *`,
+      [nome_liga, codigo_convite, donoCerto, totalRodadasVal, rodadaInicialVal]
     );
 
     const idLigaGerada = novaLiga.rows[0].id_liga;
@@ -343,6 +379,7 @@ app.get('/minhas-ligas/:usuario_id', async (req, res) => {
 
     const resultado = await pool.query(`
       SELECT l.id_liga, l.nome, l.codigo_convite, l.dono_id,
+             l.total_rodadas, l.rodada_inicial, l.status,
              (SELECT COUNT(*) FROM usuarios_ligas ul2 WHERE ul2.liga_id = l.id_liga) AS total_participantes
       FROM ligas l
       JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
@@ -513,7 +550,10 @@ app.get('/minha-liga/:id_usuario', async (req, res) => {
   try {
     const { id_usuario } = req.params;
     const resultado = await pool.query(`
-      SELECT l.id_liga, l.nome, l.codigo_convite, l.dono_id
+      SELECT l.id_liga, l.nome, l.codigo_convite, l.dono_id,
+             l.total_rodadas, l.rodada_inicial, l.status, l.data_encerramento,
+             l.resumo_encerramento,
+             l.criado_em
       FROM ligas l
       JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
       WHERE ul.usuario_id = $1
@@ -537,7 +577,9 @@ app.get('/liga/:id_liga', async (req, res) => {
   try {
     const { id_liga } = req.params;
     const resultado = await pool.query(
-      'SELECT * FROM ligas WHERE id_liga = $1',
+      `SELECT *, 
+              resumo_encerramento
+       FROM ligas WHERE id_liga = $1`,
       [id_liga]
     );
 
@@ -917,13 +959,27 @@ app.get('/ligas-disponiveis/:usuario_id', async (req, res) => {
   try {
     const { usuario_id } = req.params;
     
-    // CORREÇÃO NO SQL: Usar 'id_liga' em vez de 'id'
     const resultado = await pool.query(
-      `SELECT * FROM ligas 
-       WHERE id_liga NOT IN (
+      `SELECT 
+         l.id_liga,
+         l.nome,
+         l.codigo_convite,
+         l.dono_id,
+         l.total_rodadas,
+         l.rodada_inicial,
+         l.status,
+         u.nome AS nome_dono,
+         COUNT(ul2.usuario_id) AS total_membros
+       FROM ligas l
+       LEFT JOIN usuarios u ON u.id = l.dono_id
+       LEFT JOIN usuarios_ligas ul2 ON ul2.liga_id = l.id_liga
+       WHERE l.id_liga NOT IN (
          SELECT liga_id FROM usuarios_ligas WHERE usuario_id = $1
        )
-       ORDER BY id_liga DESC LIMIT 10`, 
+       GROUP BY l.id_liga, l.nome, l.codigo_convite, l.dono_id, l.total_rodadas,
+                l.rodada_inicial, l.status, u.nome
+       ORDER BY total_membros DESC
+       LIMIT 30`, 
       [usuario_id]
     );
 
@@ -1100,6 +1156,206 @@ setInterval(iniciarJogosAutomaticamente, 30 * 1000);
 
 
 
+
+// =========================================================================
+// ROTA: DESEMPENHO POR RODADA DE CADA MEMBRO DE UMA LIGA
+// GET /desempenho-rodadas/:liga_id
+// Retorna: para cada rodada que teve jogos, os pontos de cada membro
+// =========================================================================
+app.get('/desempenho-rodadas/:liga_id', async (req, res) => {
+  try {
+    const { liga_id } = req.params;
+
+    // Busca todos os palpites dos membros da liga, agrupados por usuário e rodada
+    const resultado = await pool.query(`
+      SELECT
+        u.id                                                      AS usuario_id,
+        u.nome,
+        u.foto_perfil,
+        j.rodada,
+        COALESCE(SUM(p.pontos_obtidos), 0)                        AS pontos_rodada,
+        COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 3)   AS acertos_exatos,
+        COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 1)   AS acertos_resultado,
+        COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 0
+                                      AND p.pontos_obtidos IS NOT NULL) AS erros,
+        COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos IS NOT NULL) AS jogos_finalizados,
+        COUNT(p.id_palpite)                                        AS total_palpites,
+        -- status da rodada: se algum jogo ainda não foi finalizado, está em andamento
+        BOOL_AND(j.status = 'finalizado')                          AS rodada_finalizada
+      FROM usuarios u
+      JOIN usuarios_ligas ul ON ul.usuario_id = u.id
+      LEFT JOIN palpites p   ON p.usuario_id = u.id
+      LEFT JOIN jogos j      ON j.id_jogo = p.jogo_id
+      WHERE ul.liga_id = $1
+        AND j.rodada IS NOT NULL
+      GROUP BY u.id, u.nome, u.foto_perfil, j.rodada
+      ORDER BY j.rodada ASC, pontos_rodada DESC
+    `, [liga_id]);
+
+    // Organiza: { rodada -> [membros com pontos] }
+    const porRodada = {};
+    for (const row of resultado.rows) {
+      const r = row.rodada;
+      if (!porRodada[r]) porRodada[r] = { rodada: r, finalizada: true, membros: [] };
+      if (!row.rodada_finalizada) porRodada[r].finalizada = false;
+      porRodada[r].membros.push({
+        usuario_id:        row.usuario_id,
+        nome:              row.nome,
+        foto_perfil:       row.foto_perfil,
+        pontos_rodada:     Number(row.pontos_rodada),
+        acertos_exatos:    Number(row.acertos_exatos),
+        acertos_resultado: Number(row.acertos_resultado),
+        erros:             Number(row.erros),
+        jogos_finalizados: Number(row.jogos_finalizados),
+        total_palpites:    Number(row.total_palpites),
+      });
+    }
+
+    // Ordena membros dentro de cada rodada por pontos DESC
+    Object.values(porRodada).forEach(r => {
+      r.membros.sort((a, b) => b.pontos_rodada - a.pontos_rodada);
+    });
+
+    res.json({ rodadas: Object.values(porRodada) });
+  } catch (err) {
+    console.error('Erro ao buscar desempenho por rodada:', err);
+    res.status(500).json({ erro: 'Erro ao buscar desempenho por rodada.' });
+  }
+});
+
+// =========================================================================
+// ROTA: ENCERRAR LIGA MANUALMENTE (dono ou admin)
+// =========================================================================
+app.post('/encerrar-liga', async (req, res) => {
+  try {
+    const { liga_id, usuario_id } = req.body;
+    if (!liga_id || !usuario_id) return res.status(400).json({ erro: 'liga_id e usuario_id são obrigatórios.' });
+
+    // Verifica se o usuário é dono da liga
+    const ligaRes = await pool.query('SELECT * FROM ligas WHERE id_liga = $1', [liga_id]);
+    if (ligaRes.rows.length === 0) return res.status(404).json({ erro: 'Liga não encontrada.' });
+    const liga = ligaRes.rows[0];
+
+    if (String(liga.dono_id) !== String(usuario_id)) {
+      return res.status(403).json({ erro: 'Apenas o dono da liga pode encerrá-la.' });
+    }
+    if (liga.status === 'encerrada') {
+      return res.status(400).json({ erro: 'Liga já está encerrada.' });
+    }
+
+    // Gera o resumo
+    const resumo = await gerarResumoLiga(liga_id);
+
+    // Salva status encerrada + resumo
+    await pool.query(
+      `UPDATE ligas SET status = 'encerrada', data_encerramento = NOW(), resumo_encerramento = $1 WHERE id_liga = $2`,
+      [JSON.stringify(resumo), liga_id]
+    );
+
+    res.json({ mensagem: 'Liga encerrada com sucesso!', resumo });
+  } catch (err) {
+    console.error('Erro ao encerrar liga:', err);
+    res.status(500).json({ erro: 'Erro interno ao encerrar liga.' });
+  }
+});
+
+// =========================================================================
+// ROTA: BUSCAR RESUMO DE UMA LIGA ENCERRADA
+// =========================================================================
+app.get('/resumo-liga/:liga_id', async (req, res) => {
+  try {
+    const { liga_id } = req.params;
+    const ligaRes = await pool.query('SELECT resumo_encerramento, status, nome FROM ligas WHERE id_liga = $1', [liga_id]);
+    if (ligaRes.rows.length === 0) return res.status(404).json({ erro: 'Liga não encontrada.' });
+    const { resumo_encerramento, status, nome } = ligaRes.rows[0];
+    if (status !== 'encerrada') return res.status(400).json({ erro: 'Liga ainda não foi encerrada.' });
+    res.json({ nome, resumo: resumo_encerramento });
+  } catch (err) {
+    console.error('Erro ao buscar resumo:', err);
+    res.status(500).json({ erro: 'Erro interno.' });
+  }
+});
+
+// =========================================================================
+// FUNÇÃO AUXILIAR: GERAR RESUMO ESTATÍSTICO DA LIGA
+// =========================================================================
+async function gerarResumoLiga(liga_id) {
+  // Ranking com pontos totais, acertos exatos e acertos de resultado
+  const rankingRes = await pool.query(`
+    SELECT
+      u.id,
+      u.nome,
+      u.time_favorito,
+      u.foto_perfil,
+      COALESCE(SUM(p.pontos_obtidos), 0)                        AS total_pontos,
+      COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 3)   AS acertos_exatos,
+      COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 1)   AS acertos_resultado,
+      COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 0
+                                    AND p.pontos_obtidos IS NOT NULL) AS erros,
+      COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos IS NOT NULL) AS total_palpites
+    FROM usuarios u
+    JOIN usuarios_ligas ul ON ul.usuario_id = u.id
+    LEFT JOIN palpites p ON p.usuario_id = u.id
+    WHERE ul.liga_id = $1
+    GROUP BY u.id, u.nome, u.time_favorito, u.foto_perfil
+    ORDER BY total_pontos DESC
+  `, [liga_id]);
+
+  const ranking = rankingRes.rows;
+
+  // Estatísticas gerais da liga
+  const statsRes = await pool.query(`
+    SELECT
+      COUNT(DISTINCT p.jogo_id)                                             AS total_jogos_palpitados,
+      COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 3)               AS total_acertos_exatos,
+      COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos IS NOT NULL)        AS total_palpites,
+      COALESCE(MAX(sub.pts), 0)                                              AS maior_pontuacao
+    FROM palpites p
+    JOIN usuarios_ligas ul ON ul.usuario_id = p.usuario_id
+    CROSS JOIN (
+      SELECT COALESCE(SUM(p2.pontos_obtidos),0) AS pts, p2.usuario_id
+      FROM palpites p2
+      JOIN usuarios_ligas ul2 ON ul2.usuario_id = p2.usuario_id
+      WHERE ul2.liga_id = $1
+      GROUP BY p2.usuario_id
+    ) sub
+    WHERE ul.liga_id = $1
+  `, [liga_id]);
+
+  // Rodada com mais pontos no geral
+  const rodadaMaisAtivaRes = await pool.query(`
+    SELECT j.rodada, SUM(p.pontos_obtidos) AS pontos_rodada
+    FROM palpites p
+    JOIN jogos j ON j.id_jogo = p.jogo_id
+    JOIN usuarios_ligas ul ON ul.usuario_id = p.usuario_id
+    WHERE ul.liga_id = $1 AND p.pontos_obtidos IS NOT NULL
+    GROUP BY j.rodada
+    ORDER BY pontos_rodada DESC
+    LIMIT 1
+  `, [liga_id]);
+
+  const campeao   = ranking[0] || null;
+  const viceCampeao = ranking[1] || null;
+  const terceiro  = ranking[2] || null;
+  const stats     = statsRes.rows[0] || {};
+  const rodadaQuente = rodadaMaisAtivaRes.rows[0] || null;
+
+  return {
+    gerado_em: new Date().toISOString(),
+    total_participantes: ranking.length,
+    campeao,
+    vice_campeao: viceCampeao,
+    terceiro_lugar: terceiro,
+    ranking,
+    stats: {
+      total_palpites: Number(stats.total_palpites) || 0,
+      total_acertos_exatos: Number(stats.total_acertos_exatos) || 0,
+      total_jogos_palpitados: Number(stats.total_jogos_palpitados) || 0,
+      maior_pontuacao: Number(stats.maior_pontuacao) || 0,
+      rodada_mais_disputada: rodadaQuente ? { rodada: rodadaQuente.rodada, pontos: Number(rodadaQuente.pontos_rodada) } : null
+    }
+  };
+}
 
 //--------------------------------------------------------------------
 const PORT = process.env.PORT || 3000;
