@@ -908,6 +908,42 @@ async function iniciarJogosAutomaticamente() {
 // Dispara ao subir o servidor e a cada 30 segundos
 iniciarJogosAutomaticamente();
 setInterval(iniciarJogosAutomaticamente, 30 * 1000);
+
+// =============================================================================
+// ROTA: RODADA ATUAL — calcula qual rodada está ativa com base nos jogos reais
+// Prioridade: 1) rodada com jogo 'aovivo', 2) menor rodada com jogo não finalizado
+// 3) maior rodada (todas finalizadas)
+// =============================================================================
+app.get('/rodada-atual', async (req, res) => {
+  try {
+    // Jogo ao vivo agora
+    const aoVivo = await pool.query(
+      `SELECT rodada FROM jogos WHERE status = 'aovivo' ORDER BY rodada ASC LIMIT 1`
+    );
+    if (aoVivo.rows.length > 0) {
+      return res.json({ rodada_atual: Number(aoVivo.rows[0].rodada) });
+    }
+
+    // Menor rodada com jogo ainda não finalizado
+    const aberta = await pool.query(
+      `SELECT rodada FROM jogos WHERE status != 'finalizado' ORDER BY rodada ASC LIMIT 1`
+    );
+    if (aberta.rows.length > 0) {
+      return res.json({ rodada_atual: Number(aberta.rows[0].rodada) });
+    }
+
+    // Fallback: maior rodada (todas finalizadas)
+    const ultima = await pool.query(
+      `SELECT rodada FROM jogos ORDER BY rodada DESC LIMIT 1`
+    );
+    const rodada = ultima.rows.length > 0 ? Number(ultima.rows[0].rodada) : 1;
+    res.json({ rodada_atual: rodada });
+  } catch (err) {
+    console.error('Erro ao calcular rodada atual:', err);
+    res.status(500).json({ erro: 'Erro ao calcular rodada atual.' });
+  }
+});
+
 // =============================================================================
 // JOB AUTOMÁTICO: CALCULAR PONTOS quando jogo muda para 'finalizado' no banco
 // Roda a cada 30 segundos — detecta jogos finalizados que ainda não tiveram
@@ -968,49 +1004,46 @@ async function calcularPontosAutomaticamente() {
         console.log(`  ✅ usuario=${palpite.usuario_id} | palpite: ${gols_casa_palpite}x${gols_fora_palpite} → ${pontos}pts`);
       }
 
-      // Tenta auto-bloquear rodada se todos os jogos dela foram finalizados
-      try {
-        const pendentes = await pool.query(
-          `SELECT COUNT(*) AS total FROM jogos WHERE rodada = $1 AND status != 'finalizado'`,
-          [rodada]
-        );
-        if (Number(pendentes.rows[0].total) === 0) {
-          await pool.query(
-            `INSERT INTO prazos_rodadas (rodada, prazo_limite, bloqueada)
-             VALUES ($1, NOW(), true)
-             ON CONFLICT (rodada) DO UPDATE SET bloqueada = true`,
-            [rodada]
-          );
-          console.log(`🔒 Rodada ${rodada} bloqueada automaticamente.`);
+    } // fim do loop de jogos
 
-          // Verifica ligas para encerramento automático
-          const ligasAtivas = await pool.query(`
-            SELECT id_liga, nome, total_rodadas, rodada_inicial
-            FROM ligas WHERE status = 'ativa' AND total_rodadas IS NOT NULL
-          `);
-          for (const liga of ligasAtivas.rows) {
-            const rodadaInicial = liga.rodada_inicial || 1;
-            const rodadaFinal   = rodadaInicial + liga.total_rodadas - 1;
-            if (rodada >= rodadaFinal) {
-              const jogosPendentes = await pool.query(`
-                SELECT COUNT(*) AS total FROM jogos
-                WHERE rodada BETWEEN $1 AND $2 AND status != 'finalizado'
-              `, [rodadaInicial, rodadaFinal]);
-              if (Number(jogosPendentes.rows[0].total) === 0) {
-                const resumo = await gerarResumoLiga(liga.id_liga);
-                await pool.query(
-                  `UPDATE ligas SET status = 'encerrada', data_encerramento = NOW(), resumo_encerramento = $1 WHERE id_liga = $2`,
-                  [JSON.stringify(resumo), liga.id_liga]
-                );
-                console.log(`🏆 Liga "${liga.nome}" encerrada automaticamente.`);
-              }
-            }
+    // ✅ CORREÇÃO: verificação de encerramento de ligas FORA do loop de pontos
+    // Assim funciona mesmo se alguns jogos não tiverem palpites
+    try {
+      const ligasAtivas = await pool.query(`
+        SELECT id_liga, nome, total_rodadas, rodada_inicial
+        FROM ligas WHERE status = 'ativa' AND total_rodadas IS NOT NULL
+      `);
+      for (const liga of ligasAtivas.rows) {
+        const rodadaInicial = Number(liga.rodada_inicial || 1);
+        const rodadaFinal   = rodadaInicial + Number(liga.total_rodadas) - 1;
+        // Verifica se ainda há jogos não finalizados dentro do intervalo da liga
+        const jogosPendentes = await pool.query(`
+          SELECT COUNT(*) AS total FROM jogos
+          WHERE rodada BETWEEN $1 AND $2 AND status != 'finalizado'
+        `, [rodadaInicial, rodadaFinal]);
+        if (Number(jogosPendentes.rows[0].total) === 0) {
+          // Também verifica se há palpites sem pontuação ainda (pontos podem estar sendo calculados)
+          const palpitesPendentes = await pool.query(`
+            SELECT COUNT(*) AS total FROM palpites p
+            JOIN jogos j ON j.id_jogo = p.jogo_id
+            WHERE j.rodada BETWEEN $1 AND $2
+              AND j.status = 'finalizado'
+              AND p.pontos_obtidos IS NULL
+          `, [rodadaInicial, rodadaFinal]);
+          if (Number(palpitesPendentes.rows[0].total) === 0) {
+            const resumo = await gerarResumoLiga(liga.id_liga);
+            await pool.query(
+              `UPDATE ligas SET status = 'encerrada', data_encerramento = NOW(), resumo_encerramento = $1 WHERE id_liga = $2`,
+              [JSON.stringify(resumo), liga.id_liga]
+            );
+            console.log(`🏆 Liga "${liga.nome}" (ID ${liga.id_liga}) encerrada automaticamente.`);
           }
         }
-      } catch (e) {
-        console.error('Aviso: erro no auto-bloqueio:', e.message);
       }
+    } catch (e) {
+      console.error('Aviso: erro no encerramento automático de ligas:', e.message);
     }
+
   } catch (err) {
     console.error('Erro no job de pontuação automática:', err.message);
   }

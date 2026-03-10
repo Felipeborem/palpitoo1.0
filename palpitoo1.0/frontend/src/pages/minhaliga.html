@@ -925,7 +925,8 @@
       const nomeLiga    = liga.nome             || 'Liga Secreta';
       // Tenta múltiplos campos possíveis para a data de criação
       const dataCriacao = liga.data_criacao || liga.created_at || liga.criado_em || liga.criada_em || null;
-      const rodadaAtual = liga.rodada_atual     || 1;
+      // ✅ CORREÇÃO: usa _rodadaAtual global (calculado da API de jogos) em vez de liga.rodada_atual que não existe
+      const rodadaAtual = _rodadaAtual || 1;
       const totalRodadas= liga.total_rodadas    || null;
       const temporada   = liga.temporada        || 1;
       const frase       = liga.frase_marcante   || liga.descricao || '"Cada rodada é uma nova chance de provar quem manda."';
@@ -1236,15 +1237,22 @@
         const rodadaInicial  = liga.rodada_inicial || 1;
         const totalRodadas   = liga.total_rodadas;
         const rodadaAtualCalc= liga.rodada_atual || rodadaInicial;
-        if (totalRodadas) {
-          const rodadaFinal = rodadaInicial + totalRodadas - 1;
-          document.getElementById('rodadaAtualLabel').innerText = `Rodadas ${rodadaInicial}–${rodadaFinal} · Liga de ${totalRodadas} rodadas`;
-        } else {
-          document.getElementById('rodadaAtualLabel').innerText = `Rodada ${rodadaAtualCalc} em andamento`;
-        }
+        // ✅ CORREÇÃO: exibe rodada atual real buscada da API, atualiza após fetch
+        document.getElementById('rodadaAtualLabel').innerText = totalRodadas
+          ? `Rodada ${rodadaAtualCalc} de ${rodadaInicial + totalRodadas - 1}`
+          : `Rodada ${rodadaAtualCalc} em andamento`;
 
         _ligaAtualId = liga.id_liga;
         _rodadaAtual = rodadaAtualCalc;
+
+        // ✅ CORREÇÃO: busca rodada atual real dos jogos no banco
+        try {
+          const resRodada = await fetch('https://palpitoo-api.onrender.com/rodada-atual');
+          if (resRodada.ok) {
+            const dadosRodada = await resRodada.json();
+            _rodadaAtual = dadosRodada.rodada_atual || rodadaAtualCalc;
+          }
+        } catch(_) {}
 
         // ── Liga encerrada? ──
         const encerrada = liga.status === 'encerrada';
@@ -1287,6 +1295,11 @@
           const resMem = await fetch(`https://palpitoo-api.onrender.com/liga-membros/${liga.id_liga}`);
           if (resMem.ok) { membros = await resMem.json(); document.getElementById('statMembros').innerText = membros.length; }
         } catch(_) {}
+
+        // ✅ CORREÇÃO: atualiza label com rodada real após fetch da API
+        document.getElementById('rodadaAtualLabel').innerText = totalRodadas
+          ? `Rodada ${_rodadaAtual} de ${rodadaInicial + totalRodadas - 1}`
+          : `Rodada ${_rodadaAtual} em andamento`;
 
         carregarRanking(liga.id_liga);
         renderizarHistorico(liga, membros);
