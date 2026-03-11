@@ -172,9 +172,9 @@
   <!-- ── TAB API ── -->
   <div id="pnl-api" class="pnl">
     <p class="stitle">🌐 Importar da API</p>
-    <p class="ssub">Premier League, Champions League, La Liga, Serie A, Bundesliga e Ligue 1.</p>
+    <p class="ssub">Brasileirão, Libertadores, Premier League e muito mais — filtre pelo país.</p>
 
-    <div class="info-box">ℹ️ <div>O plano gratuito inclui apenas <strong>ligas europeias</strong>. Para Brasileirão use a aba <strong>Cadastro Manual</strong>.</div></div>
+    <div class="info-box" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2);color:#86efac;">✅ <div>A SportAPI traz jogos de <strong>todo o mundo</strong> — incluindo Brasileirão, Libertadores e Copa do Brasil. Use os filtros de país para encontrar os jogos que quer.</div></div>
 
     <div class="card">
       <div class="grid2">
@@ -375,7 +375,7 @@ function renderJogosAPI(rodada) {
     el.innerHTML=`
       <img class="tlogo" src="${j.logo_casa||''}" onerror="this.style.display='none'">
       <div class="jtimes">${j.time_casa} <span style="color:var(--gray);font-size:10px;">x</span> ${j.time_fora}
-        <div class="jhora">${liga.emoji} ${liga.nome} · ${hora}</div></div>
+        <div class="jhora">${emojiPais(j.pais)} ${j.pais||''} · ${j.liga_nome} · ${hora}</div></div>
       <button class="btn-imp${imp?' ok':''}" id="bimp-${j.fixture_id}"
         onclick="importarAPI(${JSON.stringify(j).replace(/"/g,'&quot;')},'${rodada}',this)"
         ${imp?'disabled':''}>${imp?'✅ Importado':'⬆️ Importar'}</button>`;
