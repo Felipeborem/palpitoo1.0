@@ -881,7 +881,7 @@ app.post('/entrar-liga-clique', async (req, res) => {
 // -----------------------------------------------------------------------------
 // ROTA PARA SAIR DE UMA LIGA
 app.post('/sair-liga', async (req, res) => {
-  try {
+    try {
     const { liga_id, usuario_id } = req.body;
 
     // Verifica se o usuário é dono da liga
