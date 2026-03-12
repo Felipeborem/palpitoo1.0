@@ -29,6 +29,7 @@
     .feed-item.tipo-liga    { border-left: 3px solid var(--accent-green); }
     .feed-item.tipo-sistema { border-left: 3px solid #eab308; }
     .feed-item.tipo-pato    { border-left: 3px solid var(--accent-cyan); background: rgba(192,52,90,0.05); }
+    .feed-item.tipo-encerramento { border-left: 3px solid #f5c842; background: rgba(245,200,66,0.05); }
 
     .feed-icone {
       font-size: 22px;
@@ -43,6 +44,13 @@
     .feed-titulo    { font-family: 'Russo One', sans-serif; font-size: 14px; color: var(--text-white); margin-bottom: 4px; }
     .feed-descricao { font-size: 13px; color: var(--text-gray); line-height: 1.5; }
     .feed-tempo     { font-size: 10px; color: var(--text-gray); margin-top: 6px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+    .feed-link-resumo {
+      display: inline-block; margin-top: 8px; font-size: 11px; font-family: 'Russo One', sans-serif;
+      color: #f5c842; border: 1px solid rgba(245,200,66,0.4); border-radius: 8px;
+      padding: 4px 12px; cursor: pointer; transition: all .2s;
+      text-decoration: none;
+    }
+    .feed-link-resumo:hover { background: rgba(245,200,66,0.1); }
 
     .filtro-btn {
       padding: 7px 16px; border-radius: 20px;
@@ -65,10 +73,11 @@
       text-transform: uppercase; letter-spacing: 1px;
       display: inline-block; margin-bottom: 4px;
     }
-    .badge-pessoal { background: rgba(192,52,90,0.2);  color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
-    .badge-liga    { background: rgba(34,197,94,0.15); color: #4ade80;            border: 1px solid #4ade80; }
-    .badge-sistema { background: rgba(234,179,8,0.15); color: #eab308;            border: 1px solid #eab308; }
-    .badge-pato    { background: rgba(192,52,90,0.2);  color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+    .badge-pessoal      { background: rgba(192,52,90,0.2);  color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+    .badge-liga         { background: rgba(34,197,94,0.15); color: #4ade80;            border: 1px solid #4ade80; }
+    .badge-sistema      { background: rgba(234,179,8,0.15); color: #eab308;            border: 1px solid #eab308; }
+    .badge-pato         { background: rgba(192,52,90,0.2);  color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+    .badge-encerramento { background: rgba(245,200,66,0.2); color: #f5c842;            border: 1px solid rgba(245,200,66,0.5); }
   </style>
   <meta name="description" content="Palpitoo — A Resenha Virou Campeonato. Palpites de futebol com amigos.">
   <link rel="icon" href="./img/pato.png" type="image/png">
@@ -168,6 +177,10 @@
               <div style="width: 4px; height: 36px; background: var(--accent-cyan); border-radius: 2px; flex-shrink: 0;"></div>
               <div><p class="font-russo" style="font-size: 12px; color: var(--text-white);">🦆 Decreto do Pato</p><p style="font-size: 11px; color: var(--text-gray);">Julgamentos automáticos do Pato Mestre</p></div>
             </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 4px; height: 36px; background: #f5c842; border-radius: 2px; flex-shrink: 0;"></div>
+              <div><p class="font-russo" style="font-size: 12px; color: var(--text-white);">🏆 Encerramento</p><p style="font-size: 11px; color: var(--text-gray);">Resumo e resultado final da temporada</p></div>
+            </div>
           </div>
         </section>
 
@@ -185,38 +198,32 @@
   let filtroAtivo    = 'todos';
   let todosFeedItens = [];
 
-  // ════════════════════════════════════════════════════════
-  //  BANCO DE FRASES — PATO MESTRE
-  //  Cada situação tem pelo menos 3 variações. A função
-  //  pega(arr) sorteia uma diferente a cada carregamento.
-  // ════════════════════════════════════════════════════════
   const pega = arr => arr[Math.floor(Math.random() * arr.length)];
 
+  // ════════════════════════════════════════════════════════
+  //  FRASES — PATO MESTRE
+  // ════════════════════════════════════════════════════════
   const FRASES = {
 
-    // ── Subiu 2 posições ──────────────────────────────────
     subiu2: [
       (n, pos) => `"${n}, subiu 2 posições e agora está em ${pos}º. Mas não venha me pedir parabéns — isso é obrigação."`,
       (n, pos) => `"Dois degraus de uma vez, ${n}? Quase me impressionou. Falta só mais ${pos - 1} pra chegar onde eu mando."`,
       (n, pos) => `"${n} escalou 2 posições. O ranking notou. Eu também. Não deixa cair de volta, porque vou zoar muito."`,
     ],
 
-    // ── Subiu 3+ posições ─────────────────────────────────
     subiu3mais: [
       (n, delta, pos) => `"ATENÇÃO GERAL: ${n} subiu ${delta} posições de uma vez! Isso não é palpite, isso é macumba. Tô de olho em você."`,
       (n, delta, pos) => `"${n} subiu ${delta} posições e chegou em ${pos}º. O Pato Mestre oficialmente declara: essa rodada foi sua. Só essa."`,
       (n, delta, pos) => `"${delta} posições de subida, ${n}?! A galera deve estar em choque. Eu também tô, mas não vou admitir."`,
     ],
 
-    // ── Mitada (8+ pontos na rodada) ──────────────────────
     mitada: [
       (n, pts) => `"${pts} pontos em uma rodada só, ${n}?! O Pato Mestre decreta: isso foi uma mitada histórica. Não estrague na próxima."`,
       (n, pts) => `"${n} fez ${pts} pontos nessa rodada. ${pts >= 12 ? 'Isso é humano? Alguém checa os palpites desse aí.' : 'Tá bom demais pra ser verdade. O Pato desconfia.'}"`,
       (n, pts) => `"DECRETO URGENTE: ${n} acumulou ${pts} pts nessa rodada. A liga inteira já te odeia. Parabéns e tome cuidado."`,
-      (n, pts) => `"${pts} pontos numa rodada, ${n}. Digno de um veterano da Brah.Bet. Não que eu vá falar isso na sua cara, mas... tá dito."`,
+      (n, pts) => `"${pts} pontos numa rodada, ${n}. Digno de um veterano. Não que eu vá falar isso na sua cara, mas... tá dito."`,
     ],
 
-    // ── Rodada zerada (0 pontos) ──────────────────────────
     zero: [
       n => `"${n}... zero pontos. ZERO. Você palpitou ou jogou uma moeda? Porque a moeda iria errar menos."`,
       n => `"Rodada zerada, ${n}. O Pato Mestre decreta: você é oficialmente o bagre da rodada. Título vitalício por enquanto."`,
@@ -224,73 +231,124 @@
       n => `"${n} zerou a rodada. Eu não vou rir. Vou só anotar aqui no arquivo dos bagres históricos da liga. Segue."`,
     ],
 
-    // ── Liderança ─────────────────────────────────────────
     lider: [
       n => `"DECRETO MÁXIMO: ${n} lidera o ranking. Aproveite enquanto dura, porque o Pato Mestre já escalou quem vai te destronar."`,
       n => `"${n} no topo da tabela. Bonito. Mas já vi líder despencar em duas rodadas. O Pato não esquece."`,
       n => `"Olha quem tá na ponta, ${n}! Não sei se isso é mérito ou sorte sua. Prefiro achar que é sorte — fica mais divertido."`,
     ],
 
-    // ── Lanterna ──────────────────────────────────────────
     lanterna: [
       (n, pos, total) => `"${n} está em ${pos}º de ${total}. Lanterna oficial. O Pato Mestre decreta: você tem muito trabalho pela frente, bagre."`,
       (n, pos, total) => `"Último lugar, ${n}. ÚLTIMO. Isso é difícil de conseguir — tem que errar com consistência. Respeito, de certo modo."`,
       (n, pos, total) => `"${n} fecha o ranking em ${pos}º. O troféu de Pato Mestre da liga é seu por enquanto. Não é um prêmio que você quer guardar."`,
     ],
 
-    // ── Pódio (2º ou 3º lugar) ────────────────────────────
     podio: [
       (n, pos) => `"${n} no pódio, ${pos}º lugar! Falta pouco pra derrubar o líder. O Pato autoriza a tentativa."`,
       (n, pos) => `"Top ${pos} do ranking, ${n}. Não to mal impressionado. Vamos ver se você aguenta a pressão nas próximas rodadas."`,
       (n, pos) => `"${pos}º lugar, ${n}. Você está perturbando o sono do líder. Continue perturbando — é o que o Pato gosta de ver."`,
     ],
 
-    // ── Aproveitamento alto (50%+ de cravações) ───────────
     aproveitamentoAlto: [
       (n, taxa) => `"${taxa}% de cravações, ${n}?! Ou você tem uma bola de cristal, ou você tá assistindo a todos os treinos. Suspeito."`,
       (n, taxa) => `"O Pato decreta: ${taxa}% de placar exato é o tipo de coisa que faz os outros bagres da liga perderem o sono. Bom."`,
       (n, taxa) => `"${n} está cravando ${taxa}% dos placares. Isso não é palpite — isso é ciência. Ou trapaça. Vou apurar."`,
     ],
 
-    // ── Aproveitamento zero (0% de cravações) ─────────────
     aproveitamentoZero: [
       n => `"Nenhuma cravação ainda, ${n}. O Pato Mestre informa: acertar só o vencedor é o mínimo. Tente dar uma olhada nos jogos antes de palpitar."`,
       n => `"Zero cravações, ${n}. Você palpita de olho fechado? Porque fechado aberto tá dando na mesma. Abre o olho."`,
       n => `"${n} ainda não acertou um placar exato sequer. O Pato Mestre registra oficialmente: isso é triste. Mas recuperável. Por enquanto."`,
     ],
 
-    // ── Primeiro palpite / sem jogos encerrados ────────────
     semJogos: [
       n => `"${n}! A temporada começou e você ainda não tem resultado nenhum. O Pato não vai esperar — vai logo palpitar antes que eu decrete bagre precoce."`,
       n => `"Nenhum jogo encerrado ainda, ${n}. O Pato aguarda. Com paciência finita."`,
       n => `"${n}, seus palpites ainda não foram julgados pela bola. Mas já foram julgados pelo Pato. E o veredicto sai em breve."`,
     ],
 
-    // ── Aproveitamento médio ───────────────────────────────
     aproveitamentoMedio: [
       (n, taxa) => `"${taxa}% de cravações, ${n}. Tá no meio do caminho entre genial e bagre. O Pato observa, sem dar nota ainda."`,
       (n, taxa) => `"Apenas ${taxa}% de placar exato, ${n}. Não é feio, não é bonito. É medíocre. O Pato exige mais."`,
       (n, taxa) => `"${taxa}% das cravações convertidas, ${n}. Isso não me emociona. O torcedor meia-boca da arquibancada acerta mais."`,
     ],
 
-    // ── Sequência positiva (3+ jogos acertando pelo menos 1pt) ──
     sequencia: [
       (n, seq) => `"${n} pontuou em ${seq} jogos seguidos! O Pato Mestre decreta: isso não é sorte. É consistência. E me irrita."`,
       (n, seq) => `"${seq} jogos seguidos pontuando, ${n}. O ranking inteiro já começou a te olhar diferente. Eu também. Não é elogio — é alerta."`,
       (n, seq) => `"Sequência de ${seq} jogos no positivo, ${n}. Segue assim e vai ter que me passar na frente do ranking. O Pato tá avisado."`,
     ],
 
-    // ── Servidor offline ──────────────────────────────────
     offline: [
       n => `"Servidor offline, ${n}. Nem eu consigo decretar nada agora. Volta mais tarde — o Pato precisa de conexão para julgar."`,
       n => `"${n}, o servidor dormiu antes de mim. Raro. Tente novamente em instantes — os decretos não vão esperar pra sempre."`,
       n => `"Queda de servidor, ${n}. Até o Pato Mestre tem seus limites técnicos. Mas os bagres continuam sendo bagres offline também."`,
     ],
 
+    // ════════════════════════════════════════════════════════
+    //  FRASES DE ENCERRAMENTO DE TEMPORADA
+    // ════════════════════════════════════════════════════════
+
+    // Você foi campeão
+    encerramentoCampeao: [
+      (n, pts) => `"DECRETO HISTÓRICO: ${n} é o CAMPEÃO da temporada com ${pts} pontos! O Pato Mestre confirma: você foi o menos bagre de todos. Por esse ano."`,
+      (n, pts) => `"${n} venceu a temporada com ${pts} pts. Anota aí, porque essa conquista vai ficar guardada nos registros do Pato para sempre. Parabéns. Agora não enche o saco."`,
+      (n, pts) => `"A taça é sua, ${n}! ${pts} pontos no placar final. Aprecie o troféu — a próxima temporada começa do zero e eu já estou planejando a sua queda."`,
+      (n, pts) => `"${pts} pontos e o título na mão, ${n}. O Pato Mestre decreta: você foi o craque da panela nessa temporada. Só nessa. Não vá se acostumar."`,
+    ],
+
+    // Você ficou em 2º
+    encerramentoVice: [
+      (n, campeao, pts) => `"Vice-campeão, ${n}. ${pts} pontos e tão perto... ${campeao} levou o título por um triz. O Pato Mestre decreta: dói mais do que último lugar. Aprenda com isso."`,
+      (n, campeao, pts) => `"${n}, segundo lugar com ${pts} pts. A prata brilha, mas não dá pra pendurar na parede com orgulho total. ${campeao} vai lembrar disso na sua cara."`,
+      (n, campeao, pts) => `"VICE. Isso resume sua temporada, ${n}. Um palpite diferente e você seria campeão. Um. O Pato registra essa dor para a posteridade."`,
+      (n, campeao, pts) => `"${n} terminou em 2º com ${pts} pontos. Deu quase. O Pato Mestre aconselha: chora agora, respira fundo, e prepara a vingança na próxima temporada."`,
+    ],
+
+    // Você ficou em 3º
+    encerramentoTerceiro: [
+      (n, pts) => `"Terceiro lugar, ${n}. Bronze na mão, ${pts} pontos no placar. Tecnicamente você está no pódio. O Pato reconhece. Só que o ouro ficou com outro. Bola pra frente."`,
+      (n, pts) => `"${n} cruzou a linha em 3º com ${pts} pts. Você viu o pódio de perto e ficou na parte mais fria dele. Mas pelo menos não é bagre. Isso é algo."`,
+      (n, pts) => `"3º lugar, ${n}. O Pato Mestre decreta: você foi disciplinado, mas não foi brilhante. Tem temporada que é isso mesmo. Tente o ouro na próxima."`,
+    ],
+
+    // Você ficou na metade do ranking
+    encerramentoMeio: [
+      (n, pos, total, pts) => `"${n} terminou em ${pos}º de ${total} com ${pts} pontos. Temporada mediana, nem bagre nem craque. O Pato Mestre decreta: na próxima você tem que escolher um lado."`,
+      (n, pos, total, pts) => `"${pos}º lugar no encerramento, ${n}. Você dividiu a liga ao meio. Metade da galera te olha pra baixo, metade olha pra cima. O Pato acha isso... medíocre."`,
+      (n, pos, total, pts) => `"${pts} pontos e ${pos}º lugar, ${n}. Não foi uma temporada histórica. Mas também não foi uma tragédia. Apenas... existiu. O Pato exige mais da próxima."`,
+    ],
+
+    // Você ficou em último
+    encerramentoLanterna: [
+      (n, total, pts) => `"DECRETO DE ENCERRAMENTO: ${n} terminou em ÚLTIMO, ${total}º lugar, com ${pts} pontos. O Pato Mestre confere o título de Bagre Oficial da Temporada. Com carimbo e tudo."`,
+      (n, total, pts) => `"Último de ${total}, ${n}. ${pts} pontos no placar final. Isso não é azar — exige dedicação ao erro. Inversamente impressionante. O Pato registra."`,
+      (n, total, pts) => `"${n}, lanterna da temporada com ${pts} pts. O Pato Mestre aconselha: assiste mais jogo, palpita menos no chute e não repete isso na próxima temporada. Por favor."`,
+      (n, total, pts) => `"${total}º de ${total}. Último. O Pato não vai fingir que isso é aceitável, ${n}. Mas vai fingir que acredita que você melhora na próxima. É tudo que posso oferecer."`,
+    ],
+
+    // Temporada encerrada — frase geral da liga
+    encerramentoLiga: [
+      (nomeLiga, campeao) => `"A temporada da ${nomeLiga} acabou. O Pato Mestre assina o decreto final: ${campeao} é o campeão desta edição. Os outros ficam na fila esperando a próxima chance."`,
+      (nomeLiga, campeao) => `"ENCERRADO. ${nomeLiga} teve sua temporada finalizada. ${campeao} levanta a taça, os outros levantam a sobrancelha. É o futebol de botão, é o Palpitoo."`,
+      (nomeLiga, campeao) => `"A peleja acabou na ${nomeLiga}. ${campeao} ganhou. O Pato Mestre certifica, carimba e arquiva. Que começa logo a próxima — esse silêncio tá grande demais."`,
+    ],
+
+    // Rodada mais disputada
+    encerramentoRodadaQuente: [
+      (rodada, pts) => `"A rodada ${rodada} foi a mais disputada da temporada com ${pts} pontos no total. Nessa rodada a galera se superou — até o Pato ficou empolgado. Só um pouco."`,
+      (rodada, pts) => `"${pts} pontos distribuídos na rodada ${rodada}. O Pato Mestre decreta: essa rodada foi a festa da liga. Todo mundo palpitou, todo mundo sofreu. Puro Palpitoo."`,
+    ],
+
+    // Muitos acertos exatos na temporada
+    encerramentoCravacoes: [
+      (total) => `"${total} cravações exatas nessa temporada! O Pato Mestre fica surpreso — essa liga tem gente que sabe o que faz. Ou teve muita sorte coletiva. Vou investigar."`,
+      (total) => `"DECRETO DE HONRA: ${total} placares exatos craqueados nessa temporada. A liga inteira merece um aplauso. Um aplauso curto, mas merece."`,
+    ],
   };
 
   // ════════════════════════════════════════════════════════
-  //  DECRETOS DO PATO — lógica principal
+  //  DECRETOS DO PATO — temporada em andamento
   // ════════════════════════════════════════════════════════
   function gerarDecretosPato(dados) {
     const { palpites, ranking, posAnterior } = dados;
@@ -299,9 +357,8 @@
     const finalizados = palpites.filter(p => p.pontos_obtidos !== null);
     const posAtual    = ranking ? ranking.findIndex(r => String(r.id) === String(idLogado)) : -1;
 
-    // ── Subida de posições ────────────────────────────────
     if (posAnterior !== null && posAnterior !== undefined && posAtual !== -1) {
-      const delta = posAnterior - posAtual; // positivo = subiu
+      const delta = posAnterior - posAtual;
       if (delta >= 3) {
         decretos.push({
           tipo: 'pato', icone: '🚀', badge: 'Decreto do Pato',
@@ -319,7 +376,6 @@
       }
     }
 
-    // ── Pontuação da última rodada ────────────────────────
     const ultimaRodada = finalizados.length > 0
       ? Math.max(...finalizados.map(p => p.rodada || p.numero_rodada || 1))
       : null;
@@ -345,7 +401,6 @@
       }
     }
 
-    // ── Posição no ranking ────────────────────────────────
     if (posAtual === 0) {
       decretos.push({
         tipo: 'pato', icone: '🏆', badge: 'Decreto do Pato',
@@ -369,7 +424,6 @@
       });
     }
 
-    // ── Aproveitamento de cravações ───────────────────────
     if (finalizados.length >= 3) {
       const cravadas = finalizados.filter(p => p.pontos_obtidos === 3).length;
       const taxa     = Math.round((cravadas / finalizados.length) * 100);
@@ -398,7 +452,6 @@
       }
     }
 
-    // ── Sem jogos encerrados ──────────────────────────────
     if (finalizados.length === 0) {
       decretos.push({
         tipo: 'pato', icone: '🦆', badge: 'Decreto do Pato',
@@ -408,9 +461,7 @@
       });
     }
 
-    // ── Sequência positiva ────────────────────────────────
     if (finalizados.length >= 3) {
-      // Detecta sequência de jogos consecutivos com pelo menos 1 ponto
       const ordenados = [...finalizados].sort((a, b) => (b.rodada || 0) - (a.rodada || 0));
       let seq = 0;
       for (const p of ordenados) {
@@ -428,6 +479,122 @@
     }
 
     return decretos;
+  }
+
+  // ════════════════════════════════════════════════════════
+  //  DECRETOS DO PATO — encerramento de temporada
+  // ════════════════════════════════════════════════════════
+  function gerarDecretosEncerramento(resumo, ligaId) {
+    if (!resumo) return [];
+    const r = typeof resumo === 'string' ? JSON.parse(resumo) : resumo;
+    const itens = [];
+
+    const ranking     = r.ranking || [];
+    const campeao     = r.campeao;
+    const vice        = r.vice_campeao;
+    const terceiro    = r.terceiro_lugar;
+    const stats       = r.stats || {};
+    const nomeLiga    = r._nomeLiga || 'sua liga';
+    const posEu       = ranking.findIndex(m => String(m.id) === String(idLogado));
+    const total       = ranking.length;
+
+    // ── Card de destaque: Liga Finalizada ─────────────────
+    itens.push({
+      tipo: 'encerramento', icone: '🏆', badge: 'Encerramento',
+      titulo: `Liga "${nomeLiga}" — FINALIZADA!`,
+      descricao: `Todas as rodadas foram disputadas. O campeão foi coroado. Clique abaixo para ver o pódio e as estatísticas completas da temporada.`,
+      tempo: 'Temporada encerrada',
+      ligaId
+    });
+
+    // ── Frase geral da liga ──────────────────────────────
+    if (campeao) {
+      itens.push({
+        tipo: 'encerramento', icone: '🥇', badge: 'Encerramento',
+        titulo: `Temporada encerrada! Campeão: ${campeao.nome}`,
+        descricao: pega(FRASES.encerramentoLiga)(nomeLiga, campeao.nome),
+        tempo: 'Temporada encerrada',
+        ligaId
+      });
+    }
+
+    // ── Frase personalizada pela posição do usuário ──────
+    if (posEu !== -1 && ranking[posEu]) {
+      const euDados = ranking[posEu];
+      const pts     = euDados.total_pontos || 0;
+
+      if (posEu === 0) {
+        // Campeão
+        itens.push({
+          tipo: 'encerramento', icone: '🥇', badge: 'Decreto do Pato',
+          titulo: '🎉 VOCÊ É O CAMPEÃO!',
+          descricao: pega(FRASES.encerramentoCampeao)(primeiro, pts),
+          tempo: 'Temporada encerrada',
+          ligaId
+        });
+      } else if (posEu === 1 && campeao) {
+        // Vice
+        itens.push({
+          tipo: 'encerramento', icone: '🥈', badge: 'Decreto do Pato',
+          titulo: `Vice-campeão — ${pts} pts`,
+          descricao: pega(FRASES.encerramentoVice)(primeiro, campeao.nome, pts),
+          tempo: 'Temporada encerrada',
+          ligaId
+        });
+      } else if (posEu === 2) {
+        // Terceiro
+        itens.push({
+          tipo: 'encerramento', icone: '🥉', badge: 'Decreto do Pato',
+          titulo: `3º lugar — ${pts} pts`,
+          descricao: pega(FRASES.encerramentoTerceiro)(primeiro, pts),
+          tempo: 'Temporada encerrada',
+          ligaId
+        });
+      } else if (posEu === total - 1 && total > 2) {
+        // Lanterna
+        itens.push({
+          tipo: 'encerramento', icone: '🪣', badge: 'Decreto do Pato',
+          titulo: `Lanterna — ${posEu + 1}º de ${total}`,
+          descricao: pega(FRASES.encerramentoLanterna)(primeiro, total, pts),
+          tempo: 'Temporada encerrada',
+          ligaId
+        });
+      } else {
+        // Meio do ranking
+        itens.push({
+          tipo: 'encerramento', icone: '📍', badge: 'Decreto do Pato',
+          titulo: `${posEu + 1}º lugar — ${pts} pts`,
+          descricao: pega(FRASES.encerramentoMeio)(primeiro, posEu + 1, total, pts),
+          tempo: 'Temporada encerrada',
+          ligaId
+        });
+      }
+    }
+
+    // ── Rodada mais disputada ────────────────────────────
+    if (stats.rodada_mais_disputada) {
+      const rd = stats.rodada_mais_disputada;
+      itens.push({
+        tipo: 'encerramento', icone: '🔥', badge: 'Encerramento',
+        titulo: `Rodada ${rd.rodada} foi a mais quente!`,
+        descricao: pega(FRASES.encerramentoRodadaQuente)(rd.rodada, rd.pontos),
+        tempo: 'Temporada encerrada',
+        ligaId
+      });
+    }
+
+    // ── Total de cravações ───────────────────────────────
+    if (stats.total_acertos_exatos >= 5) {
+      itens.push({
+        tipo: 'encerramento', icone: '🎯', badge: 'Encerramento',
+        titulo: `${stats.total_acertos_exatos} cravações na temporada!`,
+        descricao: pega(FRASES.encerramentoCravacoes)(stats.total_acertos_exatos),
+        tempo: 'Temporada encerrada',
+        ligaId
+      });
+    }
+
+    return itens;
   }
 
   // ════════════════════════════════════════════════════════
@@ -459,7 +626,6 @@
         tempo: 'Esta temporada'
       });
 
-      // Posição
       if (ranking && ranking.length > 0) {
         const pos = ranking.findIndex(r => String(r.id) === String(idLogado));
         if (pos !== -1) {
@@ -590,6 +756,10 @@
 
     container.innerHTML = '';
     filtrados.forEach((item, idx) => {
+      const linkResumo = item.ligaId
+        ? `<a class="feed-link-resumo" href="resumo.html?id=${item.ligaId}">🏆 Ver Resumo da Temporada →</a>`
+        : '';
+
       container.innerHTML += `
         <div class="feed-item tipo-${item.tipo}" style="animation-delay:${idx * 0.05}s;">
           <div class="feed-icone">${item.icone}</div>
@@ -597,6 +767,7 @@
             <span class="badge-tipo badge-${item.tipo}">${item.badge}</span>
             <p class="feed-titulo">${item.titulo}</p>
             <p class="feed-descricao">${item.descricao}</p>
+            ${linkResumo}
             <p class="feed-tempo">🕐 ${item.tempo}</p>
           </div>
         </div>`;
@@ -625,30 +796,49 @@
       const palpites = await resPalpites.json();
       const ranking  = await resRanking.json();
 
-      let ligaAtual   = null;
-      let posAnterior = null;
+      let ligaAtual     = null;
+      let ligaId        = null;
+      let ligaStatus    = null;
+      let resumo        = null;
+      let posAnterior   = null;
 
       if (idLogado) {
         try {
           const resLiga = await fetch(`https://palpitoo-api.onrender.com/minha-liga/${idLogado}`);
           const dLiga   = await resLiga.json();
-          if (dLiga.liga) ligaAtual = dLiga.liga.nome;
+          if (dLiga.liga) {
+            ligaAtual  = dLiga.liga.nome;
+            ligaId     = dLiga.liga.id_liga;
+            ligaStatus = dLiga.liga.status;
+            resumo     = dLiga.liga.resumo_encerramento || null;
+          }
         } catch(_) {}
 
-        // Posição anterior pode vir do histórico ou de um endpoint específico
-        // Por enquanto guarda/lê no sessionStorage para comparar entre rodadas
         const posAtual = ranking.findIndex(r => String(r.id) === String(idLogado));
         const chave    = `pos_anterior_${idLogado}`;
         posAnterior    = sessionStorage.getItem(chave) !== null ? parseInt(sessionStorage.getItem(chave)) : null;
         if (posAtual !== -1) sessionStorage.setItem(chave, posAtual);
       }
 
-      const feedPato    = idLogado ? gerarDecretosPato({ palpites, ranking, posAnterior }) : [];
+      // ── Monta o feed conforme status da liga ──────────
+      let feedEncerramento = [];
+      let feedPato         = [];
+
+      // Liga finalizada ou aguardando com resumo — mostra decretos de encerramento
+      if ((ligaStatus === 'finalizado' || ligaStatus === 'aguardando') && resumo) {
+        const resumoObj = typeof resumo === 'string' ? JSON.parse(resumo) : resumo;
+        resumoObj._nomeLiga = ligaAtual || 'sua liga';
+        feedEncerramento = gerarDecretosEncerramento(resumoObj, ligaId);
+      } else if (idLogado) {
+        // Temporada ativa — decretos normais
+        feedPato = gerarDecretosPato({ palpites, ranking, posAnterior });
+      }
+
       const feedPessoal = idLogado ? gerarFeedPessoal(palpites, ranking) : [];
       const feedLiga    = gerarFeedLiga(jogos, ligaAtual);
       const feedSistema = gerarFeedSistema();
 
-      todosFeedItens = [...feedPato, ...feedPessoal, ...feedLiga, ...feedSistema];
+      todosFeedItens = [...feedEncerramento, ...feedPato, ...feedPessoal, ...feedLiga, ...feedSistema];
       renderizarFeed(todosFeedItens);
 
     } catch(e) {

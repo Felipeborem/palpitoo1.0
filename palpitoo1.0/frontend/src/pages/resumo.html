@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palpitoo — Temporada Encerrada</title>
+  <link rel="icon" href="./img/pato.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0a0a0c;
+      --card:      #111115;
+      --border:    rgba(255,255,255,0.07);
+      --gold:      #f5c842;
+      --gold-dim:  rgba(245,200,66,0.15);
+      --silver:    #c8d0d8;
+      --bronze:    #cd7f32;
+      --accent:    #c0345a;
+      --green:     #22c55e;
+      --gray:      #6b7280;
+      --white:     #f0f0f2;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── CONFETTI ── */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 60px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,200,66,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-rays {
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: conic-gradient(from 0deg, transparent 0deg, rgba(245,200,66,0.03) 5deg, transparent 10deg, transparent 20deg, rgba(245,200,66,0.03) 25deg, transparent 30deg);
+      animation: spin 60s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes spin { to { transform: translateX(-50%) rotate(360deg); } }
+
+    .season-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(245,200,66,0.3);
+      border-radius: 99px;
+      padding: 6px 18px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+      animation: fadeDown .6s ease both;
+    }
+
+    .hero-titulo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 12vw, 96px);
+      line-height: .95;
+      letter-spacing: .02em;
+      color: var(--white);
+      margin-bottom: 10px;
+      animation: fadeDown .6s .1s ease both;
+    }
+    .hero-titulo span { color: var(--gold); }
+
+    .hero-subtitulo {
+      font-size: 15px;
+      color: var(--gray);
+      max-width: 380px;
+      line-height: 1.6;
+      margin-bottom: 48px;
+      animation: fadeDown .6s .2s ease both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── PÓDIO ── */
+    .podio-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 16px;
+      animation: fadeUp .7s .3s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .podio-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .podio-avatar {
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid;
+      display: block;
+    }
+
+    .podio-nome {
+      font-family: 'Russo One', sans-serif;
+      font-size: 12px;
+      text-align: center;
+      max-width: 90px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .podio-pts {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: .04em;
+    }
+
+    .podio-base {
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      width: 90px;
+    }
+
+    /* 1° */
+    .podio-item.primeiro .podio-avatar { width: 80px; height: 80px; border-color: var(--gold); box-shadow: 0 0 30px rgba(245,200,66,.35); }
+    .podio-item.primeiro .podio-nome   { font-size: 14px; color: var(--gold); max-width: 110px; }
+    .podio-item.primeiro .podio-pts    { color: var(--gold); font-size: 28px; }
+    .podio-item.primeiro .podio-base   { height: 100px; background: linear-gradient(180deg,rgba(245,200,66,.2),rgba(245,200,66,.05)); border: 1px solid rgba(245,200,66,.3); width: 110px; }
+    .podio-item.primeiro .medal        { font-size: 36px; }
+
+    /* 2° */
+    .podio-item.segundo .podio-avatar  { width: 62px; height: 62px; border-color: var(--silver); }
+    .podio-item.segundo .podio-nome    { color: var(--silver); }
+    .podio-item.segundo .podio-pts     { color: var(--silver); }
+    .podio-item.segundo .podio-base    { height: 72px; background: rgba(200,208,216,.08); border: 1px solid rgba(200,208,216,.2); }
+    .podio-item.segundo .medal         { font-size: 28px; }
+
+    /* 3° */
+    .podio-item.terceiro .podio-avatar { width: 56px; height: 56px; border-color: var(--bronze); }
+    .podio-item.terceiro .podio-nome   { color: var(--bronze); }
+    .podio-item.terceiro .podio-pts    { color: var(--bronze); }
+    .podio-item.terceiro .podio-base   { height: 52px; background: rgba(205,127,50,.08); border: 1px solid rgba(205,127,50,.2); }
+    .podio-item.terceiro .medal        { font-size: 24px; }
+
+    /* ── MAIN ── */
+    .main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* ── SECTION TITLE ── */
+    .sec-title {
+      font-family: 'Russo One', sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--gray);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      margin-top: 40px;
+    }
+    .sec-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── STATS GRID ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    @media (min-width: 480px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 12px;
+      text-align: center;
+      transition: border-color .2s;
+    }
+    .stat-card:hover { border-color: rgba(245,200,66,.25); }
+    .stat-card .val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-card .lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    /* ── DESTAQUES ── */
+    .destaque-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 480px) { .destaque-grid { grid-template-columns: 1fr 1fr; } }
+
+    .destaque-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all .2s;
+    }
+    .destaque-card:hover { border-color: var(--accent); transform: translateX(3px); }
+
+    .destaque-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .destaque-info { flex-grow: 1; min-width: 0; }
+    .destaque-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gray);
+      margin-bottom: 4px;
+    }
+    .destaque-nome {
+      font-family: 'Russo One', sans-serif;
+      font-size: 15px;
+      color: var(--white);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .destaque-valor {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ── RANKING ── */
+    .rank-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: all .2s;
+    }
+    .rank-row:hover { border-color: rgba(192,52,90,.4); transform: translateX(3px); }
+    .rank-row.eu    { border-color: rgba(192,52,90,.5); background: rgba(192,52,90,.06); }
+
+    .rank-pos {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      min-width: 28px;
+      text-align: center;
+    }
+    .rank-info { flex-grow: 1; min-width: 0; }
+    .rank-nome {
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rank-mini { font-size: 10px; color: var(--gray); margin-top: 2px; }
+    .rank-pts {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .rank-pts span { font-size: 11px; color: var(--gray); font-family: 'DM Sans', sans-serif; }
+
+    /* ── RODADA DESTAQUE ── */
+    .rodada-destaque {
+      background: var(--card);
+      border: 1px solid rgba(245,200,66,.2);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .rodada-destaque .rd-label { font-size: 12px; color: var(--gray); }
+    .rodada-destaque .rd-valor {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      color: var(--gold);
+    }
+
+    /* ── BTN ── */
+    .btn-voltar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(192,52,90,.15);
+      border: 1px solid rgba(192,52,90,.4);
+      border-radius: 12px;
+      padding: 12px 24px;
+      color: #e06080;
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      text-decoration: none;
+      transition: all .2s;
+      cursor: pointer;
+      margin-top: 32px;
+    }
+    .btn-voltar:hover { background: rgba(192,52,90,.25); }
+
+    /* ── CHAMPION FLASH ── */
+    .champion-flash {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(245,200,66,0.15), transparent 60%);
+      pointer-events: none;
+      animation: flash 1.2s ease both;
+      z-index: 998;
+    }
+    @keyframes flash {
+      0%   { opacity: 0; }
+      20%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* ── LOADING ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 9999;
+      transition: opacity .4s;
+    }
+    #loading.gone { opacity: 0; pointer-events: none; }
+    .loading-pato { font-size: 48px; animation: bounce .7s infinite alternate; }
+    @keyframes bounce { to { transform: translateY(-10px); } }
+    .loading-txt {
+      font-family: 'Russo One', sans-serif;
+      font-size: 13px;
+      color: var(--gray);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    /* ── TAG VOCÊ ── */
+    .voce-tag {
+      font-size: 10px;
+      color: #c0345a;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+    }
+
+    /* ── EMPTY ── */
+    .empty { text-align: center; padding: 30px; color: var(--gray); font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="loading-pato">🦆</div>
+  <p class="loading-txt">Calculando a glória...</p>
+</div>
+
+<div class="champion-flash" id="champion-flash" style="display:none;"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-rays"></div>
+
+  <div class="season-tag" id="season-tag">🏆 TEMPORADA ENCERRADA</div>
+  <h1 class="hero-titulo">FIM DE<br><span id="hero-liga-nome">TEMPORADA</span></h1>
+  <p class="hero-subtitulo" id="hero-subtitulo">Os pontos foram contados. O campeão foi coroado. A história ficou registrada.</p>
+
+  <!-- PÓDIO -->
+  <div class="podio-wrap" id="podio-wrap">
+    <!-- gerado via JS -->
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- STATS -->
+  <p class="sec-title">📊 Estatísticas da Temporada</p>
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="val" id="s-participantes">—</div><div class="lbl">Participantes</div></div>
+    <div class="stat-card"><div class="val" id="s-palpites">—</div><div class="lbl">Palpites</div></div>
+    <div class="stat-card"><div class="val" id="s-exatos">—</div><div class="lbl">Cravações</div></div>
+    <div class="stat-card"><div class="val" id="s-maior">—</div><div class="lbl">Maior Pontuação</div></div>
+  </div>
+
+  <!-- RODADA MAIS QUENTE -->
+  <div id="rodada-quente-wrap" style="margin-top:10px;display:none;">
+    <div class="rodada-destaque">
+      <div>
+        <p class="rd-label">🔥 Rodada mais disputada</p>
+        <p class="rd-valor" id="rd-numero">—</p>
+      </div>
+      <div style="text-align:right;">
+        <p class="rd-label">Total de pontos marcados</p>
+        <p class="rd-valor" id="rd-pontos">—</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESTAQUES INDIVIDUAIS -->
+  <p class="sec-title">⚡ Destaques</p>
+  <div class="destaque-grid" id="destaque-grid">
+    <!-- gerado via JS -->
+  </div>
+
+  <!-- RANKING FINAL -->
+  <p class="sec-title">🏅 Ranking Final</p>
+  <div id="lista-ranking-final">
+    <div class="empty">Carregando...</div>
+  </div>
+
+  <div style="text-align:center;">
+    <a href="minhaliga.html" class="btn-voltar">← Voltar para a Liga</a>
+  </div>
+</main>
+
+<script>
+  const API = 'https://palpitoo-api.onrender.com';
+  const idLogado = localStorage.getItem('craqueId') || localStorage.getItem('id_craque');
+  const params = new URLSearchParams(window.location.search);
+  const ligaId = params.get('id');
+
+  // ── CONFETTI ──
+  function lancarConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const cores = ['#f5c842','#c0345a','#22c55e','#60a5fa','#f472b6','#a78bfa'];
+    const particulas = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 200,
+      r: 4 + Math.random() * 6,
+      cor: cores[Math.floor(Math.random() * cores.length)],
+      vx: (Math.random() - .5) * 3,
+      vy: 2 + Math.random() * 4,
+      rot: Math.random() * 360,
+      rotV: (Math.random() - .5) * 8,
+      shape: Math.random() > .5 ? 'rect' : 'circle',
+    }));
+
+    let frame = 0;
+    function animar() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particulas.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.cor;
+        ctx.globalAlpha = Math.max(0, 1 - frame / 220);
+        if (p.shape === 'rect') ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
+        else { ctx.beginPath(); ctx.arc(0, 0, p.r/2, 0, Math.PI*2); ctx.fill(); }
+        ctx.restore();
+        p.x += p.vx; p.y += p.vy; p.rot += p.rotV;
+        if (p.y > canvas.height + 20) { p.y = -20; p.x = Math.random() * canvas.width; }
+      });
+      frame++;
+      if (frame < 260) requestAnimationFrame(animar);
+      else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    animar();
+  }
+
+  // ── PÓDIO ──
+  function renderPodio(ranking) {
+    const wrap = document.getElementById('podio-wrap');
+    const primeiro = ranking[0] || null;
+    const segundo  = ranking[1] || null;
+    const terceiro = ranking[2] || null;
+
+    function itemHTML(m, cls, medalha, size) {
+      if (!m) return '';
+      const foto = m.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nome||'?')}&background=7A1E3A&color=fff&size=${size}`;
+      const ehEu = String(m.id) === String(idLogado);
+      return `
+        <div class="podio-item ${cls}">
+          <div class="medal">${medalha}</div>
+          <img class="podio-avatar" src="${foto}" width="${size}" height="${size}"
+               onerror="this.src='https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=${size}'">
+          <p class="podio-nome">${m.nome}${ehEu?' <span class="voce-tag">(você)</span>':''}</p>
+          <p class="podio-pts">${m.total_pontos}<span style="font-size:12px;font-family:'DM Sans';color:var(--gray);"> pts</span></p>
+          <div class="podio-base">${['1°','2°','3°'][['primeiro','segundo','terceiro'].indexOf(cls)]}</div>
+        </div>`;
+    }
+
+    wrap.innerHTML =
+      itemHTML(segundo,  'segundo',  '🥈', 62) +
+      itemHTML(primeiro, 'primeiro', '🥇', 80) +
+      itemHTML(terceiro, 'terceiro', '🥉', 56);
+  }
+
+  // ── DESTAQUES ──
+  function renderDestaques(ranking) {
+    const grid = document.getElementById('destaque-grid');
+    if (!ranking.length) { grid.innerHTML = '<div class="empty">Nenhum dado disponível.</div>'; return; }
+
+    // Mais cravações (acertos exatos)
+    const maisCravacoes = [...ranking].sort((a,b) => (b.acertos_exatos||0)-(a.acertos_exatos||0))[0];
+    // Mais acertos de resultado
+    const maisResultados = [...ranking].sort((a,b) => (b.acertos_resultado||0)-(a.acertos_resultado||0))[0];
+    // Mais consistente (menos erros com mais palpites)
+    const maisConsistente = [...ranking].filter(m => (m.total_palpites||0) > 0)
+      .sort((a,b) => ((a.erros||0)/(a.total_palpites||1)) - ((b.erros||0)/(b.total_palpites||1)))[0];
+    // Mais palpites enviados
+    const maisPalpites = [...ranking].sort((a,b) => (b.total_palpites||0)-(a.total_palpites||0))[0];
+
+    const destaques = [
+      { icon: '🎯', label: 'Rei das Cravações', m: maisCravacoes, val: `${maisCravacoes?.acertos_exatos||0} exatos` },
+      { icon: '👁️', label: 'Melhor Leitura',    m: maisResultados, val: `${maisResultados?.acertos_resultado||0} resultados` },
+      { icon: '🛡️', label: 'Mais Consistente',  m: maisConsistente, val: `${maisConsistente?.erros||0} erros` },
+      { icon: '⚡', label: 'Mais Palpites',      m: maisPalpites, val: `${maisPalpites?.total_palpites||0} palpites` },
+    ];
+
+    grid.innerHTML = destaques.map(d => {
+      if (!d.m) return '';
+      const foto = d.m.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(d.m.nome||'?')}&background=7A1E3A&color=fff&size=40`;
+      const ehEu = String(d.m.id) === String(idLogado);
+      return `
+        <div class="destaque-card">
+          <div class="destaque-icon">${d.icon}</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-grow:1;min-width:0;">
+            <img src="${foto}" width="36" height="36" style="border-radius:50%;object-fit:cover;border:2px solid var(--border);flex-shrink:0;"
+                 onerror="this.src='https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=36'">
+            <div class="destaque-info">
+              <p class="destaque-label">${d.label}</p>
+              <p class="destaque-nome">${d.m.nome}${ehEu?' <span class="voce-tag">(você)</span>':''}</p>
+            </div>
+          </div>
+          <div class="destaque-valor">${d.val}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── RANKING FINAL ──
+  function renderRanking(ranking) {
+    const lista = document.getElementById('lista-ranking-final');
+    if (!ranking.length) { lista.innerHTML = '<div class="empty">Nenhum membro encontrado.</div>'; return; }
+
+    const medalhas = ['🥇','🥈','🥉'];
+    lista.innerHTML = ranking.map((m, i) => {
+      const ehEu = String(m.id) === String(idLogado);
+      const foto = m.foto_perfil || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.nome||'?')}&background=7A1E3A&color=fff&size=36`;
+      const posHtml = i < 3
+        ? `<span class="rank-pos" style="color:${['#f5c842','#c8d0d8','#cd7f32'][i]}">${medalhas[i]}</span>`
+        : `<span class="rank-pos" style="color:#6b7280;">${i+1}°</span>`;
+      const tag  = ehEu ? 'div' : 'a';
+      const href = ehEu ? '' : `href="perfilpublico.html?id=${m.id}"`;
+      return `
+        <${tag} ${href} class="rank-row ${ehEu?'eu':''}">
+          ${posHtml}
+          <img src="${foto}" width="36" height="36" style="border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.08);flex-shrink:0;"
+               onerror="this.src='https://ui-avatars.com/api/?name=?&background=7A1E3A&color=fff&size=36'">
+          <div class="rank-info">
+            <p class="rank-nome">${m.nome}${ehEu?' <span class="voce-tag">(você)</span>':''}</p>
+            <p class="rank-mini">✅ ${m.acertos_exatos||0} exatos · 👍 ${m.acertos_resultado||0} resultado · ❌ ${m.erros||0} erros</p>
+          </div>
+          <div class="rank-pts">${m.total_pontos}<span> pts</span></div>
+        </${tag}>`;
+    }).join('');
+  }
+
+  // ── CARREGAR DADOS ──
+  async function carregar() {
+    if (!ligaId) {
+      document.getElementById('loading').classList.add('gone');
+      document.getElementById('hero-liga-nome').innerText = 'TEMPORADA';
+      return;
+    }
+
+    try {
+      // Busca dados da liga
+      const [resLiga, resRanking] = await Promise.all([
+        fetch(`${API}/liga/${ligaId}`),
+        fetch(`${API}/ranking-liga/${ligaId}`)
+      ]);
+
+      const dadosLiga   = resLiga.ok   ? await resLiga.json()   : {};
+      const dadosRanking = resRanking.ok ? await resRanking.json() : {};
+      const liga    = dadosLiga.liga || {};
+      const ranking = Array.isArray(dadosRanking) ? dadosRanking : (dadosRanking.ranking || []);
+
+      // Tenta pegar resumo salvo
+      let resumo = null;
+      try {
+        if (liga.resumo_encerramento) {
+          resumo = typeof liga.resumo_encerramento === 'string'
+            ? JSON.parse(liga.resumo_encerramento)
+            : liga.resumo_encerramento;
+        }
+      } catch(_) {}
+
+      // Mescla dados: usa resumo se disponível, fallback para ranking atual
+      const rankingFinal = resumo?.ranking?.length ? resumo.ranking : ranking;
+      const stats = resumo?.stats || {};
+
+      // Hero
+      document.getElementById('hero-liga-nome').innerText = (liga.nome || 'TEMPORADA').toUpperCase();
+      const temporada = liga.temporada || 1;
+      document.getElementById('season-tag').innerHTML = `🏆 TEMPORADA ${temporada} — ENCERRADA`;
+      if (liga.nome) {
+        document.getElementById('hero-subtitulo').innerText =
+          `"${liga.nome}" chegou ao fim. Os pontos foram contados. A história ficou registrada.`;
+      }
+
+      // Stats
+      document.getElementById('s-participantes').innerText = resumo?.total_participantes || rankingFinal.length || '—';
+      document.getElementById('s-palpites').innerText      = stats.total_palpites       || '—';
+      document.getElementById('s-exatos').innerText        = stats.total_acertos_exatos || rankingFinal.reduce((a,m) => a+(m.acertos_exatos||0),0) || '—';
+      document.getElementById('s-maior').innerText         = stats.maior_pontuacao      || (rankingFinal[0]?.total_pontos || '—');
+
+      // Rodada mais quente
+      if (stats.rodada_mais_disputada) {
+        document.getElementById('rodada-quente-wrap').style.display = 'block';
+        document.getElementById('rd-numero').innerText = `Rodada ${stats.rodada_mais_disputada.rodada}`;
+        document.getElementById('rd-pontos').innerText = `${stats.rodada_mais_disputada.pontos} pts`;
+      }
+
+      // Pódio + Destaques + Ranking
+      renderPodio(rankingFinal);
+      renderDestaques(rankingFinal);
+      renderRanking(rankingFinal);
+
+      // Celebração
+      document.getElementById('loading').classList.add('gone');
+      setTimeout(() => {
+        const flash = document.getElementById('champion-flash');
+        flash.style.display = 'block';
+        setTimeout(() => flash.style.display = 'none', 1200);
+        lancarConfetti();
+      }, 300);
+
+      // Marca como visto
+      localStorage.setItem(`palpitoo_resumo_visto_${ligaId}`, '1');
+
+    } catch(e) {
+      console.error(e);
+      document.getElementById('loading').classList.add('gone');
+    }
+  }
+
+  carregar();
+</script>
+
+</body>
+</html>

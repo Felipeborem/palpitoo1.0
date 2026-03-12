@@ -1241,12 +1241,25 @@ async function calcularPontosAutomaticamente() {
               AND p.pontos_obtidos IS NULL
           `, [rodadaInicial, rodadaFinal]);
           if (Number(palpitesPendentes.rows[0].total) === 0) {
-            // Temporada concluída — volta pra 'aguardando' pra próxima temporada
+            // Verifica se a liga já está finalizada para não sobrescrever
+            const ligaAtualStatus = await pool.query('SELECT status FROM ligas WHERE id_liga = $1', [liga.id_liga]);
+            if (ligaAtualStatus.rows[0]?.status === 'finalizado') continue;
+
+            // Gera o resumo estatístico da temporada
+            let resumoJson = null;
+            try {
+              const resumo = await gerarResumoLiga(liga.id_liga);
+              resumoJson = JSON.stringify(resumo);
+            } catch(eResumo) {
+              console.error(`Erro ao gerar resumo da liga ${liga.id_liga}:`, eResumo.message);
+            }
+
+            // Marca a liga como 'finalizado' e salva o resumo
             await pool.query(
-              `UPDATE ligas SET status = 'aguardando' WHERE id_liga = $1`,
-              [liga.id_liga]
+              `UPDATE ligas SET status = 'finalizado', data_encerramento = NOW(), resumo_encerramento = $2 WHERE id_liga = $1`,
+              [liga.id_liga, resumoJson]
             );
-            console.log(`⏸️ Liga "${liga.nome}" (ID ${liga.id_liga}) — temporada concluída, aguardando próxima.`);
+            console.log(`🏆 Liga "${liga.nome}" (ID ${liga.id_liga}) — FINALIZADA! Resumo gerado e salvo.`);
           }
         }
       }
@@ -1350,8 +1363,11 @@ app.post('/iniciar-temporada', async (req, res) => {
       return res.status(400).json({ erro: 'A temporada já está em andamento.' });
     }
 
+    // Se a liga estava finalizada, limpa o resumo anterior ao reiniciar
+    const setResumo = (liga.status === 'finalizado') ? `, resumo_encerramento = NULL, data_encerramento = NULL` : '';
+
     await pool.query(
-      `UPDATE ligas SET status = 'ativa' WHERE id_liga = $1`,
+      `UPDATE ligas SET status = 'ativa'${setResumo} WHERE id_liga = $1`,
       [liga_id]
     );
 
@@ -1371,8 +1387,8 @@ app.get('/resumo-liga/:liga_id', async (req, res) => {
     const ligaRes = await pool.query('SELECT resumo_encerramento, status, nome FROM ligas WHERE id_liga = $1', [liga_id]);
     if (ligaRes.rows.length === 0) return res.status(404).json({ erro: 'Liga não encontrada.' });
     const { resumo_encerramento, status, nome } = ligaRes.rows[0];
-    if (status !== 'encerrada') return res.status(400).json({ erro: 'Liga ainda não foi encerrada.' });
-    res.json({ nome, resumo: resumo_encerramento });
+    if (status !== 'encerrada' && status !== 'finalizado') return res.status(400).json({ erro: 'Liga ainda não foi finalizada.' });
+    res.json({ nome, status, resumo: resumo_encerramento });
   } catch (err) {
     console.error('Erro ao buscar resumo:', err);
     res.status(500).json({ erro: 'Erro interno.' });
