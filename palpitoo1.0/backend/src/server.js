@@ -883,52 +883,57 @@ app.post('/entrar-liga-clique', async (req, res) => {
 app.post('/sair-liga', async (req, res) => {
   try {
     const { liga_id, usuario_id } = req.body;
+    console.log(`[SAIR-LIGA] liga_id=${liga_id} usuario_id=${usuario_id}`);
 
-    // Verifica se o usuário é dono da liga
+    if (!liga_id || !usuario_id) {
+      return res.status(400).json({ erro: 'liga_id e usuario_id são obrigatórios.' });
+    }
+
     const ligaRes = await pool.query('SELECT dono_id FROM ligas WHERE id_liga = $1', [liga_id]);
+    console.log(`[SAIR-LIGA] liga encontrada:`, ligaRes.rows);
+
     if (ligaRes.rows.length === 0) {
       return res.status(400).json({ erro: 'Liga não encontrada.' });
     }
+
     const ehDono = String(ligaRes.rows[0].dono_id) === String(usuario_id);
+    console.log(`[SAIR-LIGA] ehDono=${ehDono}`);
 
     if (ehDono) {
-      // Busca o membro mais antigo que não seja o dono atual
-      const membroMaisAntigo = await pool.query(`
-        SELECT usuario_id FROM usuarios_ligas
-        WHERE liga_id = $1 AND usuario_id != $2
-        ORDER BY criado_em ASC
-        LIMIT 1
-      `, [liga_id, usuario_id]);
+      const outrosMembros = await pool.query(
+        `SELECT usuario_id FROM usuarios_ligas WHERE liga_id = $1 AND usuario_id != $2 ORDER BY criado_em ASC LIMIT 1`,
+        [liga_id, usuario_id]
+      );
+      console.log(`[SAIR-LIGA] outros membros:`, outrosMembros.rows);
 
-      if (membroMaisAntigo.rows.length > 0) {
-        // Transfere a liderança antes de sair
-        const novoDonoId = membroMaisAntigo.rows[0].usuario_id;
+      if (outrosMembros.rows.length > 0) {
+        const novoDonoId = outrosMembros.rows[0].usuario_id;
+        console.log(`[SAIR-LIGA] transferindo liderança para ${novoDonoId}`);
         await pool.query('UPDATE ligas SET dono_id = $1 WHERE id_liga = $2', [novoDonoId, liga_id]);
-        console.log(`👑 Liderança da liga ${liga_id} transferida para usuário ${novoDonoId}`);
       } else {
-        // Era o último membro — deleta a liga
-        await pool.query('DELETE FROM ligas WHERE id_liga = $1', [liga_id]);
+        console.log(`[SAIR-LIGA] último membro — deletando liga`);
         await pool.query('DELETE FROM usuarios_ligas WHERE liga_id = $1', [liga_id]);
-        console.log(`🗑️ Liga ${liga_id} deletada — era o único membro.`);
+        await pool.query('DELETE FROM ligas WHERE id_liga = $1', [liga_id]);
         return res.json({ mensagem: 'Liga encerrada pois você era o único membro.' });
       }
     }
 
-    // Remove o usuário da liga
+    console.log(`[SAIR-LIGA] removendo usuário da liga`);
     const deletar = await pool.query(
       'DELETE FROM usuarios_ligas WHERE liga_id = $1 AND usuario_id = $2 RETURNING *',
       [liga_id, usuario_id]
     );
+    console.log(`[SAIR-LIGA] deletar result:`, deletar.rows);
 
     if (deletar.rows.length === 0) {
-      return res.status(400).json({ erro: 'Você não faz parte desta liga ou ela não existe.' });
+      return res.status(400).json({ erro: 'Você não faz parte desta liga.' });
     }
 
     res.json({ mensagem: 'Você saiu da liga com sucesso!' });
 
   } catch (err) {
-    console.error("Erro ao sair da liga:", err);
-    res.status(500).json({ erro: 'Erro interno ao tentar sair da liga.' });
+    console.error('[SAIR-LIGA] ERRO DETALHADO:', err.message, err.stack);
+    res.status(500).json({ erro: err.message });
   }
 });
 
