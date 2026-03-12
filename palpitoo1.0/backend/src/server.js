@@ -202,7 +202,7 @@ app.post('/criar-liga', async (req, res) => {
     // 1. Salva a liga nova no banco com total_rodadas e rodada_inicial
     const novaLiga = await pool.query(
       `INSERT INTO ligas (nome, codigo_convite, dono_id, total_rodadas, rodada_inicial, status)
-       VALUES ($1, $2, $3, $4, $5, 'ativa') RETURNING *`,
+       VALUES ($1, $2, $3, $4, $5, 'aguardando') RETURNING *`,
       [nome_liga, codigo_convite, donoCerto, totalRodadasVal, rodadaInicialVal]
     );
 
@@ -300,15 +300,20 @@ app.get('/ranking-liga/:id_liga', async (req, res) => {
       SELECT 
         u.id,
         u.nome, 
-        u.time_favorito, 
-        COALESCE(SUM(p.pontos_obtidos), 0) AS total_pontos
+        u.time_favorito,
+        u.foto_perfil,
+        COALESCE(SUM(p.pontos_obtidos), 0) AS total_pontos,
+        COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 3)   AS acertos_exatos,
+        COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 1)   AS acertos_resultado,
+        COUNT(p.id_palpite) FILTER (WHERE p.pontos_obtidos = 0
+                                      AND p.pontos_obtidos IS NOT NULL) AS erros
       FROM usuarios u
       JOIN usuarios_ligas ul ON u.id = ul.usuario_id
       LEFT JOIN palpites p ON u.id = p.usuario_id
       LEFT JOIN jogos j ON j.id_jogo = p.jogo_id
         AND j.rodada BETWEEN $2 AND $3
       WHERE ul.liga_id = $1
-      GROUP BY u.id, u.nome, u.time_favorito
+      GROUP BY u.id, u.nome, u.time_favorito, u.foto_perfil
       ORDER BY total_pontos DESC
     `, [id_liga, rodadaIni, rodadaFim]);
     
@@ -320,6 +325,31 @@ app.get('/ranking-liga/:id_liga', async (req, res) => {
   } catch (err) {
     console.error("Erro ao gerar ranking da liga:", err);
     res.status(500).json({ erro: 'Erro ao gerar o ranking da liga.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// ✅ ROTA NOVA: BUSCAR MEMBROS DE UMA LIGA (com data de entrada real do banco)
+// Lembrete: rodar no banco → ALTER TABLE usuarios_ligas ADD COLUMN criado_em TIMESTAMPTZ DEFAULT NOW();
+app.get('/liga-membros/:id_liga', async (req, res) => {
+  try {
+    const { id_liga } = req.params;
+    const resultado = await pool.query(`
+      SELECT 
+        u.id,
+        u.nome,
+        u.time_favorito,
+        u.foto_perfil,
+        ul.criado_em AS data_entrada
+      FROM usuarios u
+      JOIN usuarios_ligas ul ON ul.usuario_id = u.id
+      WHERE ul.liga_id = $1
+      ORDER BY ul.criado_em ASC
+    `, [id_liga]);
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ erro: 'Erro ao buscar membros da liga.' });
   }
 });
 
@@ -367,6 +397,7 @@ app.delete('/remover-amigo', async (req, res) => {
 
 // -----------------------------------------------------------------------------
 // ROTA PARA BUSCAR A LIGA DE UM USUÁRIO (usada pelo minhaliga.html)
+// ✅ CORREÇÃO: inclui ul.criado_em AS data_entrada para saber quando o usuário entrou na liga
 app.get('/minha-liga/:id_usuario', async (req, res) => {
   try {
     const { id_usuario } = req.params;
@@ -374,7 +405,8 @@ app.get('/minha-liga/:id_usuario', async (req, res) => {
       SELECT l.id_liga, l.nome, l.codigo_convite, l.dono_id,
              l.total_rodadas, l.rodada_inicial, l.status, l.data_encerramento,
              l.resumo_encerramento,
-             l.criado_em
+             l.criado_em,
+             ul.criado_em AS data_entrada
       FROM ligas l
       JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
       WHERE ul.usuario_id = $1
@@ -852,6 +884,36 @@ app.post('/sair-liga', async (req, res) => {
   try {
     const { liga_id, usuario_id } = req.body;
 
+    // Verifica se o usuário é dono da liga
+    const ligaRes = await pool.query('SELECT dono_id FROM ligas WHERE id_liga = $1', [liga_id]);
+    if (ligaRes.rows.length === 0) {
+      return res.status(400).json({ erro: 'Liga não encontrada.' });
+    }
+    const ehDono = String(ligaRes.rows[0].dono_id) === String(usuario_id);
+
+    if (ehDono) {
+      // Busca o membro mais antigo que não seja o dono atual
+      const membroMaisAntigo = await pool.query(`
+        SELECT usuario_id FROM usuarios_ligas
+        WHERE liga_id = $1 AND usuario_id != $2
+        ORDER BY criado_em ASC
+        LIMIT 1
+      `, [liga_id, usuario_id]);
+
+      if (membroMaisAntigo.rows.length > 0) {
+        // Transfere a liderança antes de sair
+        const novoDonoId = membroMaisAntigo.rows[0].usuario_id;
+        await pool.query('UPDATE ligas SET dono_id = $1 WHERE id_liga = $2', [novoDonoId, liga_id]);
+        console.log(`👑 Liderança da liga ${liga_id} transferida para usuário ${novoDonoId}`);
+      } else {
+        // Era o último membro — deleta a liga
+        await pool.query('DELETE FROM ligas WHERE id_liga = $1', [liga_id]);
+        await pool.query('DELETE FROM usuarios_ligas WHERE liga_id = $1', [liga_id]);
+        console.log(`🗑️ Liga ${liga_id} deletada — era o único membro.`);
+        return res.json({ mensagem: 'Liga encerrada pois você era o único membro.' });
+      }
+    }
+
     // Remove o usuário da liga
     const deletar = await pool.query(
       'DELETE FROM usuarios_ligas WHERE liga_id = $1 AND usuario_id = $2 RETURNING *',
@@ -1174,12 +1236,12 @@ async function calcularPontosAutomaticamente() {
               AND p.pontos_obtidos IS NULL
           `, [rodadaInicial, rodadaFinal]);
           if (Number(palpitesPendentes.rows[0].total) === 0) {
-            const resumo = await gerarResumoLiga(liga.id_liga);
+            // Temporada concluída — volta pra 'aguardando' pra próxima temporada
             await pool.query(
-              `UPDATE ligas SET status = 'encerrada', data_encerramento = NOW(), resumo_encerramento = $1 WHERE id_liga = $2`,
-              [JSON.stringify(resumo), liga.id_liga]
+              `UPDATE ligas SET status = 'aguardando' WHERE id_liga = $1`,
+              [liga.id_liga]
             );
-            console.log(`🏆 Liga "${liga.nome}" (ID ${liga.id_liga}) encerrada automaticamente.`);
+            console.log(`⏸️ Liga "${liga.nome}" (ID ${liga.id_liga}) — temporada concluída, aguardando próxima.`);
           }
         }
       }
@@ -1195,12 +1257,6 @@ async function calcularPontosAutomaticamente() {
 // Dispara ao subir e a cada 30 segundos
 calcularPontosAutomaticamente();
 setInterval(calcularPontosAutomaticamente, 30 * 1000);
-
-
-
-
-
-
 
 
 // =========================================================================
@@ -1270,9 +1326,9 @@ app.get('/desempenho-rodadas/:liga_id', async (req, res) => {
 });
 
 // =========================================================================
-// ROTA: ENCERRAR LIGA MANUALMENTE (dono ou admin)
+// ROTA: INICIAR TEMPORADA (dono da liga muda status de 'aguardando' para 'ativa')
 // =========================================================================
-app.post('/encerrar-liga', async (req, res) => {
+app.post('/iniciar-temporada', async (req, res) => {
   try {
     const { liga_id, usuario_id } = req.body;
     if (!liga_id || !usuario_id) return res.status(400).json({ erro: 'liga_id e usuario_id são obrigatórios.' });
@@ -1283,25 +1339,21 @@ app.post('/encerrar-liga', async (req, res) => {
     const liga = ligaRes.rows[0];
 
     if (String(liga.dono_id) !== String(usuario_id)) {
-      return res.status(403).json({ erro: 'Apenas o dono da liga pode encerrá-la.' });
+      return res.status(403).json({ erro: 'Apenas o dono da liga pode iniciar a temporada.' });
     }
-    if (liga.status === 'encerrada') {
-      return res.status(400).json({ erro: 'Liga já está encerrada.' });
+    if (liga.status === 'ativa') {
+      return res.status(400).json({ erro: 'A temporada já está em andamento.' });
     }
 
-    // Gera o resumo
-    const resumo = await gerarResumoLiga(liga_id);
-
-    // Salva status encerrada + resumo
     await pool.query(
-      `UPDATE ligas SET status = 'encerrada', data_encerramento = NOW(), resumo_encerramento = $1 WHERE id_liga = $2`,
-      [JSON.stringify(resumo), liga_id]
+      `UPDATE ligas SET status = 'ativa' WHERE id_liga = $1`,
+      [liga_id]
     );
 
-    res.json({ mensagem: 'Liga encerrada com sucesso!', resumo });
+    res.json({ mensagem: 'Temporada iniciada com sucesso! ⚽' });
   } catch (err) {
-    console.error('Erro ao encerrar liga:', err);
-    res.status(500).json({ erro: 'Erro interno ao encerrar liga.' });
+    console.error('Erro ao iniciar temporada:', err);
+    res.status(500).json({ erro: 'Erro interno ao iniciar temporada.' });
   }
 });
 
@@ -1415,5 +1467,4 @@ async function gerarResumoLiga(liga_id) {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando bem demais na porta ${PORT}`);
-
 });

@@ -244,7 +244,7 @@
     .liga-tag.jogadores { background:rgba(192,52,90,.12); color:var(--accent-cyan); border:1px solid rgba(192,52,90,.25); }
     .liga-tag.rodadas   { background:rgba(234,179,8,.1);  color:#eab308; border:1px solid rgba(234,179,8,.25); }
     .liga-tag.status    { background:rgba(34,197,94,.1);  color:#22c55e; border:1px solid rgba(34,197,94,.25); }
-    .liga-tag.encerrada { background:rgba(156,163,175,.1);color:var(--text-gray); border:1px solid rgba(156,163,175,.2); }
+    .liga-tag.aguardando{ background:rgba(234,179,8,.1);  color:#eab308; border:1px solid rgba(234,179,8,.25); }
 
     .liga-explore-footer { display:flex; align-items:center; justify-content:space-between; }
     .liga-explore-dono { font-size:11px; color:var(--text-gray); }
@@ -318,7 +318,7 @@
     <nav>
       <ul class="nav-links">
         <li><a href="index.html">Início</a></li>
-        <li><a href="ligas.html">Ligas</a></li>
+        <li><a href="minhaliga.html">Ligas</a></li>
         <li><a href="palpites.html">Palpites</a></li>
         <li><a href="novidades.html">Novidades</a></li>
         <li><a href="social.html">Social</a></li>
@@ -423,16 +423,16 @@
       </div>
       <div style="margin-top:16px;">
         <button class="btn btn-cancelar font-russo" onclick="sairDaLiga()" style="font-size:12px;padding:8px 20px;">Sair da Liga</button>
-        <!-- Botão encerrar liga — só aparece para o dono -->
-        <button id="btn-encerrar-liga" class="btn font-russo" onclick="encerrarLiga()" style="display:none;font-size:12px;padding:8px 20px;margin-left:8px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:10px;cursor:pointer;">🔒 Encerrar Liga</button>
+        <!-- Botão iniciar temporada — só aparece pro dono quando liga está aguardando -->
+        <button id="btn-iniciar-temporada" class="btn font-russo" onclick="iniciarTemporada()" style="display:none;font-size:12px;padding:8px 20px;margin-left:8px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4);color:#22c55e;border-radius:10px;cursor:pointer;">▶️ Iniciar Temporada</button>
       </div>
     </section>
 
-    <!-- BANNER LIGA ENCERRADA -->
-    <div id="banner-encerrada" style="display:none;background:linear-gradient(135deg,rgba(234,179,8,0.12),transparent);border:1px solid rgba(234,179,8,0.35);border-radius:16px;padding:18px 22px;margin-bottom:20px;text-align:center;">
-      <div style="font-size:36px;margin-bottom:6px;">🏆</div>
-      <p class="font-russo" style="color:#eab308;font-size:16px;">Liga Encerrada!</p>
-      <p style="color:var(--text-gray);font-size:12px;margin-top:4px;" id="label-data-encerramento"></p>
+    <!-- BANNER AGUARDANDO TEMPORADA -->
+    <div id="banner-aguardando" style="display:none;background:linear-gradient(135deg,rgba(234,179,8,0.12),transparent);border:1px solid rgba(234,179,8,0.35);border-radius:16px;padding:18px 22px;margin-bottom:20px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:6px;">⏳</div>
+      <p class="font-russo" style="color:#eab308;font-size:16px;">Aguardando Próxima Temporada</p>
+      <p style="color:var(--text-gray);font-size:12px;margin-top:4px;">O dono da liga vai iniciar a próxima temporada em breve.</p>
     </div>
 
     <!-- TABS -->
@@ -440,7 +440,6 @@
       <button class="liga-tab-btn ativo" id="ltab-ranking"   onclick="trocarLigaTab('ranking')">🏆 Ranking</button>
       <button class="liga-tab-btn"        id="ltab-rodadas"   onclick="trocarLigaTab('rodadas')">📊 Rodadas</button>
       <button class="liga-tab-btn"        id="ltab-historico" onclick="trocarLigaTab('historico')">📖 Histórico</button>
-      <button class="liga-tab-btn"        id="ltab-resumo"    onclick="trocarLigaTab('resumo')" style="display:none;">🎯 Resumo</button>
     </div>
 
     <!-- PAINEL RANKING -->
@@ -573,7 +572,7 @@
       ligas.forEach((liga, idx) => {
         const membros      = Number(liga.total_membros) || Number(liga.total_participantes) || 0;
         const totalRodadas = liga.total_rodadas ? `${liga.total_rodadas} rodadas` : 'Ilimitada';
-        const encerrada    = liga.status === 'encerrada';
+        const aguardando   = liga.status === 'aguardando';
         const nomeDono     = liga.nome_dono || liga.dono_nome || '—';
 
         const popClass = idx === 0 ? 'top1' : idx === 1 ? 'top2' : idx === 2 ? 'top3' : '';
@@ -594,8 +593,8 @@
             <div class="liga-explore-tags">
               <span class="liga-tag jogadores">👥 ${membros} jogador${membros !== 1 ? 'es' : ''}</span>
               <span class="liga-tag rodadas">⚽ ${totalRodadas}</span>
-              ${encerrada
-                ? `<span class="liga-tag encerrada">🔒 Encerrada</span>`
+              ${aguardando
+                ? `<span class="liga-tag aguardando">⏳ Aguardando</span>`
                 : `<span class="liga-tag status">🟢 Ativa</span>`}
             </div>
 
@@ -606,15 +605,13 @@
                 <span style="font-size:10px;color:var(--text-gray);">${membros} membro${membros !== 1 ? 's' : ''}</span>
               </div>
               <div style="width:100%;height:5px;background:var(--borda-divisoria);border-radius:99px;overflow:hidden;">
-                <div style="width:${lotacaoPerc}%;height:100%;background:${encerrada?'var(--text-gray)':'var(--accent-cyan)'};border-radius:99px;transition:width .6s ease;"></div>
+                <div style="width:${lotacaoPerc}%;height:100%;background:${aguardando?'#eab308':'var(--accent-cyan)'};border-radius:99px;transition:width .6s ease;"></div>
               </div>
             </div>
 
             <div class="liga-explore-footer">
               <span class="liga-explore-dono">👑 Dono: <strong>${nomeDono}</strong></span>
-              ${encerrada
-                ? `<button class="btn-entrar-liga" disabled>Encerrada</button>`
-                : `<button class="btn-entrar-liga" onclick="entrarLigaClique(${liga.id_liga}, '${liga.nome.replace(/'/g,"\\'")}', this)">Entrar ›</button>`}
+              <button class="btn-entrar-liga" onclick="entrarLigaClique(${liga.id_liga}, '${liga.nome.replace(/'/g,"\\'")}', this)">Entrar ›</button>
             </div>
           </div>`;
       });
@@ -1073,8 +1070,10 @@
       document.getElementById('statPosicao').innerText = '2º';
       document.getElementById('statPontos').innerText  = '24';
       document.getElementById('statMembros').innerText = '6';
-      document.getElementById('label-rodada-palpites').innerText = 'Rodada 3';
-      document.getElementById('badge-rodada-palpites').style.display = 'inline-flex';
+      const labelRodada = document.getElementById('label-rodada-palpites');
+      const badgeRodada = document.getElementById('badge-rodada-palpites');
+      if (labelRodada) labelRodada.innerText = 'Rodada 3';
+      if (badgeRodada) badgeRodada.style.display = 'inline-flex';
       document.getElementById('label-data-entrada').innerText = '10 de mar. de 2025';
       document.getElementById('info-data-entrada').style.display = 'block';
 
@@ -1103,20 +1102,22 @@
       });
 
       const listaPal = document.getElementById('lista-palpites-galera');
-      listaPal.innerHTML = '<p class="palpite-jogo-titulo">⚽ FLA x SAN <span style="font-size:10px;color:var(--text-gray);font-weight:400;">(Rodada 3)</span></p>';
-      [
-        { nome:'Você',      g1:2, g2:1, oculto:false, eu:true,  pts:3 },
-        { nome:'Joãozinho', g1:1, g2:0, oculto:true,  eu:false, pts:null },
-      ].forEach(p => {
-        const ph = p.oculto?'<span style="color:var(--text-gray);font-size:13px;">🔒 Oculto</span>':`<span class="font-russo" style="color:var(--accent-cyan);font-size:15px;">${p.g1} x ${p.g2}</span>`;
-        const ptHtml = p.pts!=null?`<span style="font-size:11px;color:#22c55e;font-weight:700;margin-left:4px;">+${p.pts}pts</span>`:'';
-        listaPal.innerHTML += `
-          <div class="ranking-item ${p.eu?'eu':''}">
-            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome)}&background=random&size=36" alt="" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--borda-divisoria);">
-            <div style="flex-grow:1;"><p class="font-russo" style="font-size:14px;color:var(--text-white);">${p.nome} ${p.eu?'<span style="font-size:10px;color:var(--accent-cyan);">(você)</span>':''} ${ptHtml}</p><p style="font-size:11px;color:var(--text-gray);">Palpite · Rodada 3</p></div>
-            ${ph}
-          </div>`;
-      });
+      if (listaPal) {
+        listaPal.innerHTML = '<p class="palpite-jogo-titulo">⚽ FLA x SAN <span style="font-size:10px;color:var(--text-gray);font-weight:400;">(Rodada 3)</span></p>';
+        [
+          { nome:'Você',      g1:2, g2:1, oculto:false, eu:true,  pts:3 },
+          { nome:'Joãozinho', g1:1, g2:0, oculto:true,  eu:false, pts:null },
+        ].forEach(p => {
+          const ph = p.oculto?'<span style="color:var(--text-gray);font-size:13px;">🔒 Oculto</span>':`<span class="font-russo" style="color:var(--accent-cyan);font-size:15px;">${p.g1} x ${p.g2}</span>`;
+          const ptHtml = p.pts!=null?`<span style="font-size:11px;color:#22c55e;font-weight:700;margin-left:4px;">+${p.pts}pts</span>`:'';
+          listaPal.innerHTML += `
+            <div class="ranking-item ${p.eu?'eu':''}">
+              <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.nome)}&background=random&size=36" alt="" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--borda-divisoria);">
+              <div style="flex-grow:1;"><p class="font-russo" style="font-size:14px;color:var(--text-white);">${p.nome} ${p.eu?'<span style="font-size:10px;color:var(--accent-cyan);">(você)</span>':''} ${ptHtml}</p><p style="font-size:11px;color:var(--text-gray);">Palpite · Rodada 3</p></div>
+              ${ph}
+            </div>`;
+        });
+      }
 
       renderizarHistorico({
         nome:'Liga dos Bagres 🦆', data_criacao:'2025-03-10T00:00:00Z',
@@ -1126,16 +1127,16 @@
       }, membrosDemo);
     }
 
-    async function encerrarLiga() {
+    async function iniciarTemporada() {
       if (!_ligaAtualId) return;
-      if (!confirm('Tem certeza que deseja ENCERRAR esta liga? O resumo final será gerado e a liga ficará encerrada para todos os membros.')) return;
+      if (!confirm('Iniciar a temporada agora? A liga ficará ativa para todos os membros.')) return;
       try {
-        const res  = await fetch('https://palpitoo-api.onrender.com/encerrar-liga', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ liga_id: _ligaAtualId, usuario_id: idLogado }) });
+        const res  = await fetch('https://palpitoo-api.onrender.com/iniciar-temporada', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ liga_id: _ligaAtualId, usuario_id: idLogado }) });
         const data = await res.json();
         if (res.ok) {
-          mostrarAviso('Liga encerrada! Resumo gerado com sucesso.', 'sucesso');
-          setTimeout(carregarPagina, 1000);
-        } else { mostrarAviso(data.erro || 'Erro ao encerrar.', 'erro'); }
+          mostrarAviso('Temporada iniciada! Boa sorte a todos! ⚽', 'sucesso');
+          setTimeout(carregarPagina, 800);
+        } else { mostrarAviso(data.erro || 'Erro ao iniciar.', 'erro'); }
       } catch { mostrarAviso('Erro ao conectar com o servidor.', 'erro'); }
     }
 
@@ -1254,47 +1255,55 @@
           }
         } catch(_) {}
 
-        // ── Liga encerrada? ──
-        const encerrada = liga.status === 'encerrada';
-        const bannerEnc = document.getElementById('banner-encerrada');
-        const tabResumo = document.getElementById('ltab-resumo');
-        const painelResumo = document.getElementById('lpainel-resumo');
-        const btnEncerrar = document.getElementById('btn-encerrar-liga');
+        // ── Status da liga ──
+        const aguardando = liga.status === 'aguardando';
+        const bannerAguardando = document.getElementById('banner-aguardando');
+        const btnIniciar = document.getElementById('btn-iniciar-temporada');
 
-        if (encerrada) {
-          bannerEnc.style.display = 'block';
-          tabResumo.style.display = '';
-          painelResumo.style.display = '';
-          if (liga.data_encerramento) {
-            document.getElementById('label-data-encerramento').innerText =
-              'Encerrada em ' + new Date(liga.data_encerramento).toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
-          }
-          // Renderiza resumo
-          const resumoData = liga.resumo_encerramento;
-          renderizarResumo(resumoData, liga.nome);
-          // Abre tab resumo automaticamente
-          trocarLigaTab('resumo');
-        } else {
-          bannerEnc.style.display = 'none';
-          tabResumo.style.display = 'none';
-          // Botão encerrar apenas para dono e liga ativa
+        if (aguardando) {
+          bannerAguardando.style.display = 'block';
+          // Botão iniciar só aparece pro dono
           if (String(liga.dono_id) === String(idLogado)) {
-            btnEncerrar.style.display = 'inline-block';
+            btnIniciar.style.display = 'inline-block';
           }
+        } else {
+          bannerAguardando.style.display = 'none';
         }
 
         registrarEntrada(liga.id_liga);
-        const dataEntradaFormatada = formatarDataCurta(getDataEntrada(liga.id_liga));
-        if (dataEntradaFormatada) {
-          document.getElementById('label-data-entrada').innerText = dataEntradaFormatada;
-          document.getElementById('info-data-entrada').style.display = 'block';
-        }
+        // Exibição da data de entrada é feita após carregar membros (dados da API têm prioridade)
 
         let membros = [];
+        let dataEntradaAPI = null;
         try {
           const resMem = await fetch(`https://palpitoo-api.onrender.com/liga-membros/${liga.id_liga}`);
-          if (resMem.ok) { membros = await resMem.json(); document.getElementById('statMembros').innerText = membros.length; }
+          if (resMem.ok) {
+            membros = await resMem.json();
+            document.getElementById('statMembros').innerText = membros.length;
+
+            // Tenta pegar a data de entrada real da API
+            const euMembro = membros.find(m => String(m.id) === String(idLogado));
+            dataEntradaAPI = euMembro
+              ? (euMembro.data_entrada || euMembro.created_at || euMembro.joined_at || null)
+              : null;
+          }
         } catch(_) {}
+
+        // ✅ CORREÇÃO: fallback sempre roda, mesmo se a API falhar
+        const chaveEntrada = `palpitoo_entrada_${liga.id_liga}`;
+        if (dataEntradaAPI) {
+          // API retornou data real — atualiza localStorage
+          localStorage.setItem(chaveEntrada, dataEntradaAPI);
+        } else if (!localStorage.getItem(chaveEntrada)) {
+          // API sem data e localStorage vazio — registra hoje
+          localStorage.setItem(chaveEntrada, new Date().toISOString());
+        }
+        const dataFinal = dataEntradaAPI || localStorage.getItem(chaveEntrada);
+        const dataFormatada = formatarDataCurta(dataFinal);
+        if (dataFormatada) {
+          document.getElementById('label-data-entrada').innerText = dataFormatada;
+          document.getElementById('info-data-entrada').style.display = 'block';
+        }
 
         // ✅ CORREÇÃO: atualiza label com rodada real após fetch da API
         document.getElementById('rodadaAtualLabel').innerText = totalRodadas
@@ -1304,7 +1313,11 @@
         carregarRanking(liga.id_liga);
         renderizarHistorico(liga, membros);
 
-      } catch(e) { mostrarPreview(); mostrarAviso('Servidor offline — exibindo prévia.', 'info'); }
+      } catch(e) {
+        document.getElementById('tela-sem-liga').style.display = 'block';
+        document.getElementById('tela-com-liga').style.display  = 'none';
+        mostrarAviso('Servidor offline — tente novamente em instantes.', 'info');
+      }
     }
 
     carregarPagina();
@@ -1328,6 +1341,16 @@
     document.addEventListener('DOMContentLoaded', function() {
       const btn = document.getElementById('hamburger-btn'), nav = document.querySelector('.nav-links');
       if (btn && nav) btn.addEventListener('click', () => { btn.classList.toggle('aberto'); nav.classList.toggle('aberto'); });
+
+      // Destacar link ativo da navbar com base na página atual
+      const paginaAtual = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href === paginaAtual) {
+          link.style.color = 'var(--accent-cyan)';
+          link.style.fontWeight = '700';
+        }
+      });
     });
   </script>
 <script src="palpitoo-extras.js" defer></script>
