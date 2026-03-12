@@ -881,7 +881,7 @@ app.post('/entrar-liga-clique', async (req, res) => {
 // -----------------------------------------------------------------------------
 // ROTA PARA SAIR DE UMA LIGA
 app.post('/sair-liga', async (req, res) => {
-  try {
+    try {
     const { liga_id, usuario_id } = req.body;
     console.log(`[SAIR-LIGA] liga_id=${liga_id} usuario_id=${usuario_id}`);
 
