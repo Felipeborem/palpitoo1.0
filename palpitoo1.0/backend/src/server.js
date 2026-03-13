@@ -11,8 +11,25 @@ console.log("Host carregado:", process.env.DATABASE_URL ? "Sim" : "Não");
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  max: 10,                    // máximo de conexões (Render free tier suporta 25)
+  idleTimeoutMillis: 30000,   // fecha conexões ociosas após 30s
+  connectionTimeoutMillis: 5000, // timeout ao tentar conectar
 });
+
+// =============================================================================
+// CACHE SIMPLES EM MEMÓRIA — evita bater no banco pra dados que mudam pouco
+// =============================================================================
+const cache = new Map();
+function setCache(key, data, ttlMs) {
+  cache.set(key, { data, expira: Date.now() + ttlMs });
+}
+function getCache(key) {
+  const entry = cache.get(key);
+  if (!entry || Date.now() > entry.expira) { cache.delete(key); return null; }
+  return entry.data;
+}
+function invalidateCache(key) { cache.delete(key); }
 
 // Rota de teste
 app.get('/', (req, res) => {
@@ -79,7 +96,11 @@ app.post('/login', async (req, res) => {
 // ROTA PARA BUSCAR OS JOGOS DISPONÍVEIS
 app.get('/jogos', async (req, res) => {
   try {
+    const cached = getCache('jogos_all');
+    if (cached) return res.json(cached);
+
     const resultado = await pool.query('SELECT * FROM jogos ORDER BY id_jogo ASC');
+    setCache('jogos_all', resultado.rows, 30_000); // cache 30s
     res.json(resultado.rows);
   } catch (err) {
     console.error(err);
@@ -87,34 +108,40 @@ app.get('/jogos', async (req, res) => {
   }
 });
 // -----------------------------------------------------------------------------
-// ROTA PARA SALVAR OU ATUALIZAR OS PALPITES (AGORA BLINDADA)
+// ROTA PARA SALVAR OU ATUALIZAR OS PALPITES (BLINDADA + OTIMIZADA)
 app.post('/palpites', async (req, res) => {
   try {
-    const { palpites } = req.body; 
+    const { palpites } = req.body;
+    if (!palpites?.length) return res.json({ mensagem: 'Nenhum palpite enviado.' });
 
-    for (const p of palpites) {
-      // 1. Verifica no banco se o jogo ainda está 'andamento'
-      const jogoInfo = await pool.query('SELECT status FROM jogos WHERE id_jogo = $1', [p.id_jogo]);
-      
-      if (jogoInfo.rows.length === 0) continue; // Jogo não existe
-      
-      // Se o jogo já estiver rolando ou encerrado, ignora esse palpite específico
-      if (jogoInfo.rows[0].status !== 'andamento') {
-        console.log(`Tentativa de palpite bloqueada para o jogo ${p.id_jogo} (Status: ${jogoInfo.rows[0].status})`);
-        continue; 
+    // 1. Busca status de TODOS os jogos de uma vez (elimina N+1 queries)
+    const ids = [...new Set(palpites.map(p => p.id_jogo))];
+    const jogosRes = await pool.query(
+      'SELECT id_jogo, status FROM jogos WHERE id_jogo = ANY($1::int[])', [ids]
+    );
+    const statusMap = Object.fromEntries(jogosRes.rows.map(j => [j.id_jogo, j.status]));
+
+    // 2. Filtra só palpites de jogos em 'andamento'
+    const validos = palpites.filter(p => {
+      if (statusMap[p.id_jogo] !== 'andamento') {
+        console.log(`Palpite bloqueado: jogo ${p.id_jogo} (${statusMap[p.id_jogo]})`);
+        return false;
       }
+      return true;
+    });
 
-      // 2. Se estiver tudo certo ('andamento'), salva no banco
-      await pool.query(
-        `INSERT INTO palpites (usuario_id, jogo_id, gols_casa_palpite, gols_fora_palpite) 
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (usuario_id, jogo_id) 
-         DO UPDATE SET 
-            gols_casa_palpite = EXCLUDED.gols_casa_palpite, 
-            gols_fora_palpite = EXCLUDED.gols_fora_palpite`,
-        // ✅ CORREÇÃO: Garantir que id_usuario é número (localStorage envia string)
-        [Number(p.id_usuario), p.id_jogo, p.gols_casa, p.gols_fora]
-      );
+    // 3. Salva todos em paralelo com Promise.all (muito mais rápido que loop sequencial)
+    if (validos.length > 0) {
+      await Promise.all(validos.map(p =>
+        pool.query(
+          `INSERT INTO palpites (usuario_id, jogo_id, gols_casa_palpite, gols_fora_palpite)
+           VALUES ($1, $2, $3, $4)
+           ON CONFLICT (usuario_id, jogo_id)
+           DO UPDATE SET gols_casa_palpite = EXCLUDED.gols_casa_palpite,
+                         gols_fora_palpite = EXCLUDED.gols_fora_palpite`,
+          [Number(p.id_usuario), p.id_jogo, p.gols_casa, p.gols_fora]
+        )
+      ));
     }
 
     res.json({ mensagem: 'Palpites validados e salvos com sucesso!' });
@@ -148,8 +175,9 @@ app.put('/atualizar-foto', async (req, res) => {
   try {
     const { email, foto_base64 } = req.body;
 
+    // RETURNING só campos leves — evita trazer o base64 inteiro de volta (~MB inútil)
     const resultado = await pool.query(
-      'UPDATE usuarios SET foto_perfil = $1 WHERE email = $2 RETURNING *',
+      'UPDATE usuarios SET foto_perfil = $1 WHERE email = $2 RETURNING id, nome, email, time_favorito',
       [foto_base64, email]
     );
 
@@ -291,15 +319,19 @@ app.get('/ranking-liga/:id_liga', async (req, res) => {
     
     // 1. Busca os pontos só da galera que tá nessa liga
     // ✅ CORREÇÃO: filtra por rodadas da liga (rodada_inicial até rodada_inicial + total_rodadas - 1)
-    const ligaMeta = await pool.query('SELECT rodada_inicial, total_rodadas FROM ligas WHERE id_liga = $1', [id_liga]);
-    const meta = ligaMeta.rows[0] || {};
+    // Busca metadados + nome da liga em UMA query só (era 2 queries separadas)
+    const ligaMeta = await pool.query(
+      'SELECT nome, rodada_inicial, total_rodadas FROM ligas WHERE id_liga = $1', [id_liga]
+    );
+    const meta      = ligaMeta.rows[0] || {};
+    const nomeLiga  = meta.nome || 'Liga Privada';
     const rodadaIni = meta.rodada_inicial || 1;
     const rodadaFim = meta.total_rodadas ? rodadaIni + meta.total_rodadas - 1 : 99999;
 
     const resultado = await pool.query(`
-      SELECT 
+      SELECT
         u.id,
-        u.nome, 
+        u.nome,
         u.time_favorito,
         u.foto_perfil,
         COALESCE(SUM(p.pontos_obtidos), 0) AS total_pontos,
@@ -310,16 +342,11 @@ app.get('/ranking-liga/:id_liga', async (req, res) => {
       FROM usuarios u
       JOIN usuarios_ligas ul ON u.id = ul.usuario_id
       LEFT JOIN palpites p ON u.id = p.usuario_id
-      LEFT JOIN jogos j ON j.id_jogo = p.jogo_id
-        AND j.rodada BETWEEN $2 AND $3
+      LEFT JOIN jogos j ON j.id_jogo = p.jogo_id AND j.rodada BETWEEN $2 AND $3
       WHERE ul.liga_id = $1
       GROUP BY u.id, u.nome, u.time_favorito, u.foto_perfil
       ORDER BY total_pontos DESC
     `, [id_liga, rodadaIni, rodadaFim]);
-    
-    // 2. Busca também o nome da Liga para a gente colocar no título do site
-    const ligaInfo = await pool.query('SELECT nome FROM ligas WHERE id_liga = $1', [id_liga]);
-    const nomeLiga = ligaInfo.rows.length > 0 ? ligaInfo.rows[0].nome : 'Liga Privada';
 
     res.json({ nomeLiga, ranking: resultado.rows });
   } catch (err) {
@@ -551,70 +578,49 @@ app.get('/perfil-publico/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Dados básicos do usuário
+    // Dados básicos do usuário primeiro (precisamos confirmar que existe)
     const usuario = await pool.query(
-      'SELECT id, nome, email, time_favorito, foto_perfil, criado_em FROM usuarios WHERE id = $1',
-      [id]
+      'SELECT id, nome, email, time_favorito, foto_perfil, criado_em FROM usuarios WHERE id = $1', [id]
     );
     if (!usuario.rows.length) return res.status(404).json({ erro: 'Usuário não encontrado.' });
 
-    // Estatísticas gerais
-    const stats = await pool.query(`
-      SELECT
-        COUNT(*)                                            AS total_palpites,
-        COUNT(*) FILTER (WHERE pontos_obtidos = 3)         AS acertos_exatos,
-        COUNT(*) FILTER (WHERE pontos_obtidos = 1)         AS acertos_vencedor,
-        COUNT(*) FILTER (WHERE pontos_obtidos = 0
-                           AND pontos_obtidos IS NOT NULL) AS erros,
-        COALESCE(SUM(pontos_obtidos), 0)                   AS total_pontos
-      FROM palpites
-      WHERE usuario_id = $1
-    `, [id]);
-
-    // Liga atual
-    const ligaAtual = await pool.query(`
-      SELECT l.id_liga, l.nome, l.codigo_convite
-      FROM ligas l
-      JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
-      WHERE ul.usuario_id = $1
-      LIMIT 1
-    `, [id]);
-
-    // Últimos 10 palpites com resultado do jogo
-    const palpitesRecentes = await pool.query(`
-      SELECT
-        p.gols_casa_palpite,
-        p.gols_fora_palpite,
-        p.pontos_obtidos,
-        j.time_casa,
-        j.time_fora,
-        j.gols_casa_real,
-        j.gols_fora_real,
-        j.status,
-        j.rodada,
-        j.data_jogo
-      FROM palpites p
-      JOIN jogos j ON j.id_jogo = p.jogo_id
-      WHERE p.usuario_id = $1
-      ORDER BY j.data_jogo DESC NULLS LAST
-      LIMIT 10
-    `, [id]);
-
-    // Contagem de seguidores e seguindo
-    const seguidores = await pool.query(
-      'SELECT COUNT(*) AS total FROM seguidores WHERE seguido_id = $1', [id]
-    );
-    const seguindo = await pool.query(
-      'SELECT COUNT(*) AS total FROM seguidores WHERE seguidor_id = $1', [id]
-    );
+    // 4 queries restantes em PARALELO com Promise.all (era sequencial: ~4x mais lento)
+    const [stats, ligaAtual, palpitesRecentes, contagens] = await Promise.all([
+      pool.query(`
+        SELECT COUNT(*) AS total_palpites,
+               COUNT(*) FILTER (WHERE pontos_obtidos = 3) AS acertos_exatos,
+               COUNT(*) FILTER (WHERE pontos_obtidos = 1) AS acertos_vencedor,
+               COUNT(*) FILTER (WHERE pontos_obtidos = 0 AND pontos_obtidos IS NOT NULL) AS erros,
+               COALESCE(SUM(pontos_obtidos), 0) AS total_pontos
+        FROM palpites WHERE usuario_id = $1
+      `, [id]),
+      pool.query(`
+        SELECT l.id_liga, l.nome, l.codigo_convite
+        FROM ligas l JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+        WHERE ul.usuario_id = $1 LIMIT 1
+      `, [id]),
+      pool.query(`
+        SELECT p.gols_casa_palpite, p.gols_fora_palpite, p.pontos_obtidos,
+               j.time_casa, j.time_fora, j.gols_casa_real, j.gols_fora_real,
+               j.status, j.rodada, j.data_jogo
+        FROM palpites p JOIN jogos j ON j.id_jogo = p.jogo_id
+        WHERE p.usuario_id = $1 ORDER BY j.data_jogo DESC NULLS LAST LIMIT 10
+      `, [id]),
+      pool.query(`
+        SELECT
+          SUM(CASE WHEN seguido_id  = $1 THEN 1 ELSE 0 END) AS seguidores,
+          SUM(CASE WHEN seguidor_id = $1 THEN 1 ELSE 0 END) AS seguindo
+        FROM seguidores WHERE seguido_id = $1 OR seguidor_id = $1
+      `, [id]),
+    ]);
 
     res.json({
-      usuario:          usuario.rows[0],
-      stats:            stats.rows[0],
-      liga_atual:       ligaAtual.rows[0] || null,
+      usuario:           usuario.rows[0],
+      stats:             stats.rows[0],
+      liga_atual:        ligaAtual.rows[0] || null,
       palpites_recentes: palpitesRecentes.rows,
-      seguidores:       Number(seguidores.rows[0].total),
-      seguindo:         Number(seguindo.rows[0].total),
+      seguidores:        Number(contagens.rows[0]?.seguidores || 0),
+      seguindo:          Number(contagens.rows[0]?.seguindo   || 0),
     });
 
   } catch (err) {
@@ -666,30 +672,33 @@ app.get('/usuario/:id', async (req, res) => {
     );
     if (!usuario.rows.length) return res.status(404).json({ erro: 'Usuário não encontrado.' });
 
-    const stats = await pool.query(`
-      SELECT
-        COUNT(*)                                            AS total_palpites,
-        COUNT(*) FILTER (WHERE pontos_obtidos = 3)         AS acertos_exatos,
-        COUNT(*) FILTER (WHERE pontos_obtidos = 1)         AS acertos_vencedor,
-        COUNT(*) FILTER (WHERE pontos_obtidos = 0
-                           AND pontos_obtidos IS NOT NULL) AS erros,
-        COALESCE(SUM(pontos_obtidos), 0)                   AS total_pontos
-      FROM palpites WHERE usuario_id = $1
-    `, [id]);
-
-    const seguidores = await pool.query('SELECT COUNT(*) AS total FROM seguidores WHERE seguido_id  = $1', [id]);
-    const seguindo   = await pool.query('SELECT COUNT(*) AS total FROM seguidores WHERE seguidor_id = $1', [id]);
-    const ligaAtual  = await pool.query(`
-      SELECT l.id_liga, l.nome FROM ligas l
-      JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
-      WHERE ul.usuario_id = $1 LIMIT 1
-    `, [id]);
+    // 3 queries em paralelo (era sequencial)
+    const [stats, contagens, ligaAtual] = await Promise.all([
+      pool.query(`
+        SELECT COUNT(*) AS total_palpites,
+               COUNT(*) FILTER (WHERE pontos_obtidos = 3) AS acertos_exatos,
+               COUNT(*) FILTER (WHERE pontos_obtidos = 1) AS acertos_vencedor,
+               COUNT(*) FILTER (WHERE pontos_obtidos = 0 AND pontos_obtidos IS NOT NULL) AS erros,
+               COALESCE(SUM(pontos_obtidos), 0) AS total_pontos
+        FROM palpites WHERE usuario_id = $1
+      `, [id]),
+      pool.query(`
+        SELECT SUM(CASE WHEN seguido_id  = $1 THEN 1 ELSE 0 END) AS seguidores,
+               SUM(CASE WHEN seguidor_id = $1 THEN 1 ELSE 0 END) AS seguindo
+        FROM seguidores WHERE seguido_id = $1 OR seguidor_id = $1
+      `, [id]),
+      pool.query(`
+        SELECT l.id_liga, l.nome FROM ligas l
+        JOIN usuarios_ligas ul ON l.id_liga = ul.liga_id
+        WHERE ul.usuario_id = $1 LIMIT 1
+      `, [id]),
+    ]);
 
     res.json({
       ...usuario.rows[0],
       ...stats.rows[0],
-      seguidores: Number(seguidores.rows[0].total),
-      seguindo:   Number(seguindo.rows[0].total),
+      seguidores: Number(contagens.rows[0]?.seguidores || 0),
+      seguindo:   Number(contagens.rows[0]?.seguindo   || 0),
       liga_atual: ligaAtual.rows[0] || null,
     });
   } catch (err) {
@@ -851,21 +860,14 @@ app.post('/entrar-liga-clique', async (req, res) => {
   try {
     const { liga_id, usuario_id } = req.body;
 
-    // 1. Verifica se ele já está na liga por segurança
-    const jaEsta = await pool.query(
-      'SELECT * FROM usuarios_ligas WHERE liga_id = $1 AND usuario_id = $2', 
+    // INSERT com ON CONFLICT — deixa o constraint do banco tratar duplicata (elimina SELECT prévio)
+    const result = await pool.query(
+      'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING usuario_id',
       [liga_id, usuario_id]
     );
-    if (jaEsta.rows.length > 0) {
+    if (result.rowCount === 0) {
       return res.status(400).json({ erro: 'Você já está participando desta liga!' });
     }
-
-    // 2. Insere o craque na liga
-    await pool.query(
-      'INSERT INTO usuarios_ligas (liga_id, usuario_id) VALUES ($1, $2)', 
-      [liga_id, usuario_id]
-    );
-
     res.json({ mensagem: 'Parabéns! Você entrou na liga com sucesso! ⚽' });
   } catch (err) {
     console.error("Erro ao entrar na liga:", err);
@@ -972,9 +974,9 @@ async function iniciarJogosAutomaticamente() {
   }
 }
 
-// Dispara ao subir o servidor e a cada 30 segundos
+// Dispara ao subir o servidor e a cada 60 segundos (30s era agressivo demais para o banco)
 iniciarJogosAutomaticamente();
-setInterval(iniciarJogosAutomaticamente, 30 * 1000);
+setInterval(iniciarJogosAutomaticamente, 60 * 1000);
 
 // =============================================================================
 // ROTA: RODADA ATUAL — calcula qual rodada está ativa com base nos jogos reais
@@ -983,28 +985,18 @@ setInterval(iniciarJogosAutomaticamente, 30 * 1000);
 // =============================================================================
 app.get('/rodada-atual', async (req, res) => {
   try {
-    // Jogo ao vivo agora
-    const aoVivo = await pool.query(
-      `SELECT rodada FROM jogos WHERE status = 'aovivo' ORDER BY rodada ASC LIMIT 1`
-    );
-    if (aoVivo.rows.length > 0) {
-      return res.json({ rodada_atual: Number(aoVivo.rows[0].rodada) });
-    }
-
-    // Menor rodada com jogo ainda não finalizado
-    const aberta = await pool.query(
-      `SELECT rodada FROM jogos WHERE status != 'finalizado' ORDER BY rodada ASC LIMIT 1`
-    );
-    if (aberta.rows.length > 0) {
-      return res.json({ rodada_atual: Number(aberta.rows[0].rodada) });
-    }
-
-    // Fallback: maior rodada (todas finalizadas)
-    const ultima = await pool.query(
-      `SELECT rodada FROM jogos ORDER BY rodada DESC LIMIT 1`
-    );
-    const rodada = ultima.rows.length > 0 ? Number(ultima.rows[0].rodada) : 1;
-    res.json({ rodada_atual: rodada });
+    // 3 queries colapsadas em 1 só com prioridade via CASE
+    const result = await pool.query(`
+      SELECT
+        COALESCE(
+          MIN(rodada) FILTER (WHERE status = 'aovivo'),
+          MIN(rodada) FILTER (WHERE status != 'finalizado'),
+          MAX(rodada),
+          1
+        ) AS rodada_atual
+      FROM jogos
+    `);
+    res.json({ rodada_atual: Number(result.rows[0].rodada_atual) });
   } catch (err) {
     console.error('Erro ao calcular rodada atual:', err);
     res.status(500).json({ erro: 'Erro ao calcular rodada atual.' });
@@ -1028,6 +1020,7 @@ app.post('/criar-jogo', async (req, res) => {
        VALUES ($1, $2, 'andamento', $3, $4) RETURNING *`,
       [time_casa, time_fora, Number(rodada), data_jogo || null]
     );
+    invalidateCache('jogos_all');
     res.status(201).json({ mensagem: `${time_casa} x ${time_fora} criado!`, jogo: resultado.rows[0] });
   } catch (err) {
     console.error('Erro ao criar jogo:', err.message);
@@ -1046,6 +1039,7 @@ app.delete('/deletar-jogo/:id', async (req, res) => {
     await pool.query('DELETE FROM palpites WHERE jogo_id = $1', [Number(id)]);
     const result = await pool.query('DELETE FROM jogos WHERE id_jogo = $1 RETURNING id_jogo', [Number(id)]);
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Jogo não encontrado.' });
+    invalidateCache('jogos_all');
     res.json({ mensagem: 'Jogo removido com sucesso.' });
   } catch (err) {
     console.error('Erro ao deletar jogo:', err.message);
@@ -1188,31 +1182,24 @@ async function calcularPontosAutomaticamente() {
         [id_jogo]
       );
 
-      for (const palpite of palpites.rows) {
-        const gols_casa_palpite = Number(palpite.gols_casa_palpite);
-        const gols_fora_palpite = Number(palpite.gols_fora_palpite);
+      // Calcula pontos de todos os palpites em memória e atualiza em paralelo (era N updates sequenciais)
+      const updates = palpites.rows.map(palpite => {
+        const gc = Number(palpite.gols_casa_palpite);
+        const gf = Number(palpite.gols_fora_palpite);
         let pontos = 0;
-
-        if (gols_casa_palpite === gols_casa_real && gols_fora_palpite === gols_fora_real) {
-          pontos = 3; // Placar exato
+        if (gc === gols_casa_real && gf === gols_fora_real) {
+          pontos = 3;
         } else {
-          const saldoPalpite = gols_casa_palpite - gols_fora_palpite;
-          const saldoReal    = gols_casa_real    - gols_fora_real;
-          if (
-            (saldoPalpite > 0 && saldoReal > 0) ||
-            (saldoPalpite < 0 && saldoReal < 0) ||
-            (saldoPalpite === 0 && saldoReal === 0)
-          ) {
-            pontos = 1; // Acertou vencedor/empate
-          }
+          const sp = gc - gf, sr = gols_casa_real - gols_fora_real;
+          if ((sp > 0 && sr > 0) || (sp < 0 && sr < 0) || (sp === 0 && sr === 0)) pontos = 1;
         }
-
-        await pool.query(
+        console.log(`  ✅ usuario=${palpite.usuario_id} | ${gc}x${gf} → ${pontos}pts`);
+        return pool.query(
           'UPDATE palpites SET pontos_obtidos = $1 WHERE usuario_id = $2 AND jogo_id = $3',
           [pontos, palpite.usuario_id, id_jogo]
         );
-        console.log(`  ✅ usuario=${palpite.usuario_id} | palpite: ${gols_casa_palpite}x${gols_fora_palpite} → ${pontos}pts`);
-      }
+      });
+      await Promise.all(updates);
 
     } // fim do loop de jogos
 
@@ -1272,9 +1259,9 @@ async function calcularPontosAutomaticamente() {
   }
 }
 
-// Dispara ao subir e a cada 30 segundos
+// Dispara ao subir e a cada 60 segundos
 calcularPontosAutomaticamente();
-setInterval(calcularPontosAutomaticamente, 30 * 1000);
+setInterval(calcularPontosAutomaticamente, 60 * 1000);
 
 
 // =========================================================================

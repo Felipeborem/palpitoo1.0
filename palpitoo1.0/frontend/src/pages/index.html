@@ -165,6 +165,7 @@
   <header class="navbar">
     <a href="inicio.html" class="logo-link"><img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem"></a>
     <nav>
+      <button class="hamburger" id="hamburger-btn" aria-label="Menu"><span></span><span></span><span></span></button>
       <ul class="nav-links">
         <li><a href="index.html" class="ativo">Início</a></li>
         <li><a href="minhaliga.html">Ligas</a></li>
@@ -174,7 +175,6 @@
         <li><a href="carreira.html">Carreira</a></li>
       </ul>
     </nav>
-    <button class="hamburger" id="hamburger-btn" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="navbar-user" id="navbar-user-area"></div>
   </header>
 
@@ -727,7 +727,13 @@
 
   document.addEventListener('DOMContentLoaded', function() {
     const btn = document.getElementById('hamburger-btn'), nav = document.querySelector('.nav-links');
-    if (btn && nav) btn.addEventListener('click', () => { btn.classList.toggle('aberto'); nav.classList.toggle('aberto'); });
+    if (btn && nav) {
+      btn.addEventListener('click', () => { btn.classList.toggle('aberto'); nav.classList.toggle('aberto'); });
+      // Fecha o menu ao clicar em qualquer link
+      nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        btn.classList.remove('aberto'); nav.classList.remove('aberto');
+      }));
+    }
   });
 
   calcularDesempenho();
@@ -742,16 +748,7 @@
     <p style="color: var(--text-gray); font-size: 0.85rem; font-weight: 600; margin-bottom: 5px;">© 2026. A resenha oficial.</p>
     <p style="color: var(--accent-cyan); font-size: 0.75rem; font-weight: 700;">Desenvolvido para quem não aguenta mais calcular ponto no ZapZap.</p>
   </footer>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const btn = document.getElementById('hamburger-btn');
-      const nav = document.querySelector('.nav-links');
-      if (btn && nav) btn.addEventListener('click', function() {
-        btn.classList.toggle('aberto');
-        nav.classList.toggle('aberto');
-      });
-    });
-    </script>
+
 
 <script src="palpitoo-extras.js" defer></script>
 </body>

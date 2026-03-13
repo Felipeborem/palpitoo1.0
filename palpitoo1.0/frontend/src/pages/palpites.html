@@ -282,6 +282,7 @@
       <img src="./img/pato.png" alt="Logo Palpitoo" class="logo-imagem">
     </a>
     <nav>
+      <button class="hamburger" id="hamburger-btn" aria-label="Menu"><span></span><span></span><span></span></button>
       <ul class="nav-links">
         <li><a href="index.html">Início</a></li>
         <li><a href="minhaliga.html">Ligas</a></li>
@@ -291,6 +292,7 @@
         <li><a href="carreira.html">Carreira</a></li>
       </ul>
     </nav>
+    <div class="navbar-user" id="navbar-user-area"></div>
   </header>
 
   <main class="container-principal container-palpites">
@@ -771,6 +773,9 @@
         btn.classList.toggle('aberto');
         nav.classList.toggle('aberto');
       });
+      nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        btn.classList.remove('aberto'); nav.classList.remove('aberto');
+      }));
     });
   </script>
   <script src="palpitoo-extras.js" defer></script>
