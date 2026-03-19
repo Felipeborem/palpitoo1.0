@@ -434,24 +434,13 @@
       <p class="font-russo" style="color:#eab308;font-size:16px;">Aguardando Próxima Temporada</p>
       <p style="color:var(--text-gray);font-size:12px;margin-top:4px;">O dono da liga vai iniciar a próxima temporada em breve.</p>
     </div>
-
-    <!-- BANNER RESUMO TEMPORADA (aguardando com resumo de temporada anterior) -->
-    <div id="banner-resumo-temp" style="display:none;background:linear-gradient(135deg,rgba(245,200,66,0.12),transparent);border:1px solid rgba(245,200,66,0.4);border-radius:16px;padding:18px 22px;margin-bottom:20px;text-align:center;cursor:pointer;" onclick="window.location.href='resumo.html?id='+_ligaAtualId">
+    
+    <!-- BANNER RESUMO TEMPORADA -->
+    <div id="banner-resumo-temp" style="display:none;background:linear-gradient(135deg,rgba(245,200,66,0.12),transparent);border:1px solid rgba(245,200,66,0.4);border-radius:16px;padding:18px 22px;margin-bottom:20px;text-align:center;cursor:pointer;" onclick="window.location.href='resumo-temporada.html?id='+_ligaAtualId">
       <div style="font-size:36px;margin-bottom:6px;">🏆</div>
       <p class="font-russo" style="color:#f5c842;font-size:16px;">Temporada Encerrada!</p>
       <p style="color:var(--text-gray);font-size:12px;margin-top:4px;">Clique para ver o pódio, estatísticas e os momentos da temporada.</p>
       <p style="font-size:11px;color:#f5c842;margin-top:8px;font-weight:700;">Ver Resumo da Temporada →</p>
-    </div>
-
-    <!-- BANNER LIGA FINALIZADA (status = 'finalizado') -->
-    <div id="banner-finalizado" style="display:none;background:linear-gradient(135deg,rgba(245,200,66,0.18),rgba(192,52,90,0.08));border:2px solid rgba(245,200,66,0.55);border-radius:16px;padding:22px 22px;margin-bottom:20px;text-align:center;">
-      <div style="font-size:48px;margin-bottom:8px;">🏆</div>
-      <p class="font-russo" style="color:#f5c842;font-size:20px;letter-spacing:.03em;">Liga Finalizada!</p>
-      <p style="color:var(--text-gray);font-size:13px;margin-top:6px;line-height:1.6;">Todas as rodadas foram concluídas. O campeão foi coroado e a história ficou registrada para sempre.</p>
-      <div style="display:flex;justify-content:center;gap:10px;margin-top:16px;flex-wrap:wrap;">
-        <button onclick="window.location.href='resumo.html?id='+_ligaAtualId" class="font-russo" style="background:linear-gradient(135deg,#f5c842,#e0a800);color:#1a1a1a;border:none;border-radius:10px;padding:10px 22px;font-size:13px;cursor:pointer;letter-spacing:.04em;">🏅 Ver Resumo da Temporada</button>
-        <button id="btn-iniciar-nova-temporada" onclick="iniciarTemporada()" style="display:none;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4);color:#22c55e;border-radius:10px;padding:10px 22px;font-size:13px;font-family:'Russo One',sans-serif;cursor:pointer;">▶️ Iniciar Nova Temporada</button>
-      </div>
     </div>
 
     <!-- TABS -->
@@ -1275,39 +1264,34 @@
         } catch(_) {}
 
         // ── Status da liga ──
-        const aguardando   = liga.status === 'aguardando';
-        const finalizado    = liga.status === 'finalizado';
+        const aguardando    = liga.status === 'aguardando';
         const bannerAguardando = document.getElementById('banner-aguardando');
-        const bannerFinalizado = document.getElementById('banner-finalizado');
-        const btnIniciar       = document.getElementById('btn-iniciar-temporada');
+        const bannerResumo  = document.getElementById('banner-resumo-temp');
+        const btnIniciar    = document.getElementById('btn-iniciar-temporada');
 
-        // ── Banner Aguardando (entre temporadas) ──
-        if (aguardando) {
+        // ✅ CORREÇÃO: banner de resumo tem prioridade sobre o banner de aguardando.
+        // Quando a temporada encerra, o job salva resumo_encerramento e seta status='aguardando'
+        // para abrir a próxima temporada. Sem essa prioridade, o banner dourado nunca aparecia.
+        if (liga.resumo_encerramento) {
+          bannerResumo.style.display   = 'block';
+          bannerAguardando.style.display = 'none';
+          // Botão iniciar aparece pro dono mesmo com resumo (para dar início à nova temporada)
+          if (aguardando && String(liga.dono_id) === String(idLogado)) {
+            btnIniciar.style.display = 'inline-block';
+          }
+        } else if (aguardando) {
+          bannerResumo.style.display   = 'none';
           bannerAguardando.style.display = 'block';
+          // Botão iniciar só aparece pro dono
           if (String(liga.dono_id) === String(idLogado)) {
             btnIniciar.style.display = 'inline-block';
           }
         } else {
           bannerAguardando.style.display = 'none';
+          bannerResumo.style.display     = 'none';
         }
 
-        // ── Banner Liga Finalizada ──
-        if (finalizado) {
-          if (bannerFinalizado) bannerFinalizado.style.display = 'block';
-          // Botão "Iniciar Nova Temporada" só pro dono
-          const btnNova = document.getElementById('btn-iniciar-nova-temporada');
-          if (btnNova && String(liga.dono_id) === String(idLogado)) {
-            btnNova.style.display = 'inline-block';
-          }
-          // Marca como visto só ao clicar, então deixa exibido sem checar localStorage
-        } else {
-          if (bannerFinalizado) bannerFinalizado.style.display = 'none';
-        }
-
-        // Banner resumo temporada (aguardando com resumo de época anterior)
-        const bannerResumo = document.getElementById('banner-resumo-temp');
-        const temResumo = aguardando && liga.resumo_encerramento && !localStorage.getItem(`palpitoo_resumo_visto_${liga.id_liga}`);
-        if (bannerResumo) bannerResumo.style.display = temResumo ? 'block' : 'none';
+        registrarEntrada(liga.id_liga);
         // Exibição da data de entrada é feita após carregar membros (dados da API têm prioridade)
 
         let membros = [];
@@ -1391,5 +1375,11 @@
     });
   </script>
 <script src="palpitoo-extras.js" defer></script>
+<footer style="background-color: var(--bg-header); padding: 40px 20px; text-align: center; border-top: 2px solid var(--borda-divisoria); margin-top: 40px;">
+    <img src="./img/pato.png" alt="Pato Mestre" style="width: 50px; opacity: 0.6; margin-bottom: 15px;">
+    <p class="font-russo" style="color: var(--text-white); font-size: 1.2rem; margin-bottom: 5px;">PalpitoO</p>
+    <p style="color: var(--text-gray); font-size: 0.85rem; font-weight: 600; margin-bottom: 5px;">© 2026. A resenha oficial.</p>
+    <p style="color: var(--accent-cyan); font-size: 0.75rem; font-weight: 700;">Desenvolvido para quem não aguenta mais calcular ponto no ZapZap.</p>
+  </footer>
 </body>
 </html>

@@ -587,10 +587,10 @@
     const maisPalpites = [...ranking].sort((a,b) => (b.total_palpites||0)-(a.total_palpites||0))[0];
 
     const destaques = [
-      { icon: '🎯', label: 'Rei das Cravações', m: maisCravacoes, val: `${maisCravacoes?.acertos_exatos||0} exatos` },
-      { icon: '👁️', label: 'Melhor Leitura',    m: maisResultados, val: `${maisResultados?.acertos_resultado||0} resultados` },
+      { icon: '🎯', label: 'Rei das Cravações', m: maisCravacoes,   val: `${maisCravacoes?.acertos_exatos||0} exatos` },
+      { icon: '👁️', label: 'Melhor Leitura',    m: maisResultados,  val: `${maisResultados?.acertos_resultado||0} resultados` },
       { icon: '🛡️', label: 'Mais Consistente',  m: maisConsistente, val: `${maisConsistente?.erros||0} erros` },
-      { icon: '⚡', label: 'Mais Palpites',      m: maisPalpites, val: `${maisPalpites?.total_palpites||0} palpites` },
+      { icon: '⚡', label: 'Mais Palpites',      m: maisPalpites,    val: `${maisPalpites?.total_palpites||0} palpites` },
     ];
 
     grid.innerHTML = destaques.map(d => {
@@ -650,18 +650,18 @@
     }
 
     try {
-      // Busca dados da liga
+      // Busca dados da liga e ranking em paralelo
       const [resLiga, resRanking] = await Promise.all([
         fetch(`${API}/liga/${ligaId}`),
         fetch(`${API}/ranking-liga/${ligaId}`)
       ]);
 
-      const dadosLiga   = resLiga.ok   ? await resLiga.json()   : {};
+      const dadosLiga    = resLiga.ok    ? await resLiga.json()    : {};
       const dadosRanking = resRanking.ok ? await resRanking.json() : {};
       const liga    = dadosLiga.liga || {};
       const ranking = Array.isArray(dadosRanking) ? dadosRanking : (dadosRanking.ranking || []);
 
-      // Tenta pegar resumo salvo
+      // Tenta pegar resumo salvo no banco (gerado automaticamente ao encerrar temporada)
       let resumo = null;
       try {
         if (liga.resumo_encerramento) {
@@ -684,11 +684,17 @@
           `"${liga.nome}" chegou ao fim. Os pontos foram contados. A história ficou registrada.`;
       }
 
+      // ✅ CORREÇÃO: avisa se a temporada ainda não foi encerrada formalmente
+      if (!liga.resumo_encerramento) {
+        document.getElementById('hero-subtitulo').innerText =
+          `Esta temporada ainda está em andamento. Os dados abaixo são parciais.`;
+      }
+
       // Stats
       document.getElementById('s-participantes').innerText = resumo?.total_participantes || rankingFinal.length || '—';
-      document.getElementById('s-palpites').innerText      = stats.total_palpites       || '—';
-      document.getElementById('s-exatos').innerText        = stats.total_acertos_exatos || rankingFinal.reduce((a,m) => a+(m.acertos_exatos||0),0) || '—';
-      document.getElementById('s-maior').innerText         = stats.maior_pontuacao      || (rankingFinal[0]?.total_pontos || '—');
+      document.getElementById('s-palpites').innerText      = stats.total_palpites        || '—';
+      document.getElementById('s-exatos').innerText        = stats.total_acertos_exatos  || rankingFinal.reduce((a,m) => a+(m.acertos_exatos||0),0) || '—';
+      document.getElementById('s-maior').innerText         = stats.maior_pontuacao       || (rankingFinal[0]?.total_pontos || '—');
 
       // Rodada mais quente
       if (stats.rodada_mais_disputada) {
@@ -702,16 +708,18 @@
       renderDestaques(rankingFinal);
       renderRanking(rankingFinal);
 
-      // Celebração
+      // Celebração visual (só dispara se houver resumo real)
       document.getElementById('loading').classList.add('gone');
-      setTimeout(() => {
-        const flash = document.getElementById('champion-flash');
-        flash.style.display = 'block';
-        setTimeout(() => flash.style.display = 'none', 1200);
-        lancarConfetti();
-      }, 300);
+      if (liga.resumo_encerramento) {
+        setTimeout(() => {
+          const flash = document.getElementById('champion-flash');
+          flash.style.display = 'block';
+          setTimeout(() => flash.style.display = 'none', 1200);
+          lancarConfetti();
+        }, 300);
+      }
 
-      // Marca como visto
+      // Marca como visto no localStorage para controle de badge de notificação
       localStorage.setItem(`palpitoo_resumo_visto_${ligaId}`, '1');
 
     } catch(e) {

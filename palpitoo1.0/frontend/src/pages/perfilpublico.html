@@ -472,14 +472,19 @@
       document.getElementById('nomeUsuario').innerText = data.nome;
       document.getElementById('timeUsuario').innerText = data.time_favorito || '— sem time —';
       if (data.foto_perfil) document.getElementById('fotoPerfil').src = data.foto_perfil;
-      if (data.liga_atual)  document.getElementById('ligaAtual').innerText = data.liga_atual;
+
+      // ✅ CORREÇÃO: liga_atual é um objeto { id_liga, nome }, pegar apenas o .nome
+      if (data.liga_atual) document.getElementById('ligaAtual').innerText = data.liga_atual.nome;
+
+      // ✅ CORREÇÃO: seguidores e seguindo já vêm na resposta de /usuario/:id
+      document.getElementById('contSeguidores').innerText = data.seguidores ?? '0';
+      document.getElementById('contSeguindo').innerText   = data.seguindo   ?? '0';
 
       // Esconde botão de seguir se for o próprio perfil
       if (String(idPerfil) === String(idLogado)) {
         document.getElementById('btnSeguir').style.display = 'none';
       }
 
-      atualizarContadores();
       verificarSeSeguindo();
 
     } catch (e) {
@@ -487,12 +492,14 @@
     }
   }
 
+  // ✅ CORREÇÃO: reutiliza /usuario/:id que já retorna seguidores e seguindo corretamente
+  // (a rota /contadores/:id não existe no back-end)
   async function atualizarContadores() {
     try {
-      const res  = await fetch(`https://palpitoo-api.onrender.com/contadores/${idPerfil}`);
+      const res  = await fetch(`https://palpitoo-api.onrender.com/usuario/${idPerfil}`);
       const data = await res.json();
-      document.getElementById('contSeguidores').innerText = data.seguidores ?? '—';
-      document.getElementById('contSeguindo').innerText   = data.seguindo   ?? '—';
+      document.getElementById('contSeguidores').innerText = data.seguidores ?? '0';
+      document.getElementById('contSeguindo').innerText   = data.seguindo   ?? '0';
     } catch (e) {}
   }
 
